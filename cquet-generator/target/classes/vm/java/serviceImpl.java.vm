@@ -1,0 +1,103 @@
+package ${packageName}.${moduleName}.service.impl;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import ${packageName}.common.core.domain.Result;
+import ${packageName}.${moduleName}.domain.entity.${ClassName}Entity;
+import ${packageName}.${moduleName}.domain.form.${ClassName}Form;
+import ${packageName}.${moduleName}.domain.query.${ClassName}Query;
+import ${packageName}.${moduleName}.domain.vo.${ClassName}Vo;
+import ${packageName}.${moduleName}.mapper.${ClassName}Mapper;
+import ${packageName}.${moduleName}.service.${ClassName}Service;
+import ${packageName}.common.utils.XtPageUtil;
+import ${packageName}.common.utils.bean.BeanUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+/**
+ * ${className}实现类
+ */
+@Service
+@RequiredArgsConstructor
+public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${ClassName}Entity> implements ${ClassName}Service {
+
+    private final ${ClassName}Mapper ${className}Mapper;
+
+    @Override
+    public Result add(${ClassName}Form form) {
+        ${ClassName}Entity entity = new ${ClassName}Entity();
+        BeanUtils.copyProperties(form,entity,"id");
+        if(${className}Mapper.insert(entity)>0){
+            return Result.success("添加成功");
+        }
+        return Result.error("添加失败");
+    }
+
+    @Override
+    public Result update(${ClassName}Form form) {
+        ${ClassName}Entity entity = ${className}Mapper.selectById(form.getId());
+        // 为空抛IllegalArgumentException，做全局异常处理
+        Assert.notNull(entity, "记录不存在");
+        BeanUtils.copyProperties(form, entity);
+        if (${className}Mapper.updateById(entity) > 0) {
+            return Result.success("修改成功");
+        }
+        return Result.error("修改失败");
+    }
+
+    @Override
+    public Result remove(List<String> ids) {
+        if(baseMapper.deleteBatchIds(ids) > 0) {
+            return Result.success("删除成功");
+        }
+        return Result.error("删除失败");
+    }
+
+    @Override
+    public Result page(${ClassName}Query query) {
+        IPage<${ClassName}Entity> page = new LambdaQueryChainWrapper<>(${className}Mapper)
+                .eq(StringUtils.hasText(query.getStatus()),${ClassName}Entity::getStatus,query.getStatus())
+                .orderByDesc(${ClassName}Entity::getCreateTime)
+                .page(XtPageUtil.getPage(query, ${ClassName}Entity.class));
+        List<${ClassName}Vo> vos = page.getRecords().stream()
+                .map(entity -> {
+
+                    ${ClassName}Vo vo = new ${ClassName}Vo();
+                    BeanUtils.copyProperties(entity, vo);
+                    return vo;
+                })
+                .collect(Collectors.toList());
+        return Result.success(vos).putTotal(page.getTotal());
+    }
+
+    @Override
+    public Result detail(String id) {
+        ${ClassName}Entity entity = ${className}Mapper.selectById(id);
+        Assert.notNull(entity,"记录不存在");
+        ${ClassName}Vo vo = new ${ClassName}Vo();
+        BeanUtils.copyProperties(entity, vo);
+        return Result.success().putData(vo);
+    }
+
+    @Override
+    public Result list(${ClassName}Query query) {
+        List<${ClassName}Entity> entities = new LambdaQueryChainWrapper<>(${className}Mapper)
+                .eq(StringUtils.hasText(query.getStatus()),${ClassName}Entity::getStatus, query.getStatus())
+                .orderByDesc(${ClassName}Entity::getCreateTime)
+                .list();
+        List<${ClassName}Vo> vos = entities.stream().map(entity -> {
+                    ${ClassName}Vo vo = new ${ClassName}Vo();
+                    BeanUtils.copyProperties(entity, vo);
+                    return vo;
+                })
+                .collect(Collectors.toList());
+        return Result.success().putData(vos);
+    }
+
+}

@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-DemoApplication<cquet-admin>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "cn.edu.cquet.DemoApplication",
+            "projectName": "cquet-admin",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="cquet-generator" />
+        <module name="cquet-tourism" />
+        <module name="cquet-admin" />
+        <module name="cquet-common" />
+        <module name="cquet-system" />
+        <module name="cquet-framework" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="account-business" target="1.8" />
+      <module name="ceuet-tourism" target="17" />
+      <module name="cquet-quartz" target="1.8" />
+      <module name="cquet-toruism" target="17" />
+      <module name="tourism-backend" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="account-business" options="-parameters" />
+      <module name="ceuet-tourism" options="-parameters" />
+      <module name="cquet-admin" options="-parameters" />
+      <module name="cquet-common" options="-parameters" />
+      <module name="cquet-demo" options="-parameters" />
+      <module name="cquet-framework" options="-parameters" />
+      <module name="cquet-generator" options="-parameters" />
+      <module name="cquet-quartz" options="-parameters" />
+      <module name="cquet-system" options="-parameters" />
+      <module name="cquet-toruism" options="-parameters" />
+      <module name="cquet-tourism" options="-parameters" />
+      <module name="tourism-backend" options="-parameters" />
+    </option>
+  </component>
+</project>

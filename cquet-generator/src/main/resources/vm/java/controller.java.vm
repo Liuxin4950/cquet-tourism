@@ -1,0 +1,66 @@
+package ${packageName}.${moduleName}.controller;
+
+import ${packageName}.${moduleName}.domain.query.${ClassName}Query;
+import ${packageName}.common.core.controller.BaseController;
+import ${packageName}.common.core.domain.Result;
+import ${packageName}.common.core.domain.group.Add;
+import ${packageName}.common.core.domain.group.Update;
+import ${packageName}.${moduleName}.domain.form.${ClassName}Form;
+import ${packageName}.${moduleName}.service.${ClassName}Service;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+/**
+ * ${functionName}接口
+ */
+@Validated
+@RequiredArgsConstructor
+@Tag(name = "${functionName}接口")
+@RestController
+@RequestMapping("/${moduleName}/${businessName}")
+public class ${ClassName}Controller extends BaseController {
+
+    private final ${ClassName}Service ${className}Service;
+
+    @PostMapping
+    @Operation(summary = "添加")
+    public Result add(@RequestBody @Validated(Add.class) ${ClassName}Form form){
+        return ${className}Service.add(form);
+    }
+
+    @PutMapping
+    @Operation(summary = "修改")
+    public Result update(@RequestBody @Validated(Update.class)${ClassName}Form form){
+        return ${className}Service.update(form);
+    }
+
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "批量删除")
+    public Result remove(@PathVariable("ids") @NotEmpty(message = "请选择数据")List<String> ids){
+        return ${className}Service.remove(ids);
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "分页")
+    public Result page(${ClassName}Query query){
+        return ${className}Service.page(query);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "详情")
+    public Result detail(@PathVariable("id")String id){
+        return ${className}Service.detail(id);
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "列表")
+    public Result list(${ClassName}Query query){
+        return ${className}Service.list(query);
+    }
+
+}
