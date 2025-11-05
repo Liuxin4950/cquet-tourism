@@ -72,7 +72,7 @@ spring:
       timeout: 10s
       database: 4
       # 密码
-      password:
+      password: hc
       # 连接超时时间
       lettuce:
         pool:
