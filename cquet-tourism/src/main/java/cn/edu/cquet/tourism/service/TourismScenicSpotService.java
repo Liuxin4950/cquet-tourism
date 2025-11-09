@@ -1,5 +1,6 @@
 package cn.edu.cquet.tourism.service;
 
+<<<<<<< HEAD
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -44,4 +45,13 @@ public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
      * @return    景区信息
      */
     TourismScenicSpot getScenicSpotById(Long id);
+=======
+import com.baomidou.mybatisplus.extension.service.IService;
+
+import cn.edu.cquet.tourism.domain.TourismScenicSpot;
+
+public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
+
+   
+>>>>>>> d4825ad21a028c63c60839ae8d7ab1238da0d4e8
 }
