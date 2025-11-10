@@ -1,7 +1,7 @@
 package cn.edu.cquet.tourism.service;
 
-<<<<<<< HEAD
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
+import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -10,13 +10,11 @@ import java.util.List;
 public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
     
     /**
-     * 根据景区名称、城市、等级查询景区列表
-     * @param name      景区名称
-     * @param city      城市
-     * @param level     景区等级
-     * @return          符合条件的数据
+     * 根据查询条件获取景区列表
+     * @param queryVo 查询条件VO
+     * @return 符合条件的数据
      */
-    List<TourismScenicSpot> getScenicSpotList(String name, String city, String level);
+    List<TourismScenicSpot> getScenicSpotList(TourismScenicSpotQueryVo queryVo);
     
     /**
      * 添加景区
@@ -45,13 +43,4 @@ public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
      * @return    景区信息
      */
     TourismScenicSpot getScenicSpotById(Long id);
-=======
-import com.baomidou.mybatisplus.extension.service.IService;
-
-import cn.edu.cquet.tourism.domain.TourismScenicSpot;
-
-public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
-
-   
->>>>>>> d4825ad21a028c63c60839ae8d7ab1238da0d4e8
 }

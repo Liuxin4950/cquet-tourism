@@ -1,6 +1,7 @@
 package cn.edu.cquet.tourism.service.impl;
 
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
+import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
 import cn.edu.cquet.tourism.mapper.TourismScenicSpotMapper;
 import cn.edu.cquet.tourism.service.TourismScenicSpotService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -18,14 +19,26 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     private TourismScenicSpotMapper tourismScenicSpotMapper;
 
     @Override
-    public List<TourismScenicSpot> getScenicSpotList(String name, String city, String level) {
+    public List<TourismScenicSpot> getScenicSpotList(TourismScenicSpotQueryVo queryVo) {
         // 创建条件构造器
         LambdaQueryWrapper<TourismScenicSpot> queryWrapper = new LambdaQueryWrapper<>();
+        
         // 添加查询条件
-        queryWrapper.like(name != null && !name.isBlank(), TourismScenicSpot::getName, name)
-                .eq(city != null && !city.isBlank(), TourismScenicSpot::getCity, city)
-                .eq(level != null && !level.isBlank(), TourismScenicSpot::getLevel, level)
-                .orderByDesc(TourismScenicSpot::getCreateTime); // 按创建时间降序排列
+        queryWrapper.like(queryVo.getName() != null && !queryVo.getName().isBlank(), 
+                         TourismScenicSpot::getName, queryVo.getName())
+                   .eq(queryVo.getCity() != null && !queryVo.getCity().isBlank(), 
+                       TourismScenicSpot::getCity, queryVo.getCity())
+                   .eq(queryVo.getLevel() != null && !queryVo.getLevel().isBlank(), 
+                       TourismScenicSpot::getLevel, queryVo.getLevel())
+                   .ge(queryVo.getMinTicketPrice() != null, 
+                       TourismScenicSpot::getTicketPrice, queryVo.getMinTicketPrice())
+                   .le(queryVo.getMaxTicketPrice() != null, 
+                       TourismScenicSpot::getTicketPrice, queryVo.getMaxTicketPrice())
+                   .eq(queryVo.getStatus() != null && !queryVo.getStatus().isBlank(), 
+                       TourismScenicSpot::getStatus, queryVo.getStatus())
+                   .eq(TourismScenicSpot::getDelFlag, "0") // 只查询未删除的数据
+                   .orderByDesc(TourismScenicSpot::getCreateTime); // 按创建时间降序排列
+        
         // 调用mapper方法，传入条件构造器，查询数据
         return tourismScenicSpotMapper.selectList(queryWrapper);
     }

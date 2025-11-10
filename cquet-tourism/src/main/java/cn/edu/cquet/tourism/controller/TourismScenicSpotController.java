@@ -4,6 +4,7 @@ import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
 import cn.edu.cquet.common.core.page.TableDataInfo;
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
+import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
 import cn.edu.cquet.tourism.service.TourismScenicSpotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,12 +25,10 @@ public class TourismScenicSpotController extends BaseController {
 
     @GetMapping("/list")
     @Operation(summary = "获取景区列表")
-    public TableDataInfo getList(@RequestParam(required = false) String name,
-                                @RequestParam(required = false) String city,
-                                @RequestParam(required = false) String level) {
+    public TableDataInfo getList(TourismScenicSpotQueryVo queryVo) {
         startPage(); // 分页开始
         // 根据条件查询，查询符合条件的数据
-        List<TourismScenicSpot> list = tourismScenicSpotService.getScenicSpotList(name, city, level);
+        List<TourismScenicSpot> list = tourismScenicSpotService.getScenicSpotList(queryVo);
         // 将数据转换为TableDataInfo对象返回
         return getDataTable(list);
     }
