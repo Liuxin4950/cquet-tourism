@@ -21,7 +21,7 @@ public class TourismScenicSpot extends AbsEntity {
     @TableId(type = IdType.AUTO) // 主键自增
     private Long id;
     
-    @Schema(description = "景点名称") 
+    @Schema(description = "景点名称")
     private String name;
     
     @Schema(description = "景点等级") 

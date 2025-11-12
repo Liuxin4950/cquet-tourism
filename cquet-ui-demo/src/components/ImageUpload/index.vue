@@ -190,7 +190,8 @@ export default {
     },
     // 预览
     handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
+      this.dialogImageUrl += file.url;
+      console.log(this.dialogImageUrl);
       this.dialogVisible = true;
     },
     // 对象转成指定字符串分隔

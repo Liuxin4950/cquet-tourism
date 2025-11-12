@@ -6,12 +6,14 @@ import cn.edu.cquet.tourism.mapper.TourismScenicSpotMapper;
 import cn.edu.cquet.tourism.service.TourismScenicSpotService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 // 继承ServiceImpl类（通用服务层接口的实现类），最后实现service接口规定的方法
 public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotMapper, TourismScenicSpot> implements TourismScenicSpotService {
 
@@ -50,6 +52,7 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         queryWrapper.eq(TourismScenicSpot::getName, scenicSpot.getName());
         List<TourismScenicSpot> list = tourismScenicSpotMapper.selectList(queryWrapper);
         if (!list.isEmpty()) {
+            log.error("该景区已存在");
             return false; // 景区名称已存在
         }
         return tourismScenicSpotMapper.insert(scenicSpot) > 0;
@@ -58,6 +61,7 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     @Override
     public boolean updateScenicSpot(TourismScenicSpot scenicSpot) {
         if (scenicSpot.getId() == null) {
+            log.error("修改时，id不能为空");
             return false;
         }
         // 检查景区名称是否与其他景区重复（排除当前景区）
@@ -66,6 +70,7 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
                 .ne(TourismScenicSpot::getId, scenicSpot.getId());
         List<TourismScenicSpot> list = tourismScenicSpotMapper.selectList(queryWrapper);
         if (!list.isEmpty()) {
+            log.error("该景区已存在");
             return false; // 景区名称已存在
         }
         return tourismScenicSpotMapper.updateById(scenicSpot) > 0;
@@ -74,6 +79,7 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     @Override
     public boolean removeScenicSpotByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
+            log.error("删除时，id不能为空");
             return false;
         }
         return tourismScenicSpotMapper.deleteBatchIds(ids) > 0;
@@ -82,6 +88,7 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     @Override
     public TourismScenicSpot getScenicSpotById(Long id) {
         if (id == null) {
+            log.error("查询时，id不能为空");
             return null;
         }
         return tourismScenicSpotMapper.selectById(id);

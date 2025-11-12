@@ -6,6 +6,7 @@ import cn.edu.cquet.common.core.page.TableDataInfo;
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
 import cn.edu.cquet.tourism.service.TourismScenicSpotService;
+import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

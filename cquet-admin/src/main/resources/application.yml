@@ -5,7 +5,7 @@ cquet:
   # 版本
   version: 1.0.0
   # 文件路径 示例（ Windows配置D:/cquet/uploadPath，Linux配置 /home/cquet/uploadPath）
-  profile: F:\cquet\uploadPath
+  profile: F:\04-课程学习\SpringBoot项目实训\cquet\uploadPath
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数字计算 char 字符验证
