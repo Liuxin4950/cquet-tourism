@@ -74,6 +74,10 @@ Thumbs.db
 logs/
 *.log
 
+# target
+target/
+*.class
+
 # Package Files
 node_modules/
 npm-debug.log*
