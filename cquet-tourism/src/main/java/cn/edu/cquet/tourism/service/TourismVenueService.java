@@ -2,6 +2,7 @@ package cn.edu.cquet.tourism.service;
 
 import cn.edu.cquet.tourism.domain.TourismVenue;
 import com.baomidou.mybatisplus.extension.service.IService;
+import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
 
 import java.util.List;
 import java.util.Map;
@@ -21,4 +22,19 @@ public interface TourismVenueService extends IService<TourismVenue> {
      * @return        操作结果
      */
     boolean addVenue(TourismVenue venue);
+
+    /**
+     * 修改场馆
+     */
+    boolean updateVenue(TourismVenue venue);
+
+    /**
+     * 获取场馆详情（含图片、设施）
+     */
+    VenueDetailVo getDetail(Long id);
+
+    /**
+     * 删除场馆并清理关联
+     */
+    boolean removeVenueByIds(java.util.List<Integer> ids);
 }

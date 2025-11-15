@@ -37,8 +37,8 @@ public class TourismVenue extends AbsEntity {
     @TableField("cover_image")
     private String coverImage;
 
-    @Schema(description = "场馆图片URL列表, 数组")
-    private String imageUrls;
+//    @Schema(description = "场馆图片URL列表, 数组")
+//    private String imageUrls;
 
     @Schema(description = "门票价格")
     // Decimal: BigDecimal，常用于金融，高精度计算
@@ -78,8 +78,8 @@ public class TourismVenue extends AbsEntity {
     @Schema(description = "场馆容纳人数")
     private Integer capacity;
 
-    @Schema(description = "设施信息")
-    private String facilities;
+//    @Schema(description = "设施信息")
+//    private String facilities;
 
     @Schema(description = "是否需要预约")
     @TableField("booking_required")
@@ -95,4 +95,10 @@ public class TourismVenue extends AbsEntity {
 
     @Schema(description = "场馆状态")
     private String status; // 0：正常，1：停用
+
+    @TableField(exist = false)
+    private List<Integer> imageIds;
+
+    @TableField(exist = false)
+    private List<Integer> facilitiesIds;
 }

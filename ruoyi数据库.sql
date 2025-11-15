@@ -327,7 +327,7 @@ CREATE TABLE `sys_logininfor` (
   PRIMARY KEY (`info_id`) USING BTREE,
   KEY `idx_sys_logininfor_s` (`status`) USING BTREE,
   KEY `idx_sys_logininfor_lt` (`login_time`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='系统访问记录';
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='系统访问记录';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -336,7 +336,7 @@ CREATE TABLE `sys_logininfor` (
 
 LOCK TABLES `sys_logininfor` WRITE;
 /*!40000 ALTER TABLE `sys_logininfor` DISABLE KEYS */;
-INSERT INTO `sys_logininfor` VALUES (40,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-27 14:39:41','2025-10-27 14:39:41',0,NULL),(41,'liyuan','127.0.0.1','内网IP','Chrome 14','Windows 10','0','注册成功','2025-10-27 15:12:23','2025-10-27 15:12:23',0,NULL),(42,'admin','127.0.0.1','内网IP','Unknown','Unknown','1','用户不存在/密码错误','2025-10-27 15:12:54','2025-10-27 15:12:54',0,NULL),(43,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-27 15:13:01','2025-10-27 15:13:01',0,NULL),(44,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-27 15:13:26','2025-10-27 15:13:26',0,NULL),(45,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-27 15:15:01','2025-10-27 15:15:01',0,NULL),(46,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-28 15:59:01','2025-10-28 15:59:01',0,NULL),(47,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','退出成功','2025-10-28 16:16:53','2025-10-28 16:16:53',0,NULL),(48,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-28 16:16:55','2025-10-28 16:16:55',0,NULL),(49,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-28 19:44:05','2025-10-28 19:44:05',0,NULL),(50,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-28 19:51:00','2025-10-28 19:51:00',0,NULL),(51,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-29 10:31:22','2025-10-29 10:31:22',0,NULL),(52,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-29 10:49:14','2025-10-29 10:49:14',0,NULL),(53,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-02 18:51:16','2025-11-02 18:51:16',0,NULL),(54,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-03 10:37:01','2025-11-03 10:37:01',0,NULL),(55,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-03 14:21:59','2025-11-03 14:21:59',0,NULL),(56,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-04 16:24:13','2025-11-04 16:24:13',0,NULL),(57,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-09 21:37:49','2025-11-09 21:37:49',0,NULL),(58,'admin','127.0.0.1','内网IP','Mozilla','Windows 10','0','登录成功','2025-11-09 22:08:55','2025-11-09 22:08:55',0,NULL),(59,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-09 22:13:24','2025-11-09 22:13:24',0,NULL),(60,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-11-10 14:00:09','2025-11-10 14:00:09',0,NULL),(61,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-10 15:23:26','2025-11-10 15:23:26',0,NULL),(62,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-11-11 16:10:52','2025-11-11 16:10:52',0,NULL),(63,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-11 18:28:09','2025-11-11 18:28:09',0,NULL),(64,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-11 19:45:08','2025-11-11 19:45:08',0,NULL),(65,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-11 19:54:56','2025-11-11 19:54:56',0,NULL);
+INSERT INTO `sys_logininfor` VALUES (40,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-27 14:39:41','2025-10-27 14:39:41',0,NULL),(41,'liyuan','127.0.0.1','内网IP','Chrome 14','Windows 10','0','注册成功','2025-10-27 15:12:23','2025-10-27 15:12:23',0,NULL),(42,'admin','127.0.0.1','内网IP','Unknown','Unknown','1','用户不存在/密码错误','2025-10-27 15:12:54','2025-10-27 15:12:54',0,NULL),(43,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-27 15:13:01','2025-10-27 15:13:01',0,NULL),(44,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-27 15:13:26','2025-10-27 15:13:26',0,NULL),(45,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-27 15:15:01','2025-10-27 15:15:01',0,NULL),(46,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-28 15:59:01','2025-10-28 15:59:01',0,NULL),(47,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','退出成功','2025-10-28 16:16:53','2025-10-28 16:16:53',0,NULL),(48,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-28 16:16:55','2025-10-28 16:16:55',0,NULL),(49,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-10-28 19:44:05','2025-10-28 19:44:05',0,NULL),(50,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-28 19:51:00','2025-10-28 19:51:00',0,NULL),(51,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-29 10:31:22','2025-10-29 10:31:22',0,NULL),(52,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-10-29 10:49:14','2025-10-29 10:49:14',0,NULL),(53,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-02 18:51:16','2025-11-02 18:51:16',0,NULL),(54,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-03 10:37:01','2025-11-03 10:37:01',0,NULL),(55,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-03 14:21:59','2025-11-03 14:21:59',0,NULL),(56,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-04 16:24:13','2025-11-04 16:24:13',0,NULL),(57,'admin','127.0.0.1','内网IP','Chrome 13','Windows 10','0','登录成功','2025-11-09 21:37:49','2025-11-09 21:37:49',0,NULL),(58,'admin','127.0.0.1','内网IP','Mozilla','Windows 10','0','登录成功','2025-11-09 22:08:55','2025-11-09 22:08:55',0,NULL),(59,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-09 22:13:24','2025-11-09 22:13:24',0,NULL),(60,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-11-10 14:00:09','2025-11-10 14:00:09',0,NULL),(61,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-10 15:23:26','2025-11-10 15:23:26',0,NULL),(62,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-11-11 16:10:52','2025-11-11 16:10:52',0,NULL),(63,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-11 18:28:09','2025-11-11 18:28:09',0,NULL),(64,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-11 19:45:08','2025-11-11 19:45:08',0,NULL),(65,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-11 19:54:56','2025-11-11 19:54:56',0,NULL),(66,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-12 10:53:19','2025-11-12 10:53:19',0,NULL),(67,'liyuan','127.0.0.1','内网IP','Unknown','Unknown','0','登录成功','2025-11-12 10:56:35','2025-11-12 10:56:35',0,NULL),(68,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-11-12 11:37:32','2025-11-12 11:37:32',0,NULL),(69,'admin','127.0.0.1','内网IP','Chrome 14','Windows 10','0','登录成功','2025-11-12 11:37:57','2025-11-12 11:37:57',0,NULL);
 /*!40000 ALTER TABLE `sys_logininfor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -614,7 +614,7 @@ CREATE TABLE `sys_user` (
 
 LOCK TABLES `sys_user` WRITE;
 /*!40000 ALTER TABLE `sys_user` DISABLE KEYS */;
-INSERT INTO `sys_user` VALUES (1,103,'admin','CQUET','00','CQUET@163.com','15888888888','1','','$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2','0','0','127.0.0.1','2025-11-11 16:10:52','admin','2024-09-04 06:22:51',NULL,'2025-11-11 16:10:52','管理员'),(2,105,'ry','测试','00','ry@qq.com','15666666666','1','','$2a$10$TZh50TgviSV8zEftiwy7ZuNHrdw7a.yloDmWLbNSDO1PSTacSvLRG','0','0','127.0.0.1','2025-10-25 21:23:26','admin','2024-09-04 06:22:51',NULL,'2025-10-25 21:23:26','测试员1'),(105,NULL,'liyuan','liyuan','00','','','0','','$2a$10$tgq/ctqpuY/moLaKttk/peQyxTfsy1X7nRW3MVYNCZYIuNvbqfVGK','0','0','127.0.0.1','2025-11-11 19:54:56',NULL,'2025-10-27 15:12:23',NULL,'2025-11-11 19:54:56',NULL);
+INSERT INTO `sys_user` VALUES (1,103,'admin','CQUET','00','CQUET@163.com','15888888888','1','','$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2','0','0','127.0.0.1','2025-11-12 11:37:57','admin','2024-09-04 06:22:51',NULL,'2025-11-12 11:37:57','管理员'),(2,105,'ry','测试','00','ry@qq.com','15666666666','1','','$2a$10$TZh50TgviSV8zEftiwy7ZuNHrdw7a.yloDmWLbNSDO1PSTacSvLRG','0','0','127.0.0.1','2025-10-25 21:23:26','admin','2024-09-04 06:22:51',NULL,'2025-10-25 21:23:26','测试员1'),(105,NULL,'liyuan','liyuan','00','','','0','','$2a$10$tgq/ctqpuY/moLaKttk/peQyxTfsy1X7nRW3MVYNCZYIuNvbqfVGK','0','0','127.0.0.1','2025-11-12 10:56:35',NULL,'2025-10-27 15:12:23',NULL,'2025-11-12 10:56:35',NULL);
 /*!40000 ALTER TABLE `sys_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -811,6 +811,52 @@ LOCK TABLES `tourism_activity_comment` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `tourism_facilities`
+--
+
+DROP TABLE IF EXISTS `tourism_facilities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tourism_facilities` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '设备主键',
+  `facilities` text NOT NULL COMMENT '设备名称',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='设备信息表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tourism_facilities`
+--
+
+LOCK TABLES `tourism_facilities` WRITE;
+/*!40000 ALTER TABLE `tourism_facilities` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tourism_facilities` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tourism_image`
+--
+
+DROP TABLE IF EXISTS `tourism_image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tourism_image` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '图片主键',
+  `image_url` varchar(255) NOT NULL COMMENT '图片URL地址',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='旅游图片信息表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tourism_image`
+--
+
+LOCK TABLES `tourism_image` WRITE;
+/*!40000 ALTER TABLE `tourism_image` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tourism_image` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `tourism_news`
 --
 
@@ -934,6 +980,35 @@ INSERT INTO `tourism_scenic_spot` VALUES (1,'洪崖洞民俗风貌区','AAAA','/
 UNLOCK TABLES;
 
 --
+-- Table structure for table `tourism_scenic_spot_image`
+--
+
+DROP TABLE IF EXISTS `tourism_scenic_spot_image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tourism_scenic_spot_image` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '关联记录主键',
+  `scenic_spot_id` bigint NOT NULL COMMENT '关联的旅游景区ID（外键）',
+  `image_id` int NOT NULL COMMENT '关联的图片ID（外键）',
+  `sort` int DEFAULT '0' COMMENT '图片排序序号',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_venue_image` (`scenic_spot_id`,`image_id`),
+  KEY `image_id` (`image_id`),
+  CONSTRAINT `tourism_scenic_spot_image_ibfk_1` FOREIGN KEY (`scenic_spot_id`) REFERENCES `tourism_scenic_spot` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tourism_scenic_spot_image_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `tourism_image` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='旅游景区-图片关联表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tourism_scenic_spot_image`
+--
+
+LOCK TABLES `tourism_scenic_spot_image` WRITE;
+/*!40000 ALTER TABLE `tourism_scenic_spot_image` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tourism_scenic_spot_image` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `tourism_user_collection`
 --
 
@@ -945,7 +1020,6 @@ CREATE TABLE `tourism_user_collection` (
   `user_id` bigint NOT NULL COMMENT '用户ID',
   `target_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '收藏目标类型（scenic_spot、venue、activity）',
   `target_id` bigint NOT NULL COMMENT '收藏目标ID',
-  `target_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '收藏目标名称',
   `create_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '创建者',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '更新者',
@@ -982,7 +1056,6 @@ CREATE TABLE `tourism_venue` (
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '场馆名称',
   `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '场馆类别（博物馆、图书馆、文化馆、剧院等）',
   `cover_image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '封面图片URL',
-  `image_urls` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '场馆图片URLs，JSON格式存储',
   `ticket_price` decimal(10,2) DEFAULT '0.00' COMMENT '门票价格（0表示免费）',
   `address` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '场馆地址',
   `city` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '所在城市',
@@ -994,7 +1067,6 @@ CREATE TABLE `tourism_venue` (
   `longitude` decimal(10,7) DEFAULT NULL COMMENT '经度',
   `latitude` decimal(10,7) DEFAULT NULL COMMENT '纬度',
   `capacity` int DEFAULT '0' COMMENT '容纳人数',
-  `facilities` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '设施信息，JSON格式存储',
   `booking_required` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '0' COMMENT '是否需要预约（0不需要 1需要）',
   `collection_count` int DEFAULT '0' COMMENT '收藏次数',
   `view_count` int DEFAULT '0' COMMENT '浏览次数',
@@ -1011,7 +1083,7 @@ CREATE TABLE `tourism_venue` (
   KEY `idx_city` (`city`) USING BTREE,
   KEY `idx_status` (`status`) USING BTREE,
   KEY `idx_create_time` (`create_time`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='场馆信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='场馆信息表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1020,8 +1092,66 @@ CREATE TABLE `tourism_venue` (
 
 LOCK TABLES `tourism_venue` WRITE;
 /*!40000 ALTER TABLE `tourism_venue` DISABLE KEYS */;
-INSERT INTO `tourism_venue` VALUES (1,'重庆中国三峡博物馆','博物馆','/images/sanxia_museum_cover.jpg','/images/sanxia_museum_1.jpg,/images/sanxia_museum_2.jpg',0.00,'重庆市渝中区人民路236号','重庆市','渝中区','09:00-17:00（周一闭馆）','023-63679066','http://www.3gmuseum.cn','重庆中国三峡博物馆是首批国家一级博物馆，展示了三峡历史文化和重庆地方历史文化。',106.5584200,29.5562700,2000,'[\"无障碍设施\",\"免费WiFi\",\"语音导览\",\"文创商店\"]','0',0,0,'0','admin','2025-11-02 12:19:13','',NULL,'国家一级博物馆','0'),(2,'重庆图书馆','图书馆','/images/cq_library_cover.jpg','/images/cq_library_1.jpg,/images/cq_library_2.jpg',0.00,'重庆市沙坪坝区凤天大道106号','重庆市','沙坪坝区','09:00-21:00','023-65210070','http://www.cqlib.cn','重庆图书馆是重庆市综合性研究型公共图书馆，为市民提供文献借阅、信息咨询、文化活动等服务。',106.4321000,29.5412000,3000,'[\"自习室\",\"电子阅览室\",\"多媒体室\",\"咖啡厅\"]','1',0,0,'0','admin','2025-11-02 12:19:13','',NULL,'市级综合图书馆','0'),(3,'重庆科技馆','科技馆','',NULL,20.00,'重庆市渝北区黄山大道中段','','','','12345432213','http://www.cqstm.org.cn','重庆科技馆是重庆市重要的科普教育基地',NULL,NULL,0,NULL,'0',0,0,'0','liyuan','2025-11-11 19:07:46','',NULL,NULL,'0'),(4,'场馆名称','场馆类别','封面图片URL',NULL,20.00,'详细地址','','','','13345667788','官方网站','场馆描述',106.1234560,29.1234560,0,NULL,'0',0,0,'1','liyuan','2025-11-11 19:55:34','',NULL,NULL,'0'),(5,'重庆科技馆1','科技馆','http://example.com/images/venue1.jpg',NULL,0.00,'重庆市渝北区黄山大道中段','','','','12345678890','http://www.cqstm.org.cn','重庆科技馆是重庆市重要的科普教育基地',106.1234560,29.1234560,0,NULL,'0',0,0,'1','liyuan','2025-11-11 19:56:37','',NULL,NULL,'0');
+INSERT INTO `tourism_venue` VALUES (1,'重庆中国三峡博物馆','博物馆','/images/sanxia_museum_cover.jpg',0.00,'重庆市渝中区人民路236号','重庆市','渝中区','09:00-17:00（周一闭馆）','023-63679066','http://www.3gmuseum.cn','重庆中国三峡博物馆是首批国家一级博物馆，展示了三峡历史文化和重庆地方历史文化。',106.5584200,29.5562700,2000,'0',0,0,'0','admin','2025-11-02 12:19:13','',NULL,'国家一级博物馆','0'),(2,'重庆图书馆','图书馆','/images/cq_library_cover.jpg',0.00,'重庆市沙坪坝区凤天大道106号','重庆市','沙坪坝区','09:00-21:00','023-65210070','http://www.cqlib.cn','重庆图书馆是重庆市综合性研究型公共图书馆，为市民提供文献借阅、信息咨询、文化活动等服务。',106.4321000,29.5412000,3000,'1',0,0,'0','admin','2025-11-02 12:19:13','',NULL,'市级综合图书馆','0'),(3,'重庆科技馆','科技馆','',20.00,'重庆市渝北区黄山大道中段','','','','12345432213','http://www.cqstm.org.cn','重庆科技馆是重庆市重要的科普教育基地',NULL,NULL,0,'0',0,0,'0','liyuan','2025-11-11 19:07:46','',NULL,NULL,'0'),(4,'场馆名称','场馆类别','封面图片URL',20.00,'详细地址','','','','13345667788','官方网站','场馆描述',106.1234560,29.1234560,0,'0',0,0,'1','liyuan','2025-11-11 19:55:34','',NULL,NULL,'0'),(5,'重庆科技馆1','科技馆','http://example.com/images/venue1.jpg',0.00,'重庆市渝北区黄山大道中段','','','','12345678890','http://www.cqstm.org.cn','重庆科技馆是重庆市重要的科普教育基地',106.1234560,29.1234560,0,'0',0,0,'1','liyuan','2025-11-11 19:56:37','liyuan','2025-11-12 10:57:47',NULL,'2'),(6,'重庆科技馆2','科技馆','http://example.com/images/venue1.jpg',0.00,'重庆市渝北区黄山大道中段','','','','12345678890','http://www.cqstm.org.cn','重庆科技馆是重庆市重要的科普教育基地',106.1234560,29.1234560,0,'0',0,0,'1','liyuan','2025-11-12 10:58:09','',NULL,NULL,'0');
 /*!40000 ALTER TABLE `tourism_venue` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tourism_venue_facilities`
+--
+
+DROP TABLE IF EXISTS `tourism_venue_facilities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tourism_venue_facilities` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '关联记录主键',
+  `venue_id` bigint NOT NULL COMMENT '关联的场馆ID（外键）',
+  `facilities_id` int NOT NULL COMMENT '关联的设备ID（外键）',
+  `sort` int DEFAULT '0' COMMENT '设备排序序号',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_venue_facilities` (`venue_id`,`facilities_id`),
+  KEY `facilities_id` (`facilities_id`),
+  CONSTRAINT `tourism_venue_facilities_ibfk_1` FOREIGN KEY (`venue_id`) REFERENCES `tourism_venue` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tourism_venue_facilities_ibfk_2` FOREIGN KEY (`facilities_id`) REFERENCES `tourism_facilities` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='场馆设备-关联表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tourism_venue_facilities`
+--
+
+LOCK TABLES `tourism_venue_facilities` WRITE;
+/*!40000 ALTER TABLE `tourism_venue_facilities` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tourism_venue_facilities` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tourism_venue_image`
+--
+
+DROP TABLE IF EXISTS `tourism_venue_image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tourism_venue_image` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '关联记录主键',
+  `venue_id` bigint NOT NULL COMMENT '关联的旅游场馆ID（外键）',
+  `image_id` int NOT NULL COMMENT '关联的图片ID（外键）',
+  `sort` int DEFAULT '0' COMMENT '图片排序序号',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_venue_image` (`venue_id`,`image_id`),
+  KEY `image_id` (`image_id`),
+  CONSTRAINT `tourism_venue_image_ibfk_1` FOREIGN KEY (`venue_id`) REFERENCES `tourism_venue` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tourism_venue_image_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `tourism_image` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='旅游场馆-图片关联表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tourism_venue_image`
+--
+
+LOCK TABLES `tourism_venue_image` WRITE;
+/*!40000 ALTER TABLE `tourism_venue_image` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tourism_venue_image` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -1033,4 +1163,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-12 10:46:25
+-- Dump completed on 2025-11-14 16:15:48

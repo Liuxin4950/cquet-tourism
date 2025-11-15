@@ -2,6 +2,7 @@ package cn.edu.cquet.tourism.service;
 
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
+import cn.edu.cquet.tourism.domain.vo.ScenicSpotDetailVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -43,4 +44,9 @@ public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
      * @return    景区信息
      */
     TourismScenicSpot getScenicSpotById(Long id);
+
+    /**
+     * 获取景区详情（含图片等关联）
+     */
+    ScenicSpotDetailVo getDetail(Long id);
 }

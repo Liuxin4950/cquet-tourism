@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -31,9 +32,9 @@ public class TourismScenicSpot extends AbsEntity {
     @TableField("cover_image")
     private String coverImage;
 
-    @Schema(description = "景点图片URL列表") 
-    @TableField("image_urls")
-    private String imageUrls;
+//    @Schema(description = "景点图片URL列表")
+//    @TableField("image_urls")
+//    private String imageUrls;
 
     @Schema(description = "门票价格") 
     @TableField("ticket_price")
@@ -76,4 +77,6 @@ public class TourismScenicSpot extends AbsEntity {
     @TableField("view_count")
     private Integer viewCount;
 
+    @TableField(exist = false)
+    private List<Integer> imageIds;
 }

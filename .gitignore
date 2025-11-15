@@ -1,23 +1,7 @@
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
-
-# Other files and folders
-.settings/
-
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
-
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
-
-# Java & Maven
+# ==============================================
+# 1. 构建产物（后端+前端）
+# ==============================================
+# 后端 Maven
 target/
 *.class
 *.jar
@@ -26,6 +10,26 @@ target/
 *.zip
 *.tar.gz
 *.rar
+# 后端 Gradle
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+build/
+!gradle/wrapper/gradle-wrapper.jar
+# 前端
+dist/
+build/
+out/
+.vite/
+
+# ==============================================
+# 2. 依赖&锁文件
+# ==============================================
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -36,32 +40,77 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
-# IDE - IntelliJ IDEA
+# ==============================================
+# 3. IDE 配置（全IDE覆盖）
+# ==============================================
+# IntelliJ IDEA
 .idea/
+.idea/workspace.xml
+.idea/usage.statistics.xml
+.idea/tasks.xml
+.idea/gradle.xml
 *.iws
 *.iml
 *.ipr
-
-# IDE - Eclipse
+# Eclipse
 .project
 .classpath
 .factorypath
 .settings/
 .loadpath
 .recommenders
-
-# IDE - VS Code
+# VS Code
 .vscode/
-
-# IDE - NetBeans
+.vscode/settings.json
+.vscode/launch.json
+# NetBeans
 nbproject/private/
-build/
 nbbuild/
 dist/
 nbdist/
 .nb-gradle/
 
-# OS generated files
+# ==============================================
+# 4. 配置文件（本地+环境化）
+# ==============================================
+# SpringBoot
+application-*.yml
+application-*.yaml
+application-*.properties
+bootstrap.yml
+bootstrap-*.yml
+bootstrap-*.properties
+!application-example.yml
+!application-example.properties
+!bootstrap-example.yml
+# 前端环境变量
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+# 加密&证书
+*.key
+*.pem
+*.jks
+
+# ==============================================
+# 5. 工具缓存&日志
+# ==============================================
+# 缓存
+.eslintcache
+.prettiercache
+.sonar/
+.sonarlint/
+coverage/
+# 日志
+logs/
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# 临时文件
 .DS_Store
 .DS_Store?
 ._*
@@ -69,40 +118,28 @@ nbdist/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Logs
-logs/
-*.log
-
-# target
-target/
-*.class
-
-# Package Files
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Application specific
-application-*.yml
-application-*.yaml
-application-*.properties
-!application-example.yml
-!application-example.properties
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Temporary files
 *.tmp
+*.tmp.*
 *.bak
+*.bak.*
 *.swp
 *~.nib
 local.properties
 
-# Generated files
-.generated/
+# ==============================================
+# 6. 框架&工具生成文件
+# ==============================================
+# MyBatis
+src/main/resources/mapper/*Mapper.xml.bak
+src/main/java/**/entity/*.java.bak
 generated/
+mybatis-generator/
+# 测试报告
+target/site/
+target/jacoco/
+target/surefire-reports/
+# Docker
+Dockerfile.*.bak
+docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.example.yml

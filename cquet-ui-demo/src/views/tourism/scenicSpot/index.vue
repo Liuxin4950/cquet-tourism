@@ -295,6 +295,8 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <!-- TODO(多表查询改造后恢复)：暂时注释图片上传相关组件 -->
+        <!--
         <el-row>
           <el-col :span="12">
             <el-form-item label="封面图片" prop="coverImage">
@@ -307,6 +309,7 @@
             </el-form-item>
           </el-col>
         </el-row>
+        -->
         <el-row>
           <el-col :span="12">
             <el-form-item label="经度" prop="longitude">
@@ -356,7 +359,8 @@ import {
   updateScenicSpot,
   delScenicSpot,
 } from "@/api/tourism/scenicSpot";
-import ImageUpload from "@/components/ImageUpload";
+// TODO(多表查询改造后恢复)：暂时注释图片上传组件导入
+// import ImageUpload from "@/components/ImageUpload";
 
 // 引入分页组件
 import Pagination from "@/components/Pagination";
@@ -366,7 +370,8 @@ export default {
   // 注册分页组件
   components: {
     Pagination,
-    ImageUpload,
+    // TODO(多表查询改造后恢复)：暂时注释图片上传组件注册
+    // ImageUpload,
   },
   data() {
     return {
@@ -404,8 +409,9 @@ export default {
       open: false,
       // 表单数据
       form: {
-        coverImage: undefined,
-        imageUrls: undefined,
+        // TODO(多表查询改造后恢复)：暂时注释图片相关字段
+        // coverImage: undefined,
+        // imageUrls: undefined,
       },
       // 新增或修改表单的数据校验规则
       rules: {
@@ -424,9 +430,10 @@ export default {
         address: [
           { required: true, message: "景区地址不能为空", trigger: "blur" },
         ],
-        coverImage: [
-          { required: true, message: "封面图片不能为空", trigger: "blur" },
-        ],
+        // TODO(多表查询改造后恢复)：暂时注释封面图片校验规则
+        // coverImage: [
+        //   { required: true, message: "封面图片不能为空", trigger: "blur" },
+        // ],
       },
     };
   },
@@ -501,19 +508,20 @@ export default {
       const scenicSpotId = row.id || this.ids[0];
       getScenicSpot(scenicSpotId).then((response) => {
         this.form = response.data;
-        if (this.form.imageUrls) {
-          try {
-            const imageUrlsArray = JSON.parse(this.form.imageUrls);
-            if (Array.isArray(imageUrlsArray)) {
-              this.form.imageUrls = imageUrlsArray.join(",");
-            } else {
-              this.form.imageUrls = "";
-            }
-          } catch (e) {
-            console.error("Failed to parse imageUrls:", this.form.imageUrls, e);
-            this.form.imageUrls = "";
-          }
-        }
+        // TODO(多表查询改造后恢复)：暂时注释内容图片字段解析逻辑
+        // if (this.form.imageUrls) {
+        //   try {
+        //     const imageUrlsArray = JSON.parse(this.form.imageUrls);
+        //     if (Array.isArray(imageUrlsArray)) {
+        //       this.form.imageUrls = imageUrlsArray.join(",");
+        //     } else {
+        //       this.form.imageUrls = "";
+        //     }
+        //   } catch (e) {
+        //     console.error("Failed to parse imageUrls:", this.form.imageUrls, e);
+        //     this.form.imageUrls = "";
+        //   }
+        // }
         this.open = true;
         this.title = "修改景区信息";
       });
@@ -524,8 +532,9 @@ export default {
         id: undefined,
         name: undefined,
         level: undefined,
-        coverImage: undefined,
-        imageUrls: undefined,
+        // TODO(多表查询改造后恢复)：暂时注释图片相关字段
+        // coverImage: undefined,
+        // imageUrls: undefined,
         ticketPrice: 0,
         address: undefined,
         city: undefined,
@@ -569,11 +578,12 @@ export default {
       this.$refs["form"].validate((valid) => {
         if (valid) {
           const formData = { ...this.form };
-          if (formData.imageUrls && typeof formData.imageUrls === "string") {
-            formData.imageUrls = JSON.stringify(formData.imageUrls.split(","));
-          } else {
-            formData.imageUrls = JSON.stringify([]);
-          }
+          // TODO(多表查询改造后恢复)：暂时注释内容图片序列化逻辑
+          // if (formData.imageUrls && typeof formData.imageUrls === "string") {
+          //   formData.imageUrls = JSON.stringify(formData.imageUrls.split(","));
+          // } else {
+          //   formData.imageUrls = JSON.stringify([]);
+          // }
           if (formData.id != undefined) {
             updateScenicSpot(formData).then((response) => {
               this.$modal.msgSuccess("修改成功");

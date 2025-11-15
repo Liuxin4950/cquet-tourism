@@ -12,6 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import cn.edu.cquet.common.annotation.Log;
+import cn.edu.cquet.common.enums.BusinessType;
+import cn.edu.cquet.tourism.domain.vo.ScenicSpotDetailVo;
 
 import java.util.List;
 
@@ -24,6 +28,7 @@ public class TourismScenicSpotController extends BaseController {
     @Autowired
     private TourismScenicSpotService tourismScenicSpotService;
 
+    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:list')")
     @GetMapping("/list")
     @Operation(summary = "获取景区列表")
     public TableDataInfo getList(TourismScenicSpotQueryVo queryVo) {
@@ -34,19 +39,21 @@ public class TourismScenicSpotController extends BaseController {
         return getDataTable(list);
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:query')")
     @GetMapping("/{id}")
     @Operation(summary = "获取景区信息")
     public Result getInfo(@PathVariable Long id) {
-        TourismScenicSpot scenicSpot = tourismScenicSpotService.getScenicSpotById(id);
-        if (scenicSpot == null) {
+        ScenicSpotDetailVo detail = tourismScenicSpotService.getDetail(id);
+        if (detail == null) {
             return warn("景区不存在");
         }
-        return success(scenicSpot);
+        return success(detail);
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:add')")
+    @Log(title = "A级景区", businessType = BusinessType.INSERT)
     @PostMapping
     @Operation(summary = "新增景区")
-    // @Validated: 新增时，进行实体类的数据校验
     public Result add(@RequestBody @Validated TourismScenicSpot scenicSpot) {
         if (scenicSpot.getId() != null) {
             return warn("新增不需要指定id");
@@ -58,6 +65,8 @@ public class TourismScenicSpotController extends BaseController {
         return success();
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:edit')")
+    @Log(title = "A级景区", businessType = BusinessType.UPDATE)
     @PutMapping
     @Operation(summary = "修改景区")
     public Result update(@RequestBody @Validated TourismScenicSpot scenicSpot) {
@@ -71,6 +80,8 @@ public class TourismScenicSpotController extends BaseController {
         return success();
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:remove')")
+    @Log(title = "A级景区", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除景区")
     public Result remove(@PathVariable List<Long> ids) {

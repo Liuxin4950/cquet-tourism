@@ -1,7 +1,6 @@
 package cn.edu.cquet.tourism.controller;
 
 import cn.edu.cquet.common.core.controller.BaseController;
-import cn.edu.cquet.common.core.domain.R;
 import cn.edu.cquet.common.core.domain.Result;
 import cn.edu.cquet.common.core.page.TableDataInfo;
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
@@ -15,6 +14,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import cn.edu.cquet.common.annotation.Log;
+import cn.edu.cquet.common.enums.BusinessType;
+import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
 
 import java.util.List;
 
@@ -26,6 +29,7 @@ public class tourismVenueController extends BaseController {
     @Autowired
     private TourismVenueService tourismVenueService;
 
+    @PreAuthorize("@ss.hasPermi('tourism:venue:list')")
     @GetMapping("/list")
     @Operation(summary = "获取场馆列表")
     public TableDataInfo getList(@Param("name") String name, @Param("address") String address) {
@@ -36,16 +40,19 @@ public class tourismVenueController extends BaseController {
         return getDataTable(list);
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:venue:query')")
     @GetMapping("/{id}")
     @Operation(summary = "获取场馆信息")
     public Result getInfo(@PathVariable Long id) {
-        TourismVenue venue = tourismVenueService.getById(id);
+        VenueDetailVo venue = tourismVenueService.getDetail(id);
         if (venue == null) {
             return warn("场馆不存在");
         }
         return success(venue);
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:venue:add')")
+    @Log(title = "场馆管理", businessType = BusinessType.INSERT)
     @PostMapping
     @Operation(summary = "新增场馆")
     public Result add(@RequestBody @Validated TourismVenue venue) {
@@ -55,10 +62,22 @@ public class tourismVenueController extends BaseController {
         return toAjax(tourismVenueService.addVenue(venue));
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:venue:edit')")
+    @Log(title = "场馆管理", businessType = BusinessType.UPDATE)
+    @PutMapping
+    @Operation(summary = "修改场馆")
+    public Result edit(@RequestBody @Validated TourismVenue venue) {
+        if (venue.getId() == null) {
+            return warn("修改时，id不能为空");
+        }
+        return toAjax(tourismVenueService.updateVenue(venue));
+    }
+
+    @PreAuthorize("@ss.hasPermi('tourism:venue:remove')")
+    @Log(title = "场馆管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除场馆")
-    public Result remove(@RequestBody List<Integer> ids) {
-        // 将删除的结果转换为Result对象返回
-        return toAjax(tourismVenueService.removeByIds(ids));
+    public Result remove(@PathVariable List<Integer> ids) {
+        return toAjax(tourismVenueService.removeVenueByIds(ids));
     }
 }
