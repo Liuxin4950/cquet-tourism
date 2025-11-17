@@ -30,6 +30,13 @@ import cn.edu.cquet.tourism.mapper.TourismActivityMapper;
 
 @Slf4j
 @Service
+/**
+ * 场馆服务实现
+ *
+ * 说明：
+ * - 继承 MyBatis-Plus `ServiceImpl`，实现 `TourismVenueService` 业务方法。
+ * - 维护与图片、设施、活动的多表关联关系。
+ */
 public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, TourismVenue> implements TourismVenueService {
 
     @Autowired
@@ -51,7 +58,10 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
     private TourismActivityMapper activityMapper;
 
     @Override
-    // 根据名称和地址查询场馆列表
+    /**
+     * 根据名称和地址查询场馆列表
+     * 条件：名称、地址支持模糊；仅查询未删除的数据
+     */
     public List<TourismVenue> getVenueByNameAndAddress(String name, String address) {
         // 创建条件构造器
         LambdaQueryWrapper<TourismVenue> queryWrapper = new LambdaQueryWrapper<>();
@@ -65,6 +75,10 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 新增场馆
+     * 规则：名称唯一；保存主表后同步图片与设施关联关系
+     */
     public boolean addVenue(TourismVenue venue) {
         LambdaQueryWrapper<TourismVenue> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(TourismVenue::getName, venue.getName());
@@ -96,6 +110,10 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 更新场馆
+     * 规则：排除自身后名称唯一；更新主表；若携带 `imageIds`/`facilitiesIds`，先清理旧关联再重建
+     */
     public boolean updateVenue(TourismVenue venue) {
         if (venue.getId() == null) return false;
         LambdaQueryWrapper<TourismVenue> q = new LambdaQueryWrapper<>();
@@ -132,6 +150,10 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
     }
 
     @Override
+    /**
+     * 场馆详情
+     * 内容：主表信息 + 图片列表 + 设施列表
+     */
     public VenueDetailVo getDetail(Long id) {
         TourismVenue v = tourismVenueMapper.selectById(id);
         if (v == null) return null;
@@ -158,6 +180,10 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
         return vo;
     }
 
+    /**
+     * 查询场馆下的活动列表
+     * 条件：未删除、审核通过、状态正常；按创建时间倒序
+     */
     public List<TourismActivity> getActivitiesByVenueId(Integer venueId) {
         LambdaQueryWrapper<TourismActivity> qw = new LambdaQueryWrapper<>();
         qw.eq(TourismActivity::getVenueId, venueId)
@@ -170,6 +196,10 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 批量删除场馆
+     * 步骤：删除图片与设施的关联；批量逻辑删除主表
+     */
     public boolean removeVenueByIds(List<Integer> ids) {
         if (ids == null || ids.isEmpty()) return false;
         LambdaQueryWrapper<TourismVenueImage> del1 = new LambdaQueryWrapper<>();

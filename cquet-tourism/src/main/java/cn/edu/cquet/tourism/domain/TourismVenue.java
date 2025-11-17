@@ -21,6 +21,14 @@ import java.util.List;
 @Schema(description = "场馆信息") // 描述
 @EqualsAndHashCode(callSuper = true) // 继承父类属性, 重写所有equals和hashCode方法
 @Data
+/**
+ * 场馆实体
+ *
+ * 说明：
+ * - 继承抽象实体 `AbsEntity`，包含通用审计字段。
+ * - 与图片通过 `tourism_venue_image` 建立关联；与设施通过 `tourism_venue_facilities` 建立关联。
+ * - 业务层通过 `imageIds`、`facilitiesIds` 辅助批量绑定关联。
+ */
 public class TourismVenue extends AbsEntity {
     @Schema(description = "主键，整型")
     @TableId(type = IdType.AUTO) // 主键自增

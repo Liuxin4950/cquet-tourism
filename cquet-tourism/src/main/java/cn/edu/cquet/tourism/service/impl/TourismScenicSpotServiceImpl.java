@@ -21,7 +21,14 @@ import java.util.List;
 
 @Service
 @Slf4j
-// 继承ServiceImpl类（通用服务层接口的实现类），最后实现service接口规定的方法
+/**
+ * 景区服务实现
+ *
+ * 说明：
+ * - 继承 MyBatis-Plus `ServiceImpl`，封装了基础的 CRUD 能力；同时实现 `TourismScenicSpotService` 自定义方法。
+ * - 使用 `LambdaQueryWrapper` 构造类型安全的查询条件。
+ * - 通过 `@Transactional` 保证新增/修改/删除的原子性（含多表关联关系维护）。
+ */
 public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotMapper, TourismScenicSpot> implements TourismScenicSpotService {
 
     @Autowired
@@ -34,6 +41,10 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     private TourismImageMapper imageMapper;
 
     @Override
+    /**
+     * 按条件分页查询景区列表
+     * 条件：名称模糊、城市精确、等级精确、票价区间、状态、未删除；按创建时间倒序
+     */
     public List<TourismScenicSpot> getScenicSpotList(TourismScenicSpotQueryVo queryVo) {
         // 创建条件构造器
         LambdaQueryWrapper<TourismScenicSpot> queryWrapper = new LambdaQueryWrapper<>();
@@ -60,6 +71,10 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 新增景区
+     * 规则：名称唯一；保存主表后根据 `imageIds` 建立关联关系
+     */
     public boolean addScenicSpot(TourismScenicSpot scenicSpot) {
         LambdaQueryWrapper<TourismScenicSpot> queryWrapper = new LambdaQueryWrapper<>();
         // 判断景区名称是否重复
@@ -84,6 +99,10 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 更新景区
+     * 规则：排除自身后名称唯一；更新主表；若携带 `imageIds`，先清理旧关联再批量建立新关联
+     */
     public boolean updateScenicSpot(TourismScenicSpot scenicSpot) {
         if (scenicSpot.getId() == null) {
             log.error("修改时，id不能为空");
@@ -116,6 +135,10 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 批量删除景区
+     * 步骤：删除图片关联；批量逻辑删除主表
+     */
     public boolean removeScenicSpotByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             log.error("删除时，id不能为空");
@@ -130,6 +153,9 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     }
 
     @Override
+    /**
+     * 按主键查询景区
+     */
     public TourismScenicSpot getScenicSpotById(Long id) {
         if (id == null) {
             log.error("查询时，id不能为空");
@@ -139,6 +165,10 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     }
 
     @Override
+    /**
+     * 景区详情
+     * 内容：主表信息 + 关联图片列表
+     */
     public ScenicSpotDetailVo getDetail(Long id) {
         TourismScenicSpot spot = getScenicSpotById(id);
         if (spot == null) return null;

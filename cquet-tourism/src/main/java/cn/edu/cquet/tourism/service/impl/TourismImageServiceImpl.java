@@ -13,6 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+/**
+ * 图片服务实现
+ *
+ * 说明：仅维护图片基础记录（URL），不涉及文件存储；提供单条与批量创建、查询与删除。
+ */
 public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, TourismImage> implements TourismImageService {
 
     @Autowired
@@ -20,6 +25,10 @@ public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, Tou
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 创建单条图片记录
+     * 约束：`url` 必填
+     */
     public TourismImage create(TourismImage image) {
         if (image == null || !StringUtils.hasText(image.getUrl())) {
             return null;
@@ -30,6 +39,10 @@ public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, Tou
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 批量创建图片记录
+     * 规则：忽略空 URL
+     */
     public List<TourismImage> createBatch(List<String> urls) {
         List<TourismImage> result = new ArrayList<>();
         if (urls == null || urls.isEmpty()) {
@@ -50,6 +63,9 @@ public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, Tou
     }
 
     @Override
+    /**
+     * 按主键查询图片记录
+     */
     public TourismImage getById(Integer id) {
         if (id == null) {
             return null;
@@ -59,6 +75,9 @@ public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, Tou
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 批量删除图片记录
+     */
     public boolean removeByIds(List<Integer> ids) {
         if (ids == null || ids.isEmpty()) {
             return false;

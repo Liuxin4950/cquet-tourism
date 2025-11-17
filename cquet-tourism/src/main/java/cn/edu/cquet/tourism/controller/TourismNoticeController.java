@@ -17,6 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("tourism/notice")
 @Tag(name = "通知公告管理")
+/**
+ * 通知公告管理接口层
+ *
+ * 说明：提供公告的列表、详情、创建、修改与删除。
+ */
 public class TourismNoticeController extends BaseController {
 
     @Autowired
@@ -24,6 +29,11 @@ public class TourismNoticeController extends BaseController {
 
     @GetMapping("/list")
     @Operation(summary = "获取通知公告列表（按标题与时间区间）")
+    /**
+     * 列表查询
+     * 入参：`TourismNewsVo`（标题、起止时间）
+     * 返回：分页 `TableDataInfo`
+     */
     public TableDataInfo list(TourismNewsVo queryData) {
         startPage();
         List<TourismNotice> list = noticeService.getByTitleAndTime(queryData.getTitle(), queryData.getStartDate(), queryData.getEndDate());
@@ -32,12 +42,20 @@ public class TourismNoticeController extends BaseController {
 
     @GetMapping("/{id}")
     @Operation(summary = "获取通知公告详情")
+    /**
+     * 详情查询
+     * 入参：路径参数 `id`
+     */
     public Result detail(@PathVariable Integer id) {
         return success(noticeService.getById(id));
     }
 
     @PostMapping
     @Operation(summary = "新增通知公告（标题、内容、发布时间）")
+    /**
+     * 新增
+     * 约束：新增无需指定 `id`
+     */
     public Result add(@RequestBody @Validated TourismNotice notice) {
         if (notice.getId() != null) return warn("新增不需要指定id");
         return toAjax(noticeService.addNotice(notice));
@@ -45,6 +63,10 @@ public class TourismNoticeController extends BaseController {
 
     @PutMapping
     @Operation(summary = "修改通知公告")
+    /**
+     * 修改
+     * 约束：必须指定 `id`
+     */
     public Result edit(@RequestBody @Validated TourismNotice notice) {
         if (notice.getId() == null) return warn("修改时，id不能为空");
         return toAjax(noticeService.updateById(notice));
@@ -52,6 +74,10 @@ public class TourismNoticeController extends BaseController {
 
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除通知公告")
+    /**
+     * 删除
+     * 入参：路径参数 `ids`
+     */
     public Result remove(@PathVariable List<Integer> ids) {
         return toAjax(noticeService.removeBatchByIds(ids));
     }

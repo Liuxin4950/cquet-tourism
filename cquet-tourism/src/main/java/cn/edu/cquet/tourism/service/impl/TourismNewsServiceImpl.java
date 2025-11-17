@@ -11,13 +11,21 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-// 继承ServiceImpl类（通用服务层接口的实现类），最后实现service接口规定的方法
+/**
+ * 新闻服务实现
+ *
+ * 说明：继承 MyBatis-Plus `ServiceImpl`，实现新闻的查询与新增。
+ */
 public class TourismNewsServiceImpl extends ServiceImpl<TourismNewsMapper, TourismNews> implements TourismNewsService {
 
     @Autowired
     private TourismNewsMapper tourismNewsMapper;
 
     @Override
+    /**
+     * 列表查询
+     * 条件：标题模糊；创建时间在起止范围之间
+     */
     public List<TourismNews> getNewsByTitleAndTime(String title, String StartTime, String EndTime) {
         // 创建条件构造器
         LambdaQueryWrapper<TourismNews> queryWrapper = new LambdaQueryWrapper<>();
@@ -29,6 +37,10 @@ public class TourismNewsServiceImpl extends ServiceImpl<TourismNewsMapper, Touri
     }
 
     @Override
+    /**
+     * 新增新闻
+     * 规则：标题唯一
+     */
     public boolean addNews(TourismNews news) {
         LambdaQueryWrapper<TourismNews> queryWrapper = new LambdaQueryWrapper<>();
         // 判断title是否重复

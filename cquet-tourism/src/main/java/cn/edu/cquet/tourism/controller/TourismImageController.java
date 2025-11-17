@@ -18,6 +18,14 @@ import java.util.List;
 @RestController
 @RequestMapping("tourism/images")
 @Tag(name = "图片管理")
+/**
+ * 图片管理接口层
+ *
+ * 说明：
+ * - 负责图片记录的新增、批量新增、查询与删除。
+ * - 图片仅保存 URL 等基础信息，具体文件存储由外部系统负责。
+ * - 统一使用 `Result` 封装返回，权限与日志按注解控制。
+ */
 public class TourismImageController extends BaseController {
 
     @Autowired
@@ -27,6 +35,14 @@ public class TourismImageController extends BaseController {
     @Log(title = "图片管理", businessType = BusinessType.INSERT)
     @PostMapping
     @Operation(summary = "新增图片记录（保存URL）")
+    /**
+     * 新增单条图片记录
+     *
+     * 路径：`POST /tourism/images`
+     * 权限：`tourism:image:add`
+     * 入参：请求体 `TourismImage`（至少包含 `url`）
+     * 返回：创建后的记录
+     */
     public Result add(@RequestBody @Validated TourismImage image) {
         if (image == null || image.getUrl() == null || image.getUrl().isBlank()) {
             return warn("图片URL不能为空");
@@ -42,6 +58,14 @@ public class TourismImageController extends BaseController {
     @Log(title = "图片管理", businessType = BusinessType.INSERT)
     @PostMapping("/batch")
     @Operation(summary = "批量新增图片记录（URL列表）")
+    /**
+     * 批量新增图片记录
+     *
+     * 路径：`POST /tourism/images/batch`
+     * 权限：`tourism:image:add`
+     * 入参：请求体为 URL 字符串列表
+     * 返回：创建成功的图片记录列表
+     */
     public Result addBatch(@RequestBody List<String> urls) {
         List<TourismImage> created = imageService.createBatch(urls);
         return success(created);
@@ -50,6 +74,14 @@ public class TourismImageController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:image:query')")
     @GetMapping("/{id}")
     @Operation(summary = "查询图片记录")
+    /**
+     * 根据主键查询图片记录
+     *
+     * 路径：`GET /tourism/images/{id}`
+     * 权限：`tourism:image:query`
+     * 入参：路径参数 `id`
+     * 返回：图片记录，不存在则返回警告
+     */
     public Result get(@PathVariable Integer id) {
         TourismImage img = imageService.getById(id);
         if (img == null) {
@@ -62,6 +94,14 @@ public class TourismImageController extends BaseController {
     @Log(title = "图片管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除图片记录")
+    /**
+     * 删除图片记录
+     *
+     * 路径：`DELETE /tourism/images/{ids}`
+     * 权限：`tourism:image:remove`
+     * 入参：路径参数 `ids`
+     * 返回：统一 `Result`
+     */
     public Result remove(@PathVariable List<Integer> ids) {
         return toAjax(imageService.removeByIds(ids));
     }

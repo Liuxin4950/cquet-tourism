@@ -14,12 +14,21 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 @Service
+/**
+ * 特色活动服务实现
+ *
+ * 说明：提供活动的列表、详情、状态更新、创建与修改、审核通过/不通过等业务。
+ */
 public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMapper, TourismActivity> implements TourismActivityService {
 
     @Autowired
     private TourismActivityMapper activityMapper;
 
     @Override
+    /**
+     * 列表查询
+     * 条件：名称模糊、场馆、审核状态；仅查询未删除；按创建时间降序
+     */
     public List<TourismActivity> list(String name, Integer venueId, String auditStatus) {
         LambdaQueryWrapper<TourismActivity> qw = new LambdaQueryWrapper<>();
         String as = normalizeAuditStatus(auditStatus);
@@ -32,6 +41,9 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
     }
 
     @Override
+    /**
+     * 详情查询
+     */
     public TourismActivity detail(Long id) {
         if (id == null) return null;
         return activityMapper.selectById(id);
@@ -39,6 +51,9 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 更新活动状态
+     */
     public boolean updateStatus(Long id, String status) {
         if (id == null || !StringUtils.hasText(status)) return false;
         TourismActivity a = new TourismActivity();
@@ -49,6 +64,10 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 新增活动
+     * 默认审核状态：`0`（待审核）
+     */
     public boolean create(TourismActivity activity) {
         if (activity == null) return false;
         String as = normalizeAuditStatus(activity.getAuditStatus());
@@ -58,6 +77,9 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 更新活动
+     */
     public boolean update(TourismActivity activity) {
         if (activity == null || activity.getId() == null) return false;
         String as = normalizeAuditStatus(activity.getAuditStatus());
@@ -67,6 +89,10 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 审核通过
+     * 效果：审核状态=通过、活动状态=正常；记录审核意见/人/时间
+     */
     public boolean approve(Long id, String opinion) {
         if (id == null) return false;
         TourismActivity exist = activityMapper.selectById(id);
@@ -84,6 +110,10 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 审核不通过
+     * 效果：审核状态=不通过；记录原因、审核人与时间
+     */
     public boolean reject(Long id, String reason) {
         if (id == null || !StringUtils.hasText(reason)) return false;
         TourismActivity exist = activityMapper.selectById(id);
@@ -98,6 +128,10 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
         return rows > 0;
     }
 
+    /**
+     * 审核状态归一化
+     * 支持中英文与数字混写：`pending/approved/rejected` 或 `0/1/2`
+     */
     private String normalizeAuditStatus(String s) {
         if (!StringUtils.hasText(s)) return null;
         String v = s.trim().toLowerCase();

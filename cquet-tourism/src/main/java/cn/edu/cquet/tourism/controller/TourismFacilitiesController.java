@@ -25,6 +25,14 @@ import java.util.List;
 @Tag(name = "设备设施管理", description = "设备设施管理接口")
 @RestController
 @RequestMapping("/tourism/facilities")
+/**
+ * 设备设施管理接口层
+ *
+ * 说明：
+ * - 提供设施的列表查询、详情、增删改接口。
+ * - 继承 `BaseController`，统一分页与返回封装。
+ * - 权限通过 `@PreAuthorize` 控制，日志通过 `@Log` 记录。
+ */
 public class TourismFacilitiesController extends BaseController {
 
     @Autowired
@@ -33,6 +41,14 @@ public class TourismFacilitiesController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:facilities:list')")
     @GetMapping("/list")
     @Operation(summary = "获取设备设施列表")
+    /**
+     * 列表查询
+     *
+     * 路径：`GET /tourism/facilities/list`
+     * 权限：`tourism:facilities:list`
+     * 入参：可选参数 `facilitiesName`（按名称模糊查询）
+     * 返回：分页表格数据 `TableDataInfo`
+     */
     public TableDataInfo getList(@RequestParam(value = "facilitiesName", required = false) String facilitiesName) {
         startPage(); // 分页开始
         List<TourismFacilities> list = tourismFacilitiesService.getFacilitiesListByName(facilitiesName);
@@ -42,6 +58,14 @@ public class TourismFacilitiesController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:facilities:query')")
     @GetMapping("/{id}")
     @Operation(summary = "获取设备设施信息")
+    /**
+     * 详情查询
+     *
+     * 路径：`GET /tourism/facilities/{id}`
+     * 权限：`tourism:facilities:query`
+     * 入参：路径参数 `id`
+     * 返回：统一 `Result`
+     */
     public Result getInfo(@PathVariable Integer id) {
         return success(tourismFacilitiesService.getById(id));
     }

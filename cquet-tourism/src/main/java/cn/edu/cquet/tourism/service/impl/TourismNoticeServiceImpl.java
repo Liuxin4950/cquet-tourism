@@ -11,12 +11,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+/**
+ * 通知公告服务实现
+ */
 public class TourismNoticeServiceImpl extends ServiceImpl<TourismNoticeMapper, TourismNotice> implements TourismNoticeService {
 
     @Autowired
     private TourismNoticeMapper noticeMapper;
 
     @Override
+    /**
+     * 列表查询
+     * 条件：标题模糊 + 创建时间范围
+     */
     public List<TourismNotice> getByTitleAndTime(String title, String startTime, String endTime) {
         LambdaQueryWrapper<TourismNotice> qw = new LambdaQueryWrapper<>();
         qw.like(title != null && !title.isBlank(), TourismNotice::getTitle, title)
@@ -26,6 +33,10 @@ public class TourismNoticeServiceImpl extends ServiceImpl<TourismNoticeMapper, T
     }
 
     @Override
+    /**
+     * 新增公告
+     * 规则：标题唯一
+     */
     public boolean addNotice(TourismNotice notice) {
         LambdaQueryWrapper<TourismNotice> qw = new LambdaQueryWrapper<>();
         qw.eq(TourismNotice::getTitle, notice.getTitle());

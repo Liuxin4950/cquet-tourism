@@ -23,6 +23,16 @@ import java.util.List;
 @RequestMapping("tourism/scenic-spot")
 // API 文档注解
 @Tag(name = "A级景区管理")
+/**
+ * A级景区管理接口层
+ *
+ * 说明：
+ * - 负责处理景区相关的增删改查 HTTP 请求。
+ * - 继承 `BaseController`，可直接使用分页 `startPage()`、封装表格数据 `getDataTable(...)`、统一返回封装 `success()/warn()/toAjax(...)` 等便捷方法。
+ * - 通过 `@PreAuthorize` 控制权限，如 `tourism:scenic-spot:list` 表示具有“景区列表”权限方可访问。
+ * - 通过 `@Log` 记录业务日志，`BusinessType` 指定操作类型（新增、修改、删除）。
+ * - 使用 `@Operation`、`@Tag` 生成接口文档说明。
+ */
 public class TourismScenicSpotController extends BaseController {
 
     @Autowired
@@ -31,6 +41,14 @@ public class TourismScenicSpotController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:list')")
     @GetMapping("/list")
     @Operation(summary = "获取景区列表")
+    /**
+     * 列表查询
+     *
+     * 路径：`GET /tourism/scenic-spot/list`
+     * 权限：`tourism:scenic-spot:list`
+     * 入参：`TourismScenicSpotQueryVo`（名称、城市、等级、票价范围、状态等条件）
+     * 返回：`TableDataInfo` 表格数据（包含分页总数与当前页数据）
+     */
     public TableDataInfo getList(TourismScenicSpotQueryVo queryVo) {
         startPage(); // 分页开始
         // 根据条件查询，查询符合条件的数据
@@ -42,6 +60,14 @@ public class TourismScenicSpotController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:query')")
     @GetMapping("/{id}")
     @Operation(summary = "获取景区信息")
+    /**
+     * 详情查询
+     *
+     * 路径：`GET /tourism/scenic-spot/{id}`
+     * 权限：`tourism:scenic-spot:query`
+     * 入参：路径参数 `id`
+     * 返回：`Result` 包装的 `ScenicSpotDetailVo`，为空则返回警告“景区不存在”
+     */
     public Result getInfo(@PathVariable Long id) {
         ScenicSpotDetailVo detail = tourismScenicSpotService.getDetail(id);
         if (detail == null) {
@@ -54,6 +80,15 @@ public class TourismScenicSpotController extends BaseController {
     @Log(title = "A级景区", businessType = BusinessType.INSERT)
     @PostMapping
     @Operation(summary = "新增景区")
+    /**
+     * 新增
+     *
+     * 路径：`POST /tourism/scenic-spot`
+     * 权限：`tourism:scenic-spot:add`
+     * 入参：请求体 `TourismScenicSpot`
+     * 约束：新增无需指定 `id`
+     * 返回：成功/失败统一封装 `Result`
+     */
     public Result add(@RequestBody @Validated TourismScenicSpot scenicSpot) {
         if (scenicSpot.getId() != null) {
             return warn("新增不需要指定id");
@@ -69,6 +104,15 @@ public class TourismScenicSpotController extends BaseController {
     @Log(title = "A级景区", businessType = BusinessType.UPDATE)
     @PutMapping
     @Operation(summary = "修改景区")
+    /**
+     * 修改
+     *
+     * 路径：`PUT /tourism/scenic-spot`
+     * 权限：`tourism:scenic-spot:edit`
+     * 入参：请求体 `TourismScenicSpot`
+     * 约束：修改必须指定 `id`
+     * 返回：成功/失败统一封装 `Result`
+     */
     public Result update(@RequestBody @Validated TourismScenicSpot scenicSpot) {
         if (scenicSpot.getId() == null) {
             return warn("修改时，id不能为空");
@@ -84,6 +128,14 @@ public class TourismScenicSpotController extends BaseController {
     @Log(title = "A级景区", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除景区")
+    /**
+     * 删除
+     *
+     * 路径：`DELETE /tourism/scenic-spot/{ids}`
+     * 权限：`tourism:scenic-spot:remove`
+     * 入参：路径参数 `ids`（多个 id 用逗号分隔，由框架自动转为 `List<Long>`）
+     * 返回：成功/失败统一封装 `Result`
+     */
     public Result remove(@PathVariable List<Long> ids) {
         // 将删除的结果转换为Result对象返回
         boolean result = tourismScenicSpotService.removeScenicSpotByIds(ids);

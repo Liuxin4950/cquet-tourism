@@ -25,6 +25,15 @@ import java.util.List;
 @RestController
 @RequestMapping("tourism/venue")
 @Tag(name = "场馆信息")
+/**
+ * 场馆信息接口层
+ *
+ * 说明：
+ * - 提供场馆的增删改查、详情与活动列表查询等接口。
+ * - 继承 `BaseController`，统一分页、返回格式与Ajax结果转换。
+ * - 使用 `@PreAuthorize` 控制权限，`@Log` 记录操作日志。
+ * - 通过 `@Operation` 与 `@Tag` 输出接口文档。
+ */
 public class tourismVenueController extends BaseController {
 
     @Autowired
@@ -33,6 +42,14 @@ public class tourismVenueController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:venue:list')")
     @GetMapping("/list")
     @Operation(summary = "获取场馆列表")
+    /**
+     * 列表查询
+     *
+     * 路径：`GET /tourism/venue/list`
+     * 权限：`tourism:venue:list`
+     * 入参：`name`、`address`（均为可选模糊查询条件）
+     * 返回：分页表格数据 `TableDataInfo`
+     */
     public TableDataInfo getList(@Param("name") String name, @Param("address") String address) {
         startPage(); // 分页开始
         // 根据条件查询，查询符合条件的数据
@@ -44,6 +61,14 @@ public class tourismVenueController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:venue:query')")
     @GetMapping("/{id}")
     @Operation(summary = "获取场馆信息")
+    /**
+     * 详情查询
+     *
+     * 路径：`GET /tourism/venue/{id}`
+     * 权限：`tourism:venue:query`
+     * 入参：路径参数 `id`
+     * 返回：`Result` 包装的 `VenueDetailVo`，为空则返回警告“场馆不存在”
+     */
     public Result getInfo(@PathVariable Long id) {
         VenueDetailVo venue = tourismVenueService.getDetail(id);
         if (venue == null) {
@@ -56,6 +81,15 @@ public class tourismVenueController extends BaseController {
     @Log(title = "场馆管理", businessType = BusinessType.INSERT)
     @PostMapping
     @Operation(summary = "新增场馆")
+    /**
+     * 新增
+     *
+     * 路径：`POST /tourism/venue`
+     * 权限：`tourism:venue:add`
+     * 入参：请求体 `TourismVenue`
+     * 约束：新增无需指定 `id`
+     * 返回：统一 `Result`（`toAjax` 将受影响行数转换为布尔/成功失败）
+     */
     public Result add(@RequestBody @Validated TourismVenue venue) {
         if (venue.getId() != null) {
             return warn("新增不需要指定id");
@@ -67,6 +101,15 @@ public class tourismVenueController extends BaseController {
     @Log(title = "场馆管理", businessType = BusinessType.UPDATE)
     @PutMapping
     @Operation(summary = "修改场馆")
+    /**
+     * 修改
+     *
+     * 路径：`PUT /tourism/venue`
+     * 权限：`tourism:venue:edit`
+     * 入参：请求体 `TourismVenue`
+     * 约束：必须指定 `id`
+     * 返回：统一 `Result`
+     */
     public Result edit(@RequestBody @Validated TourismVenue venue) {
         if (venue.getId() == null) {
             return warn("修改时，id不能为空");
@@ -78,6 +121,14 @@ public class tourismVenueController extends BaseController {
     @Log(title = "场馆管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除场馆")
+    /**
+     * 删除
+     *
+     * 路径：`DELETE /tourism/venue/{ids}`
+     * 权限：`tourism:venue:remove`
+     * 入参：路径参数 `ids`
+     * 返回：统一 `Result`
+     */
     public Result remove(@PathVariable List<Integer> ids) {
         return toAjax(tourismVenueService.removeVenueByIds(ids));
     }
@@ -85,6 +136,14 @@ public class tourismVenueController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:venue:activity:list')")
     @GetMapping("/{id}/activities")
     @Operation(summary = "查看当前场馆的特色活动列表")
+    /**
+     * 查询场馆下的特色活动列表
+     *
+     * 路径：`GET /tourism/venue/{id}/activities`
+     * 权限：`tourism:venue:activity:list`
+     * 入参：路径参数 `id`
+     * 返回：`Result` 包装的活动列表
+     */
     public Result activities(@PathVariable Long id) {
         if (id == null) {
             return warn("场馆id不能为空");

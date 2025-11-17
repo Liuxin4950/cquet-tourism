@@ -16,6 +16,13 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @TableName("tourism_scenic_spot")
 @Schema(description = "旅游景点")    
+/**
+ * 景区实体
+ *
+ * 说明：
+ * - 继承抽象实体 `AbsEntity`，包含通用字段（创建人/时间、更新人/时间、删除标记等）。
+ * - 与图片存在多对多关系，通过中间表 `tourism_scenic_spot_image` 维护，业务层以 `imageIds` 辅助绑定。
+ */
 public class TourismScenicSpot extends AbsEntity {
     
     @Schema(description = "主键，整型")

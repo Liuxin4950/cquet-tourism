@@ -19,6 +19,10 @@ import java.util.List;
 public class TourismFacilitiesServiceImpl extends ServiceImpl<TourismFacilitiesMapper, TourismFacilities> implements TourismFacilitiesService {
 
     @Override
+    /**
+     * 设施列表查询
+     * 条件：按 `facilitiesName` 模糊匹配（可选）
+     */
     public List<TourismFacilities> getFacilitiesListByName(String facilitiesName) {
         LambdaQueryWrapper<TourismFacilities> queryWrapper = new LambdaQueryWrapper<>();
         if (StringUtils.isNotBlank(facilitiesName)) {
