@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import cn.edu.cquet.common.utils.bean.BeanUtils;
+import cn.edu.cquet.tourism.domain.TourismActivity;
+import cn.edu.cquet.tourism.mapper.TourismActivityMapper;
 
 @Slf4j
 @Service
@@ -44,6 +46,9 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
 
     @Autowired
     private TourismFacilitiesMapper facilitiesMapper;
+
+    @Autowired
+    private TourismActivityMapper activityMapper;
 
     @Override
     // 根据名称和地址查询场馆列表
@@ -151,6 +156,16 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
             vo.setFacilities(facilities);
         }
         return vo;
+    }
+
+    public List<TourismActivity> getActivitiesByVenueId(Integer venueId) {
+        LambdaQueryWrapper<TourismActivity> qw = new LambdaQueryWrapper<>();
+        qw.eq(TourismActivity::getVenueId, venueId)
+          .eq(TourismActivity::getDelFlag, "0")
+          .eq(TourismActivity::getAuditStatus, "1")
+          .eq(TourismActivity::getStatus, "0")
+          .orderByDesc(TourismActivity::getCreateTime);
+        return activityMapper.selectList(qw);
     }
 
     @Override

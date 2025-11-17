@@ -1,145 +1,290 @@
 # ==============================================
-# 1. 构建产物（后端+前端）
+# 1. 通用操作系统 & IDE 临时文件
 # ==============================================
-# 后端 Maven
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+*.swp
+*.swo
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.*.swp
+.*.swo
+
+# IDE (IntelliJ, Eclipse, VSCode)
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+*.code-workspace
+*.vs/
+*.vcxproj
+*.sln
+*.suo
+
+# 编辑器备份文件
+*~
+*.bak
+*.tmp
+*.log
+*.diff
+*.patch
+
+# ==============================================
+# 2. 构建 & 依赖管理
+# ==============================================
+# Maven
 target/
-*.class
 *.jar
 *.war
 *.ear
 *.zip
 *.tar.gz
 *.rar
-# 后端 Gradle
+
+# Gradle
 .gradle/
-gradle/
-gradlew
-gradlew.bat
 build/
 !gradle/wrapper/gradle-wrapper.jar
-# 前端
-dist/
-build/
-out/
-.vite/
 
-# ==============================================
-# 2. 依赖&锁文件
-# ==============================================
+# Node.js
 node_modules/
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
-
-# ==============================================
-# 3. IDE 配置（全IDE覆盖）
-# ==============================================
-# IntelliJ IDEA
-.idea/
-.idea/workspace.xml
-.idea/usage.statistics.xml
-.idea/tasks.xml
-.idea/gradle.xml
-*.iws
-*.iml
-*.ipr
-# Eclipse
-.project
-.classpath
-.factorypath
-.settings/
-.loadpath
-.recommenders
-# VS Code
-.vscode/
-.vscode/settings.json
-.vscode/launch.json
-# NetBeans
-nbproject/private/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
-
-# ==============================================
-# 4. 配置文件（本地+环境化）
-# ==============================================
-# SpringBoot
-application-*.yml
-application-*.yaml
-application-*.properties
-bootstrap.yml
-bootstrap-*.yml
-bootstrap-*.properties
-!application-example.yml
-!application-example.properties
-!bootstrap-example.yml
-# 前端环境变量
-.env
-.env.local
-.env.development.local
-.env.production.local
-.env.test.local
-# 加密&证书
-*.key
-*.pem
-*.jks
-
-# ==============================================
-# 5. 工具缓存&日志
-# ==============================================
-# 缓存
-.eslintcache
-.prettiercache
-.sonar/
-.sonarlint/
-coverage/
-# 日志
-logs/
-*.log
-*.log.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-# 临时文件
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-*.tmp
-*.tmp.*
-*.bak
-*.bak.*
-*.swp
-*~.nib
-local.properties
+package-lock.json
+yarn.lock
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Docker
+.dockerenv
+.dockerinit
+.dockerignore
 
 # ==============================================
-# 6. 框架&工具生成文件
+# 3. 后端配置 (Spring Boot 重点)
 # ==============================================
-# MyBatis
-src/main/resources/mapper/*Mapper.xml.bak
-src/main/java/**/entity/*.java.bak
-generated/
-mybatis-generator/
-# 测试报告
-target/site/
-target/jacoco/
-target/surefire-reports/
-# Docker
-Dockerfile.*.bak
-docker-compose.override.yml
-docker-compose.*.yml
+# 本地专属配置 (不提交)
+application.properties
+application.yml
+application-*.properties
+application-*.yml
+!application-example.yml
+!application-example.properties
+
+bootstrap.properties
+bootstrap.yml
+bootstrap-*.properties
+bootstrap-*.yml
+!bootstrap-example.yml
+
+# 数据库凭证
+*.sql
+!schema.sql
+!data.sql
+
+# 本地启动配置
+run.*
+start.*
+stop.*
+
+# 调试文件
+*.debug
+
+# ==============================================
+# 4. 前端工程
+# ==============================================
+# 环境变量 (不提交)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# 构建产物
+dist/
+build/
+out/
+public/build/
+public/dist/
+*.min.js
+*.min.css
+
+# 哈希资源 (精确匹配8+位hex)
+*.[0-9a-fA-F]{8,}.js
+*.[0-9a-fA-F]{8,}.json
+*.[0-9a-fA-F]{8,}.css
+*.[0-9a-fA-F]{8,}.png
+*.[0-9a-fA-F]{8,}.jpg
+*.[0-9a-fA-F]{8,}.jpeg
+*.[0-9a-fA-F]{8,}.svg
+*.[0-9a-fA-F]{8,}.woff
+*.[0-9a-fA-F]{8,}.woff2
+*.[0-9a-fA-F]{8,}.map
+
+# 构建缓存
+.vite/
+.cache/
+.nuxt/
+.next/
+.svelte-kit/
+.temp/
+.tmp/
+
+# 框架特定
+vue.config.js
+webpack.config.js
+postcss.config.js
+babel.config.js
+.eslintrc.js
+.stylelintrc.js
+.prettierrc.js
+jest.config.js
+
+# 热更新文件
+*.hot-update.js
+*.hot-update.json
+*.hot-update.css
+
+# ==============================================
+# 5. 安全 & 证书
+# ==============================================
+# 私钥 & 证书 (不提交)
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+*.jks
+keystore
+truststore
+ssl/
+certs/
+
+# 加密文件
+*.enc
+*.secret
+*.aes
+vault.*
+.secrets
+
+# 敏感配置
+config/secrets.yml
+secrets/
+credentials/
+.ssh/
+.gpg/
+.aws/
+.azure/
+.gcp/
+
+# ==============================================
+# 6. 运维 & 部署
+# ==============================================
+# Kubernetes
+*.kubeconfig
+.kube/
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+terraform.tfvars
+.terraform.lock.hcl
+
+# Ansible
+ansible_vault_password
+vault_pass.txt
+group_vars/vault.yml
+host_vars/vault.yml
+
+# CI/CD
+.gitlab-ci.yml
+.jenkinsfile
+.travis.yml
+.circleci/
+.github/workflows/
+.sonarcloud.properties
+
+# 日志 & 临时
+logs/
+*.log
+temp/
+tmp/
+dump.rdb
+nohup.out
+
+# 数据库 dump
+*.dump
+*.sql.gz
+
+# ==============================================
+# 7. 其他语言
+# ==============================================
+# Java
+*.class
+*.war
+*.ear
+
+# Go
+*.exe
+*.test
+vendor/
+
+# Rust
+/target/
+**/*.rs.bk
+
+# C/C++
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+CMakeCache.txt
+CMakeFiles/
+Makefile
+
+# ==============================================
+# 8. 保留关键示例 (强制跟踪)
+# ==============================================
+!application-example.yml
+!application-example.properties
+!bootstrap-example.yml
+!schema.sql
+!data.sql
+!Dockerfile.example
 !docker-compose.example.yml
+!.env.example

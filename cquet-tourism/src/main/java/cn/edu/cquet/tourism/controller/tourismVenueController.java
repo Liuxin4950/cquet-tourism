@@ -18,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
+import cn.edu.cquet.tourism.domain.TourismActivity;
 
 import java.util.List;
 
@@ -79,5 +80,16 @@ public class tourismVenueController extends BaseController {
     @Operation(summary = "删除场馆")
     public Result remove(@PathVariable List<Integer> ids) {
         return toAjax(tourismVenueService.removeVenueByIds(ids));
+    }
+
+    @PreAuthorize("@ss.hasPermi('tourism:venue:activity:list')")
+    @GetMapping("/{id}/activities")
+    @Operation(summary = "查看当前场馆的特色活动列表")
+    public Result activities(@PathVariable Long id) {
+        if (id == null) {
+            return warn("场馆id不能为空");
+        }
+        List<TourismActivity> list = ((cn.edu.cquet.tourism.service.impl.TourismVenueServiceImpl)tourismVenueService).getActivitiesByVenueId(id.intValue());
+        return success(list);
     }
 }

@@ -74,8 +74,8 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
         com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<TourismActivity> uw = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>();
         uw.set(TourismActivity::getAuditStatus, "1")
           .set(TourismActivity::getStatus, "0")
-          .set(org.springframework.util.StringUtils.hasText(opinion), TourismActivity::getRejectReason, opinion)
-          .set(TourismActivity::getUpdateBy, SecurityUtils.getUsername())
+          .set(org.springframework.util.StringUtils.hasText(opinion), TourismActivity::getAuditReason, opinion)
+          .set(TourismActivity::getAuditor, SecurityUtils.getUsername())
           .set(TourismActivity::getUpdateTime, new java.util.Date())
           .eq(TourismActivity::getId, id);
         int rows = activityMapper.update(null, uw);
@@ -90,8 +90,8 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
         if (exist == null) return false;
         com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<TourismActivity> uw = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>();
         uw.set(TourismActivity::getAuditStatus, "2")
-          .set(TourismActivity::getRejectReason, reason)
-          .set(TourismActivity::getUpdateBy, SecurityUtils.getUsername())
+          .set(TourismActivity::getAuditReason, reason)
+          .set(TourismActivity::getAuditor, SecurityUtils.getUsername())
           .set(TourismActivity::getUpdateTime, new java.util.Date())
           .eq(TourismActivity::getId, id);
         int rows = activityMapper.update(null, uw);

@@ -48,6 +48,9 @@ public class TourismActivity extends AbsEntity {
     @TableField("audit_status")
     private String auditStatus;
 
-    @TableField("remark")
-    private String rejectReason;
+    @TableField("audit_reason")
+    private String auditReason;
+
+    @TableField("auditor")
+    private String auditor;
 }
