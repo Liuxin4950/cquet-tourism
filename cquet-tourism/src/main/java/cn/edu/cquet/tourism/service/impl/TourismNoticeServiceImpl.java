@@ -30,6 +30,7 @@ public class TourismNoticeServiceImpl extends ServiceImpl<TourismNoticeMapper, T
         LambdaQueryWrapper<TourismNotice> qw = new LambdaQueryWrapper<>();
         qw.eq(TourismNotice::getTitle, notice.getTitle());
         if (!noticeMapper.selectList(qw).isEmpty()) {
+            log.error("标题重复");
             return false;
         }
         return noticeMapper.insert(notice) > 0;

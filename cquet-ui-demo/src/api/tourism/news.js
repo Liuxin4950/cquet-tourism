@@ -12,7 +12,7 @@ export function listNews(query) {
 // 查询新闻详细
 export function getNews(newsId) {
   return request({
-    url: '/tourism/news' + newsId,
+    url: '/tourism/news/' + newsId,
     method: 'get'
   })
 }
