@@ -7,19 +7,10 @@
       :inline="true"
       v-show="showSearch"
     >
-      <el-form-item label="角色名称" prop="title">
+      <el-form-item label="新闻标题" prop="title">
         <el-input
           v-model="queryParams.title"
           placeholder="请输入新闻标题"
-          clearable
-          style="width: 240px"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="权限字符" prop="roleKey">
-        <el-input
-          v-model="queryParams.roleKey"
-          placeholder="请输入权限字符"
           clearable
           style="width: 240px"
           @keyup.enter.native="handleQuery"
@@ -69,7 +60,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:role:add']"
+          v-hasPermi="['tourism:news:add']"
           >新增</el-button
         >
       </el-col>
@@ -81,7 +72,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:role:edit']"
+          v-hasPermi="['tourism:news:edit']"
           >修改</el-button
         >
       </el-col>
@@ -93,7 +84,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:role:remove']"
+          v-hasPermi="['tourism:news:remove']"
           >删除</el-button
         >
       </el-col>

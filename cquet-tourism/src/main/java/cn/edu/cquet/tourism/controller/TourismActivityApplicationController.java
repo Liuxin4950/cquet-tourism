@@ -14,7 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("tourism/activity-application")
+@RequestMapping("tourism/activityApplication")
 @Tag(name = "特色活动申报管理")
 /**
  * 特色活动申报管理接口层
@@ -26,7 +26,7 @@ public class TourismActivityApplicationController extends BaseController {
     @Autowired
     private TourismActivityService activityService;
 
-    @PreAuthorize("@ss.hasPermi('tourism:activity-application:list')")
+    @PreAuthorize("@ss.hasPermi('tourism:activityApplication:list')")
     @GetMapping("/list")
     @Operation(summary = "申报列表（含待审核/通过/不通过）")
     /**
@@ -40,7 +40,7 @@ public class TourismActivityApplicationController extends BaseController {
         return getDataTable(activityService.list(name, venueId, auditStatus));
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:activity-application:approve')")
+    @PreAuthorize("@ss.hasPermi('tourism:activityApplication:approve')")
     @Log(title = "特色活动申报", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/approve")
     @Operation(summary = "审核通过（同步审核意见/审核人/审核时间）")
@@ -56,7 +56,7 @@ public class TourismActivityApplicationController extends BaseController {
         return toAjax(activityService.approve(id, op));
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:activity-application:reject')")
+    @PreAuthorize("@ss.hasPermi('tourism:activityApplication:reject')")
     @Log(title = "特色活动申报", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/reject")
     @Operation(summary = "审核不通过（同步审核意见/审核人/审核时间）")

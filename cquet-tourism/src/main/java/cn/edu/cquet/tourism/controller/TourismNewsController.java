@@ -9,6 +9,7 @@ import cn.edu.cquet.tourism.service.TourismNewsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ public class TourismNewsController extends BaseController {
 
     @GetMapping("/list")
     @Operation(summary = "获取新闻列表")
+    @PreAuthorize("@ss.hasPermi('tourism:news:list')")
     /**
      * 列表查询
      * 入参：`TourismNewsVo` 包含标题与时间范围

@@ -19,15 +19,15 @@ import lombok.EqualsAndHashCode;
 public class TourismNotice extends AbsEntity {
 
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
-    @TableField("title")
+    @TableField("notice_title")
     @NotBlank(message = "标题不能为空")
     @Xss(message = "标题不能包含脚本")
     @Size(min = 2, max = 50, message = "标题长度需在2-50之间")
     private String title;
 
-    @TableField("content")
+    @TableField("notice_content")
     @NotBlank(message = "内容不能为空")
     @Xss(message = "内容不能包含脚本")
     private String content;
