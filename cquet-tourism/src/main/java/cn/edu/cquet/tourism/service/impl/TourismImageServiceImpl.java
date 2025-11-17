@@ -21,7 +21,7 @@ import java.util.List;
 public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, TourismImage> implements TourismImageService {
 
     @Autowired
-    private TourismImageMapper imageMapper;
+    private TourismImageMapper imageMapper; // 图片表 Mapper
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -30,11 +30,11 @@ public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, Tou
      * 约束：`url` 必填
      */
     public TourismImage create(TourismImage image) {
-        if (image == null || !StringUtils.hasText(image.getUrl())) {
-            return null;
+        if (image == null || !StringUtils.hasText(image.getUrl())) { // 基本校验：对象存在且 URL 非空
+            return null; // 违反约束直接返回
         }
-        imageMapper.insert(image);
-        return image;
+        imageMapper.insert(image); // 插入图片记录
+        return image; // 返回带主键的记录
     }
 
     @Override
@@ -44,22 +44,21 @@ public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, Tou
      * 规则：忽略空 URL
      */
     public List<TourismImage> createBatch(List<String> urls) {
-        List<TourismImage> result = new ArrayList<>();
-        if (urls == null || urls.isEmpty()) {
-            log.warn("图片URL列表为空");
-            return result;
+        List<TourismImage> result = new ArrayList<>(); // 结果列表
+        if (urls == null || urls.isEmpty()) { // 入参校验
+            log.warn("图片URL列表为空"); // 提示但不抛异常
+            return result; // 返回空列表
         }
-        for (String url : urls) {
-            // 忽略空字符串
-            if (!StringUtils.hasText(url)) {
+        for (String url : urls) { // 遍历 URL
+            if (!StringUtils.hasText(url)) { // 忽略空 URL
                 continue;
             }
-            TourismImage img = new TourismImage();
-            img.setUrl(url);
-            imageMapper.insert(img);
-            result.add(img);
+            TourismImage img = new TourismImage(); // 构造实体
+            img.setUrl(url); // 设置 URL
+            imageMapper.insert(img); // 插入记录
+            result.add(img); // 收集结果
         }
-        return result;
+        return result; // 返回创建记录集合
     }
 
     @Override
@@ -67,10 +66,10 @@ public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, Tou
      * 按主键查询图片记录
      */
     public TourismImage getById(Integer id) {
-        if (id == null) {
+        if (id == null) { // 基本校验
             return null;
         }
-        return imageMapper.selectById(id);
+        return imageMapper.selectById(id); // 主键查询
     }
 
     @Override
@@ -79,9 +78,9 @@ public class TourismImageServiceImpl extends ServiceImpl<TourismImageMapper, Tou
      * 批量删除图片记录
      */
     public boolean removeByIds(List<Integer> ids) {
-        if (ids == null || ids.isEmpty()) {
+        if (ids == null || ids.isEmpty()) { // 基本校验
             return false;
         }
-        return imageMapper.deleteBatchIds(ids) > 0;
+        return imageMapper.deleteBatchIds(ids) > 0; // 批量删除
     }
 }

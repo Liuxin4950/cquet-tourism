@@ -19,7 +19,7 @@ import java.util.List;
 public class TourismNewsServiceImpl extends ServiceImpl<TourismNewsMapper, TourismNews> implements TourismNewsService {
 
     @Autowired
-    private TourismNewsMapper tourismNewsMapper;
+    private TourismNewsMapper tourismNewsMapper; // 新闻表 Mapper
 
     @Override
     /**
@@ -27,13 +27,10 @@ public class TourismNewsServiceImpl extends ServiceImpl<TourismNewsMapper, Touri
      * 条件：标题模糊；创建时间在起止范围之间
      */
     public List<TourismNews> getNewsByTitleAndTime(String title, String StartTime, String EndTime) {
-        // 创建条件构造器
-        LambdaQueryWrapper<TourismNews> queryWrapper = new LambdaQueryWrapper<>();
-        // 添加查询条件
-        queryWrapper.like(title != null && !title.isBlank(), TourismNews::getTitle, title)
-                .between(StartTime != null && EndTime != null && !StartTime.isBlank() && !EndTime.isBlank(), TourismNews::getCreateTime, StartTime, EndTime);
-        // 调用mapper方法，传入条件构造器，查询数据
-        return tourismNewsMapper.selectList(queryWrapper);
+        LambdaQueryWrapper<TourismNews> queryWrapper = new LambdaQueryWrapper<>(); // 创建查询构造器
+        queryWrapper.like(title != null && !title.isBlank(), TourismNews::getTitle, title) // 标题模糊匹配
+                .between(StartTime != null && EndTime != null && !StartTime.isBlank() && !EndTime.isBlank(), TourismNews::getCreateTime, StartTime, EndTime); // 创建时间范围
+        return tourismNewsMapper.selectList(queryWrapper); // 执行查询
     }
 
     @Override
@@ -42,13 +39,12 @@ public class TourismNewsServiceImpl extends ServiceImpl<TourismNewsMapper, Touri
      * 规则：标题唯一
      */
     public boolean addNews(TourismNews news) {
-        LambdaQueryWrapper<TourismNews> queryWrapper = new LambdaQueryWrapper<>();
-        // 判断title是否重复
-        queryWrapper.eq(TourismNews::getTitle, news.getTitle());
-        List<TourismNews> list = tourismNewsMapper.selectList(queryWrapper);
-        if (!list.isEmpty()) {
+        LambdaQueryWrapper<TourismNews> queryWrapper = new LambdaQueryWrapper<>(); // 唯一性校验条件
+        queryWrapper.eq(TourismNews::getTitle, news.getTitle()); // 标题唯一
+        List<TourismNews> list = tourismNewsMapper.selectList(queryWrapper); // 执行查询
+        if (!list.isEmpty()) { // 有重复则失败
             return false;
         }
-        return tourismNewsMapper.insert(news) > 0;
+        return tourismNewsMapper.insert(news) > 0; // 插入记录
     }
 }

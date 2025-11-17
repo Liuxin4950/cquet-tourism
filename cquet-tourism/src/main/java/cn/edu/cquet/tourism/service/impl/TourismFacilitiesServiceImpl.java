@@ -24,11 +24,11 @@ public class TourismFacilitiesServiceImpl extends ServiceImpl<TourismFacilitiesM
      * 条件：按 `facilitiesName` 模糊匹配（可选）
      */
     public List<TourismFacilities> getFacilitiesListByName(String facilitiesName) {
-        LambdaQueryWrapper<TourismFacilities> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(facilitiesName)) {
-            queryWrapper.like(TourismFacilities::getFacilitiesName, facilitiesName);
+        LambdaQueryWrapper<TourismFacilities> queryWrapper = new LambdaQueryWrapper<>(); // 创建查询构造器
+        if (StringUtils.isNotBlank(facilitiesName)) { // 仅当名称非空时追加条件
+            queryWrapper.like(TourismFacilities::getFacilitiesName, facilitiesName); // 名称模糊匹配
         }
-        return this.list(queryWrapper);
+        return this.list(queryWrapper); // 执行查询返回列表
     }
 
 }
