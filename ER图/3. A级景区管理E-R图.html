@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .entity { fill: #e3f2fd; stroke: #1976d2; stroke-width: 3; }
+      .attribute { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; }
+      .key-attribute { fill: #e8f5e8; stroke: #388e3c; stroke-width: 3; }
+      .relationship { fill: #fce4ec; stroke: #c2185b; stroke-width: 3; }
+      .text { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 13px; text-anchor: middle; dominant-baseline: middle; fill: #333; }
+      .title { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; dominant-baseline: middle; fill: #1976d2; }
+      .subtitle { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 11px; text-anchor: middle; dominant-baseline: middle; fill: #666; }
+      .line { stroke: #333; stroke-width: 2; fill: none; }
+      .foreign-key { stroke: #d32f2f; stroke-width: 3; stroke-dasharray: 5,5; }
+      .cardinality { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #d32f2f; }
+    </style>
+  </defs>
+  
+  <!-- 标题 -->
+  <text x="600" y="30" class="title">A级景区管理模块 E-R图</text>
+  
+  <!-- 系统用户实体 -->
+  <rect x="100" y="120" width="160" height="80" class="entity" rx="8"/>
+  <text x="180" y="150" class="text" font-weight="bold">系统用户</text>
+  <text x="180" y="170" class="subtitle">(sys_user)</text>
+  
+  <!-- A级景区实体 -->
+  <rect x="500" y="300" width="200" height="100" class="entity" rx="8"/>
+  <text x="600" y="335" class="text" font-weight="bold">A级景区</text>
+  <text x="600" y="355" class="subtitle">(tourism_scenic_spot)</text>
+  
+  <!-- 景区图片关联实体 -->
+  <rect x="900" y="300" width="200" height="100" class="entity" rx="8"/>
+  <text x="1000" y="330" class="text" font-weight="bold">景区图片关联</text>
+  <text x="1000" y="350" class="subtitle">(tourism_scenic_spot_image)</text>
+  <text x="1000" y="370" class="subtitle">关联实体</text>
+  
+  <!-- 图片实体 -->
+  <rect x="900" y="500" width="200" height="80" class="entity" rx="8"/>
+  <text x="1000" y="535" class="text" font-weight="bold">图片信息</text>
+  <text x="1000" y="555" class="subtitle">(tourism_image)</text>
+  
+  <!-- 用户收藏实体 -->
+  <rect x="100" y="500" width="180" height="80" class="entity" rx="8"/>
+  <text x="190" y="535" class="text" font-weight="bold">用户收藏</text>
+  <text x="190" y="555" class="subtitle">(tourism_user_collection)</text>
+  
+  <!-- A级景区属性 -->
+  <ellipse cx="430" cy="280" rx="25" ry="18" class="key-attribute"/>
+  <text x="430" y="280" class="text" font-size="11">id (PK)</text>
+  
+  <ellipse cx="550" cy="250" rx="30" ry="18" class="attribute"/>
+  <text x="550" y="250" class="text" font-size="11">name</text>
+  
+  <ellipse cx="650" cy="250" rx="25" ry="18" class="attribute"/>
+  <text x="650" y="250" class="text" font-size="11">level</text>
+  
+  <ellipse cx="750" cy="280" rx="40" ry="18" class="attribute"/>
+  <text x="750" y="280" class="text" font-size="11">cover_image</text>
+  
+  <ellipse cx="430" cy="450" rx="35" ry="18" class="attribute"/>
+  <text x="430" y="450" class="text" font-size="11">ticket_price</text>
+  
+  <ellipse cx="550" cy="450" rx="30" ry="18" class="attribute"/>
+  <text x="550" y="450" class="text" font-size="11">address</text>
+  
+  <ellipse cx="650" cy="450" rx="25" ry="18" class="attribute"/>
+  <text x="650" y="450" class="text" font-size="11">city</text>
+  
+  <ellipse cx="750" cy="450" rx="35" ry="18" class="attribute"/>
+  <text x="750" y="450" class="text" font-size="11">opening_hours</text>
+  
+  <!-- 图片关联属性 -->
+  <ellipse cx="830" cy="320" rx="25" ry="18" class="key-attribute"/>
+  <text x="830" y="320" class="text" font-size="11">id (PK)</text>
+  
+  <ellipse cx="1000" cy="250" rx="45" ry="18" class="attribute" style="stroke: #d32f2f; stroke-dasharray: 3,3;"/>
+  <text x="1000" y="250" class="text" font-size="11" fill="#d32f2f">scenic_spot_id (FK)</text>
+  
+  <ellipse cx="1130" cy="320" rx="35" ry="18" class="attribute" style="stroke: #d32f2f; stroke-dasharray: 3,3;"/>
+  <text x="1130" y="320" class="text" font-size="11" fill="#d32f2f">image_id (FK)</text>
+  
+  <!-- 图片属性 -->
+  <ellipse cx="830" cy="520" rx="25" ry="18" class="key-attribute"/>
+  <text x="830" y="520" class="text" font-size="11">id (PK)</text>
+  
+  <ellipse cx="1000" cy="460" rx="35" ry="18" class="attribute"/>
+  <text x="1000" y="460" class="text" font-size="11">image_url</text>
+  
+  <ellipse cx="1130" cy="520" rx="30" ry="18" class="attribute"/>
+  <text x="1130" y="520" class="text" font-size="11">upload_time</text>
+  
+  <!-- 用户收藏属性 -->
+  <ellipse cx="30" cy="520" rx="25" ry="18" class="key-attribute"/>
+  <text x="30" y="520" class="text" font-size="11">id (PK)</text>
+  
+  <ellipse cx="190" cy="460" rx="35" ry="18" class="attribute" style="stroke: #d32f2f; stroke-dasharray: 3,3;"/>
+  <text x="190" y="460" class="text" font-size="11" fill="#d32f2f">user_id (FK)</text>
+  
+  <ellipse cx="320" cy="520" rx="35" ry="18" class="attribute"/>
+  <text x="320" y="520" class="text" font-size="11">target_type</text>
+  
+  <ellipse cx="190" cy="620" rx="35" ry="18" class="attribute" style="stroke: #d32f2f; stroke-dasharray: 3,3;"/>
+  <text x="190" y="620" class="text" font-size="11" fill="#d32f2f">target_id (FK)</text>
+  
+  <!-- 关系 -->
+  <!-- 管理关系 -->
+  <polygon points="350,200 400,225 350,250 300,225" class="relationship"/>
+  <text x="350" y="225" class="text" font-weight="bold">管理</text>
+  
+  <!-- 景区图片关系 -->
+  <polygon points="750,350 800,375 750,400 700,375" class="relationship"/>
+  <text x="750" y="375" class="text" font-weight="bold">关联</text>
+  
+  <!-- 图片关联关系 -->
+  <polygon points="1000,420 1050,445 1000,470 950,445" class="relationship"/>
+  <text x="1000" y="445" class="text" font-weight="bold">包含</text>
+  
+  <!-- 收藏关系 -->
+  <polygon points="300,400 350,425 300,450 250,425" class="relationship"/>
+  <text x="300" y="425" class="text" font-weight="bold">收藏</text>
+  
+  <!-- 连接线 -->
+  <!-- 用户管理景区 -->
+  <line x1="260" y1="160" x2="300" y2="225" class="line"/>
+  <line x1="400" y1="225" x2="500" y2="350" class="line"/>
+  
+  <!-- 景区图片关联 -->
+  <line x1="700" y1="350" x2="700" y2="375" class="line"/>
+  <line x1="800" y1="375" x2="900" y2="350" class="line"/>
+  
+  <!-- 图片关联 -->
+  <line x1="1000" y1="400" x2="1000" y2="420" class="line"/>
+  <line x1="1000" y1="470" x2="1000" y2="500" class="line"/>
+  
+  <!-- 用户收藏 -->
+  <line x1="180" y1="200" x2="250" y2="425" class="line"/>
+  <line x1="350" y1="425" x2="500" y2="350" class="line"/>
+  
+  <!-- 外键连接线 -->
+  <line x1="600" y1="300" x2="1000" y2="250" class="foreign-key"/>
+  <line x1="1100" y1="350" x2="1130" y2="320" class="foreign-key"/>
+  <line x1="1000" y1="400" x2="1130" y2="520" class="foreign-key"/>
+  <line x1="180" y1="200" x2="190" y2="460" class="foreign-key"/>
+  <line x1="500" y1="350" x2="190" y2="620" class="foreign-key"/>
+  
+  <!-- 基数标注 -->
+  <text x="280" y="170" class="cardinality">1</text>
+  <text x="480" y="330" class="cardinality">N</text>
+  <text x="720" y="330" class="cardinality">1</text>
+  <text x="880" y="330" class="cardinality">N</text>
+  <text x="1020" y="480" class="cardinality">1</text>
+  <text x="1020" y="420" class="cardinality">N</text>
+  <text x="200" y="180" class="cardinality">N</text>
+  <text x="480" y="370" class="cardinality">N</text>
+  
+  <!-- 说明文字 -->
+  <rect x="50" y="680" width="1100" height="100" fill="none" stroke="#ccc" stroke-width="2"/>
+  <text x="600" y="705" class="text" font-weight="bold">关系说明</text>
+  <text x="100" y="730" class="text" font-size="12">1. 系统用户管理A级景区 (1:N)  2. A级景区关联多张图片 (1:N:N)  3. 用户可收藏景区 (N:N)</text>
+  <text x="100" y="750" class="text" font-size="12">4. tourism_scenic_spot_image 为关联实体，实现景区与图片的多对多关系</text>
+  <text x="100" y="770" class="text" font-size="12">5. 红色虚线表示外键关联关系</text>
+</svg>

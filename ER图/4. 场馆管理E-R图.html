@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .entity { fill: #e3f2fd; stroke: #1976d2; stroke-width: 3; }
+      .attribute { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; }
+      .key-attribute { fill: #e8f5e8; stroke: #388e3c; stroke-width: 3; }
+      .relationship { fill: #fce4ec; stroke: #c2185b; stroke-width: 3; }
+      .text { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 13px; text-anchor: middle; dominant-baseline: middle; fill: #333; }
+      .title { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; dominant-baseline: middle; fill: #1976d2; }
+      .subtitle { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 11px; text-anchor: middle; dominant-baseline: middle; fill: #666; }
+      .line { stroke: #333; stroke-width: 2; fill: none; }
+      .foreign-key { stroke: #d32f2f; stroke-width: 3; stroke-dasharray: 5,5; }
+      .cardinality { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #d32f2f; }
+    </style>
+  </defs>
+  
+  <!-- 标题 -->
+  <text x="600" y="30" class="title">场馆管理模块 E-R图</text>
+  
+  <!-- 系统用户实体 -->
+  <rect x="100" y="120" width="160" height="80" class="entity" rx="8"/>
+  <text x="180" y="150" class="text" font-weight="bold">系统用户</text>
+  <text x="180" y="170" class="subtitle">(sys_user)</text>
+  
+  <!-- 场馆实体 -->
+  <rect x="500" y="300" width="200" height="100" class="entity" rx="8"/>
+  <text x="600" y="335" class="text" font-weight="bold">场馆信息</text>
+  <text x="600" y="355" class="subtitle">(tourism_venue)</text>
+  
+  <!-- 设施实体 -->
+  <rect x="900" y="300" width="180" height="80" class="entity" rx="8"/>
+  <text x="990" y="330" class="text" font-weight="bold">设施信息</text>
+  <text x="990" y="350" class="subtitle">(tourism_facilities)</text>
+  
+  <!-- 场馆设施关联实体 -->
+  <rect x="750" y="480" width="200" height="80" class="entity" rx="8"/>
+  <text x="850" y="510" class="text" font-weight="bold">场馆设施关联</text>
+  <text x="850" y="530" class="subtitle">(tourism_venue_facilities)</text>
+  
+  <!-- 用户收藏实体 -->
+  <rect x="100" y="500" width="180" height="80" class="entity" rx="8"/>
+  <text x="190" y="535" class="text" font-weight="bold">用户收藏</text>
+  <text x="190" y="555" class="subtitle">(tourism_user_collection)</text>
+  
+  <!-- 场馆属性 -->
+  <ellipse cx="430" cy="280" rx="25" ry="18" class="key-attribute"/>
+  <text x="430" y="280" class="text" font-size="11">id (PK)</text>
+  
+  <ellipse cx="550" cy="250" rx="30" ry="18" class="attribute"/>
+  <text x="550" y="250" class="text" font-size="11">name</text>
+  
+  <ellipse cx="650" cy="250" rx="30" ry="18" class="attribute"/>
+  <text x="650" y="250" class="text" font-size="11">category</text>
+  
+  <ellipse cx="750" cy="280" rx="40" ry="18" class="attribute"/>
+  <text x="750" y="280" class="text" font-size="11">cover_image</text>
+  
+  <ellipse cx="430" cy="450" rx="35" ry="18" class="attribute"/>
+  <text x="430" y="450" class="text" font-size="11">ticket_price</text>
+  
+  <ellipse cx="550" cy="450" rx="30" ry="18" class="attribute"/>
+  <text x="550" y="450" class="text" font-size="11">address</text>
+  
+  <ellipse cx="650" cy="450" rx="30" ry="18" class="attribute"/>
+  <text x="650" y="450" class="text" font-size="11">capacity</text>
+  
+  <ellipse cx="750" cy="450" rx="45" ry="18" class="attribute"/>
+  <text x="750" y="450" class="text" font-size="11">booking_required</text>
+  
+  <!-- 设施属性 -->
+  <ellipse cx="830" cy="320" rx="25" ry="18" class="key-attribute"/>
+  <text x="830" y="320" class="text" font-size="11">id (PK)</text>
+  
+  <ellipse cx="990" cy="250" rx="35" ry="18" class="attribute"/>
+  <text x="990" y="250" class="text" font-size="11">facilities</text>
+  
+  <ellipse cx="1130" cy="320" rx="30" ry="18" class="attribute"/>
+  <text x="1130" y="320" class="text" font-size="11">description</text>
+  
+  <!-- 关联实体属性 -->
+  <ellipse cx="680" cy="500" rx="25" ry="18" class="key-attribute"/>
+  <text x="680" y="500" class="text" font-size="11">id (PK)</text>
+  
+  <ellipse cx="800" cy="440" rx="35" ry="18" class="attribute" style="stroke: #d32f2f; stroke-dasharray: 3,3;"/>
+  <text x="800" y="440" class="text" font-size="11" fill="#d32f2f">venue_id (FK)</text>
+  
+  <ellipse cx="950" cy="500" rx="35" ry="18" class="attribute" style="stroke: #d32f2f; stroke-dasharray: 3,3;"/>
+  <text x="950" y="500" class="text" font-size="11" fill="#d32f2f">facility_id (FK)</text>
+  
+  <!-- 用户收藏属性 -->
+  <ellipse cx="30" cy="520" rx="25" ry="18" class="key-attribute"/>
+  <text x="30" y="520" class="text" font-size="11">id (PK)</text>
+  
+  <ellipse cx="190" cy="460" rx="35" ry="18" class="attribute" style="stroke: #d32f2f; stroke-dasharray: 3,3;"/>
+  <text x="190" y="460" class="text" font-size="11" fill="#d32f2f">user_id (FK)</text>
+  
+  <ellipse cx="320" cy="520" rx="35" ry="18" class="attribute"/>
+  <text x="320" y="520" class="text" font-size="11">target_type</text>
+  
+  <ellipse cx="190" cy="620" rx="35" ry="18" class="attribute" style="stroke: #d32f2f; stroke-dasharray: 3,3;"/>
+  <text x="190" y="620" class="text" font-size="11" fill="#d32f2f">target_id (FK)</text>
+  
+  <!-- 关系 -->
+  <!-- 管理关系 -->
+  <polygon points="350,200 400,225 350,250 300,225" class="relationship"/>
+  <text x="350" y="225" class="text" font-weight="bold">管理</text>
+  
+  <!-- 场馆设施关系 -->
+  <polygon points="720,380 770,405 720,430 670,405" class="relationship"/>
+  <text x="720" y="405" class="text" font-weight="bold">拥有</text>
+  
+  <!-- 设施关联关系 -->
+  <polygon points="900,420 950,445 900,470 850,445" class="relationship"/>
+  <text x="900" y="445" class="text" font-weight="bold">包含</text>
+  
+  <!-- 收藏关系 -->
+  <polygon points="300,400 350,425 300,450 250,425" class="relationship"/>
+  <text x="300" y="425" class="text" font-weight="bold">收藏</text>
+  
+  <!-- 连接线 -->
+  <!-- 用户管理场馆 -->
+  <line x1="260" y1="160" x2="300" y2="225" class="line"/>
+  <line x1="400" y1="225" x2="500" y2="350" class="line"/>
+  
+  <!-- 场馆设施关联 -->
+  <line x1="650" y1="380" x2="670" y2="405" class="line"/>
+  <line x1="770" y1="405" x2="850" y2="480" class="line"/>
+  
+  <!-- 设施关联 -->
+  <line x1="900" y1="340" x2="900" y2="420" class="line"/>
+  <line x1="950" y1="445" x2="990" y2="380" class="line"/>
+  
+  <!-- 用户收藏 -->
+  <line x1="180" y1="200" x2="250" y2="425" class="line"/>
+  <line x1="350" y1="425" x2="500" y2="350" class="line"/>
+  
+  <!-- 外键连接线 -->
+  <line x1="600" y1="400" x2="800" y2="440" class="foreign-key"/>
+  <line x1="990" y1="380" x2="950" y2="500" class="foreign-key"/>
+  <line x1="180" y1="200" x2="190" y2="460" class="foreign-key"/>
+  <line x1="500" y1="350" x2="190" y2="620" class="foreign-key"/>
+  
+  <!-- 基数标注 -->
+  <text x="280" y="170" class="cardinality">1</text>
+  <text x="480" y="330" class="cardinality">N</text>
+  <text x="630" y="360" class="cardinality">1</text>
+  <text x="830" y="460" class="cardinality">N</text>
+  <text x="970" y="360" class="cardinality">1</text>
+  <text x="870" y="460" class="cardinality">N</text>
+  <text x="200" y="180" class="cardinality">N</text>
+  <text x="480" y="370" class="cardinality">N</text>
+  
+  <!-- 属性连接线 -->
+  <line x1="455" y1="280" x2="500" y2="340" class="line"/>
+  <line x1="550" y1="268" x2="550" y2="300" class="line"/>
+  <line x1="650" y1="268" x2="650" y2="300" class="line"/>
+  <line x1="730" y1="290" x2="700" y2="340" class="line"/>
+  <line x1="430" y1="432" x2="500" y2="400" class="line"/>
+  <line x1="550" y1="432" x2="550" y2="400" class="line"/>
+  <line x1="650" y1="432" x2="650" y2="400" class="line"/>
+  <line x1="730" y1="440" x2="700" y2="360" class="line"/>
+  
+  <line x1="855" y1="320" x2="900" y2="340" class="line"/>
+  <line x1="990" y1="268" x2="990" y2="300" class="line"/>
+  <line x1="1110" y1="330" x2="1080" y2="340" class="line"/>
+  
+  <line x1="705" y1="500" x2="750" y2="520" class="line"/>
+  
+  <line x1="55" y1="520" x2="100" y2="540" class="line"/>
+  <line x1="190" y1="478" x2="190" y2="500" class="line"/>
+  <line x1="300" y1="530" x2="280" y2="540" class="line"/>
+  <line x1="190" y1="602" x2="190" y2="580" class="line"/>
+  
+  <!-- 说明文字 -->
+  <rect x="50" y="680" width="1100" height="100" fill="none" stroke="#ccc" stroke-width="2"/>
+  <text x="600" y="705" class="text" font-weight="bold">关系说明</text>
+  <text x="100" y="730" class="text" font-size="12">1. 系统用户管理场馆信息 (1:N)  2. 场馆拥有多种设施 (N:N)  3. 用户可收藏场馆 (N:N)</text>
+  <text x="100" y="750" class="text" font-size="12">4. tourism_venue_facilities 为关联实体，实现场馆与设施的多对多关系</text>
+  <text x="100" y="770" class="text" font-size="12">5. 红色虚线表示外键关联关系</text>
+</svg>
