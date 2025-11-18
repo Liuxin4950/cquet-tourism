@@ -215,10 +215,13 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         ScenicSpotDetailVo vo = new ScenicSpotDetailVo(); // 创建详情 VO
         BeanUtils.copyProperties(spot, vo); // 复制主表字段到 VO
 
+        // TourismScenicSpotImage：图片关联表
         LambdaQueryWrapper<TourismScenicSpotImage> q = new LambdaQueryWrapper<>(); // 查询关联关系
+        // intValue() 强转成 int
         q.eq(TourismScenicSpotImage::getScenicSpotId, spot.getId().intValue()); // scenic_spot_id=当前ID
         List<TourismScenicSpotImage> rels = scenicSpotImageMapper.selectList(q); // 取出所有关联记录
         if (!rels.isEmpty()) { // 若存在关联
+            // 将获取的rels数组转换为流，映射为图片ID存储到imageIds中
             List<Integer> imageIds = rels.stream().map(TourismScenicSpotImage::getImageId).collect(java.util.stream.Collectors.toList()); // 提取图片ID列表
             List<TourismImage> images = imageMapper.selectBatchIds(imageIds); // 批量查询图片
             vo.setImages(images); // 设置到 VO
