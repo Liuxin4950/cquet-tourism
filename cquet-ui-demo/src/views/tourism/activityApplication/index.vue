@@ -47,12 +47,13 @@
       <el-table-column label="审核时间" prop="auditTime" width="170" align="center">
         <template slot-scope="scope"><span>{{ parseTime(scope.row.auditTime) }}</span></template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="180">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
         <template slot-scope="scope">
           <template v-if="scope.row.auditStatus === '0'">
             <el-button size="mini" type="text" icon="el-icon-circle-check" @click="approve(scope.row)" v-hasPermi="['tourism:activityApplication:approve']">通过</el-button>
             <el-button size="mini" type="text" icon="el-icon-circle-close" @click="reject(scope.row)" v-hasPermi="['tourism:activityApplication:reject']">拒绝</el-button>
           </template>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:activity:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -62,7 +63,7 @@
 </template>
 
 <script>
-import { listScenicActivityApplication, passScenicActivityApplication, rejectScenicActivityApplication } from '@/api/tourism/scenicActivity'
+import { listScenicActivityApplication, passScenicActivityApplication, rejectScenicActivityApplication, delScenicActivity } from '@/api/tourism/scenicActivity'
 import { listScenicVenue } from '@/api/tourism/scenicVenue'
 import Pagination from '@/components/Pagination'
 
@@ -76,7 +77,7 @@ export default {
       single: true,
       multiple: true,
       ids: [],
-      queryParams: { pageNum: 1, pageSize: 10, name: undefined, venueId: undefined, auditStatus: undefined },
+      queryParams: { pageNum: 1, pageSize: 10, name: undefined, venueId: undefined, auditStatus: '0' },
       showSearch: true,
       loading: false,
       venueOptions: [],
@@ -100,7 +101,7 @@ export default {
         this.total = response.total
       })
     },
-    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 10, name: undefined, venueId: undefined, auditStatus: undefined }; this.getList() },
+    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 10, name: undefined, venueId: undefined, auditStatus: '0' }; this.getList() },
     handleSelectionChange(selection) { this.ids = selection.map(item => item.id); this.single = selection.length != 1; this.multiple = !selection.length },
     approve(row) {
       this.$prompt('请输入审核意见（可选）', '审核通过', { confirmButtonText: '确定', cancelButtonText: '取消' }).then(({ value }) => {
@@ -111,6 +112,10 @@ export default {
       this.$prompt('请输入审核不通过原因（必填）', '审核拒绝', { confirmButtonText: '确定', cancelButtonText: '取消', inputValidator: v => !!(v && v.trim()), inputErrorMessage: '原因不能为空' }).then(({ value }) => {
         rejectScenicActivityApplication(row.id, value).then(() => { this.$modal.msgSuccess('审核已拒绝'); this.getList() })
       }).catch(() => {})
+    },
+    handleDelete(row) {
+      const ids = row.id || this.ids
+      this.$modal.confirm('是否确认删除活动编号为"' + ids + '"的数据项？').then(function () { return delScenicActivity(ids) }).then(() => { this.getList(); this.$modal.msgSuccess('删除成功') }).catch(() => { this.$modal.msgError('删除失败') })
     },
     auditText(s) { if (s === '1') return '通过'; if (s === '2') return '拒绝'; return '待审核' },
     auditTagType(s) { if (s === '1') return 'success'; if (s === '2') return 'danger'; return 'warning' },

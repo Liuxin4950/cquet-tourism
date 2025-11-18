@@ -16,17 +16,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select
-          v-model="queryParams.status"
-          placeholder="新闻状态"
-          clearable
-          style="width: 240px"
-        >
-          <el-option label="正常" value="0" />
-          <el-option label="停用" value="1" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
           v-model="dateRange"
@@ -46,7 +35,7 @@
           @click="handleQuery"
           >搜索</el-button
         >
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery"
+        <el-button icon="el-icon-refresh" size="mini" @click="resetButton"
           >重置</el-button
         >
       </el-form-item>
@@ -132,6 +121,14 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-document"
+            @click="viewDetail(scope.row)"
+            v-hasPermi="['tourism:news:query']"
+            >详情</el-button
+          >
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['tourism:news:edit']"
@@ -159,7 +156,7 @@
     />
 
     <!-- 添加或修改角色配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="新闻标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入新闻标题" />
@@ -179,25 +176,40 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="新闻详情" :visible.sync="detailOpen" width="900px" append-to-body>
+      <el-descriptions :border="true" :column="2" size="small">
+        <el-descriptions-item label="标题">{{ detail.title }}</el-descriptions-item>
+        <el-descriptions-item label="作者">{{ detail.author }}</el-descriptions-item>
+        <el-descriptions-item label="创建人">{{ detail.createBy }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ parseTime(detail.createTime) }}</el-descriptions-item>
+        <el-descriptions-item label="内容" :span="2"><div v-html="detail.content"></div></el-descriptions-item>
+      </el-descriptions>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="detailOpen = false">关 闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {
   listNews,
-  getInfo,
+  getNews,
   addNews,
   updateNews,
   delNews,
 } from "@/api/tourism/news";
 // 引入分页组件
 import Pagination from "@/components/Pagination";
+import Editor from "@/components/Editor";
 
 export default {
   name: "TourismNews",
   // 注册分页组件
   components: {
     Pagination,
+    Editor,
   },
   data() {
     return {
@@ -215,8 +227,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        startTime: undefined,
-        endTime: undefined,
+        startDate: undefined,
+        endDate: undefined,
         title: undefined,
         status: undefined,
       },
@@ -232,6 +244,8 @@ export default {
       // 表单数据
       form: {
       },
+      detailOpen: false,
+      detail: {},
       // 新增或修改表单的数据校验规则
       rules: {
         title: [
@@ -256,8 +270,12 @@ export default {
     // 获取数据列表
     getList() {
       this.loading = true;
-      this.queryParams.startTime = this.dateRange[0];
-      this.queryParams.endTime = this.dateRange[1];
+      const s = this.dateRange && this.dateRange[0] ? (this.dateRange[0] + ' 00:00:00') : undefined;
+      const e = this.dateRange && this.dateRange[1] ? (this.dateRange[1] + ' 23:59:59') : undefined;
+      this.queryParams.startDate = s;
+      this.queryParams.endDate = e;
+      this.queryParams.startTime = s;
+      this.queryParams.endTime = e;
       listNews(this.queryParams).then((response) => {
         this.loading = false;
         this.newsList = response.rows;
@@ -272,6 +290,10 @@ export default {
         pageSize: 10,
         title: undefined,
         status: undefined,
+        startDate: undefined,
+        endDate: undefined,
+        startTime: undefined,
+        endTime: undefined,
       };
       this.getList();
     },
@@ -285,13 +307,21 @@ export default {
     resetButton() {
       this.dateRange = [];
       this.resetForm("queryForm");
-      this.handleQuery();
+      this.queryParams = {
+        pageNum: 1,
+        pageSize: 10,
+        startDate: undefined,
+        endDate: undefined,
+        title: undefined,
+        status: undefined,
+      };
+      this.getList();
     },
     // 修改方法
     handleUpdate(row) {
       this.reset();
       const newsId = row.id || this.ids[0];
-      getInfo(newsId).then(response => {
+      getNews(newsId).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改新闻动态";
@@ -345,6 +375,9 @@ export default {
           this.getList();
         }
       })
+    },
+    viewDetail(row) {
+      getNews(row.id).then(res => { this.detail = res.data || {}; this.detailOpen = true })
     },
     /** 取消按钮 */
     cancel: function() {

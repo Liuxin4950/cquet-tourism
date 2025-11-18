@@ -54,3 +54,28 @@ export function uploadImage(file) {
     data: formData
   })
 }
+
+// 查询景区关联的场馆列表
+export function listScenicSpotVenues(scenicSpotId) {
+  return request({
+    url: '/tourism/scenic-spot/' + scenicSpotId + '/venues',
+    method: 'get'
+  })
+}
+
+// 查询景区关联图片
+export function listScenicSpotImages(scenicSpotId) {
+  return request({
+    url: '/tourism/scenic-spot/' + scenicSpotId + '/images',
+    method: 'get'
+  })
+}
+
+// 设置景区关联图片（覆盖）
+export function setScenicSpotImages(scenicSpotId, imageIds) {
+  return request({
+    url: '/tourism/scenic-spot/' + scenicSpotId + '/images',
+    method: 'put',
+    data: imageIds || []
+  })
+}

@@ -9,7 +9,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetButton">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -38,13 +38,14 @@
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" />
-      <el-table-column label="标题" prop="title" min-width="220" :show-overflow-tooltip="true" />
+      <el-table-column label="标题" prop="title" max-width="90" :show-overflow-tooltip="true" />
       <el-table-column label="创建人" prop="createBy" width="140" :show-overflow-tooltip="true" />
       <el-table-column label="创建时间" prop="createTime" width="170" align="center">
         <template slot-scope="scope"><span>{{ parseTime(scope.row.createTime) }}</span></template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="160">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right">
         <template slot-scope="scope">
+          <el-button size="mini" type="text" icon="el-icon-document" @click="viewDetail(scope.row)" v-hasPermi="['tourism:notice:query']">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['tourism:notice:edit']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:notice:remove']">删除</el-button>
         </template>
@@ -70,6 +71,18 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="公告详情" :visible.sync="detailOpen" width="900px" append-to-body>
+      <el-descriptions :border="true" :column="2" size="small">
+        <el-descriptions-item label="标题">{{ detail.title }}</el-descriptions-item>
+        <el-descriptions-item label="创建人">{{ detail.createBy }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ parseTime(detail.createTime) }}</el-descriptions-item>
+        <el-descriptions-item label="内容" :span="2"><div v-html="detail.content"></div></el-descriptions-item>
+      </el-descriptions>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="detailOpen = false">关 闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -87,13 +100,15 @@ export default {
       single: true,
       multiple: true,
       ids: [],
-      queryParams: { pageNum: 1, pageSize: 10, startTime: undefined, endTime: undefined, title: undefined },
+      queryParams: { pageNum: 1, pageSize: 10, startDate: undefined, endDate: undefined, title: undefined },
       dateRange: [],
       showSearch: true,
       loading: false,
       title: '',
       open: false,
       form: {},
+      detailOpen: false,
+      detail: {},
       rules: {
         title: [{ required: true, message: '标题不能为空', trigger: 'blur' }]
       }
@@ -104,11 +119,14 @@ export default {
     handleQuery() { this.getList() },
     getList() {
       this.loading = true
-      this.queryParams.startTime = this.dateRange[0]
-      this.queryParams.endTime = this.dateRange[1]
+      const s = this.dateRange && this.dateRange[0] ? (this.dateRange[0] + ' 00:00:00') : undefined
+      const e = this.dateRange && this.dateRange[1] ? (this.dateRange[1] + ' 23:59:59') : undefined
+      this.queryParams.startDate = s
+      this.queryParams.endDate = e
       listNotice(this.queryParams).then(response => { this.loading = false; this.noticeList = response.rows; this.total = response.total })
     },
-    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 10, title: undefined }; this.dateRange = []; this.getList() },
+    resetQuery() { this.queryParams = { pageNum: 1, pageSize: 10, title: undefined, startDate: undefined, endDate: undefined }; this.dateRange = []; this.getList() },
+    resetButton() { this.dateRange = []; this.resetForm('queryForm'); this.queryParams = { pageNum: 1, pageSize: 10, title: undefined, startDate: undefined, endDate: undefined }; this.getList() },
     handleSelectionChange(selection) { this.ids = selection.map(item => item.id); this.single = selection.length != 1; this.multiple = !selection.length },
     handleUpdate(row) {
       this.reset()
@@ -131,6 +149,9 @@ export default {
           }
         }
       })
+    },
+    viewDetail(row) {
+      getNotice(row.id).then(res => { this.detail = res.data || {}; this.detailOpen = true })
     },
     cancel() { this.open = false; this.resetForm && this.resetForm('form') }
   }

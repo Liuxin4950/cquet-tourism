@@ -29,6 +29,5 @@ public class TourismNotice extends AbsEntity {
 
     @TableField("notice_content")
     @NotBlank(message = "内容不能为空")
-    @Xss(message = "内容不能包含脚本")
     private String content;
 }

@@ -38,6 +38,9 @@
       <el-col :span="1.5">
         <el-button type="success" plain icon="el-icon-edit" size="mini" :disabled="single" @click="handleUpdate" v-hasPermi="['tourism:activity:edit']">修改</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button type="danger" plain icon="el-icon-delete" size="mini" :disabled="multiple" @click="handleDelete" v-hasPermi="['tourism:activity:remove']">删除</el-button>
+      </el-col>
     </el-row>
 
     <el-table
@@ -76,7 +79,7 @@
           <el-tag :type="auditTagType(scope.row.auditStatus)">{{ auditText(scope.row.auditStatus) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态" prop="status" width="100" align="center">
+      <el-table-column label="运行状态" prop="status" width="100" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status === '0' ? 'success' : 'info'">{{ scope.row.status === '0' ? '正常' : '停用' }}</el-tag>
         </template>
@@ -87,12 +90,9 @@
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="240">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-document" @click="viewDetail(scope.row)" v-hasPermi="['tourism:activity:query']">详情</el-button>
-          <el-button size="mini" type="text" icon="el-icon-video-play" @click="toggleStatus(scope.row)" v-hasPermi="['tourism:activity:edit']">{{ scope.row.status === '0' ? '停用' : '启用' }}</el-button>
-          <template v-if="scope.row.auditStatus === '0'">
-            <el-button size="mini" type="text" icon="el-icon-circle-check" @click="approve(scope.row)" v-hasPermi="['tourism:activity:approve']">通过</el-button>
-            <el-button size="mini" type="text" icon="el-icon-circle-close" @click="reject(scope.row)" v-hasPermi="['tourism:activity:reject']">拒绝</el-button>
-          </template>
+          <el-button size="mini" type="text" icon="el-icon-video-play" @click="toggleStatus(scope.row)" :disabled="scope.row.auditStatus !== '1'" v-hasPermi="['tourism:activity:edit']">{{ scope.row.status === '0' ? '停用' : '启用' }}</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['tourism:activity:edit']">修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:activity:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -110,8 +110,16 @@
           <el-col :span="12"><el-form-item label="联系电话" prop="contactPhone"><el-input v-model="form.contactPhone" placeholder="请输入联系电话" /></el-form-item></el-col>
         </el-row>
         <el-row>
-          <el-col :span="12"><el-form-item label="开始时间" prop="startTime"><el-date-picker v-model="form.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择开始时间" style="width: 100%" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="结束时间" prop="endTime"><el-date-picker v-model="form.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择结束时间" style="width: 100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="主办方" prop="organizer"><el-input v-model="form.organizer" placeholder="请输入主办方" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="封面图片" prop="coverImage"><image-upload v-model="form.coverImage" :limit="1" /></el-form-item></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12"><el-form-item label="当前人数" prop="currentParticipants"><el-input-number v-model="form.currentParticipants" :min="0" style="width: 100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="最大人数" prop="maxParticipants"><el-input-number v-model="form.maxParticipants" :min="1" style="width: 100%" /></el-form-item></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12"><el-form-item label="开始时间" prop="startTime"><el-date-picker v-model="form.startTime" type="datetime" value-format="yyyy-MM-dd'T'HH:mm:ss" placeholder="选择开始时间" style="width: 100%" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="结束时间" prop="endTime"><el-date-picker v-model="form.endTime" type="datetime" value-format="yyyy-MM-dd'T'HH:mm:ss" placeholder="选择结束时间" style="width: 100%" /></el-form-item></el-col>
         </el-row>
         <el-row>
           <el-col :span="24"><el-form-item label="活动介绍" prop="description"><el-input v-model="form.description" type="textarea" :rows="4" placeholder="请输入活动介绍" /></el-form-item></el-col>
@@ -126,20 +134,34 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="活动详情" :visible.sync="detailOpen" width="700px" append-to-body>
-      <el-descriptions :border="true" :column="2" size="small">
-        <el-descriptions-item label="活动名称">{{ detail.name }}</el-descriptions-item>
-        <el-descriptions-item label="类别">{{ detail.category }}</el-descriptions-item>
-        <el-descriptions-item label="主办方">{{ detail.organizer }}</el-descriptions-item>
-        <el-descriptions-item label="联系电话">{{ detail.contactPhone }}</el-descriptions-item>
-        <el-descriptions-item label="开始时间">{{ parseTime(detail.startTime) }}</el-descriptions-item>
-        <el-descriptions-item label="结束时间">{{ parseTime(detail.endTime) }}</el-descriptions-item>
-        <el-descriptions-item label="审核状态"><el-tag :type="auditTagType(detail.auditStatus)">{{ auditText(detail.auditStatus) }}</el-tag></el-descriptions-item>
-        <el-descriptions-item label="状态"><el-tag :type="detail.status === '0' ? 'success' : 'info'">{{ detail.status === '0' ? '正常' : '停用' }}</el-tag></el-descriptions-item>
-        <el-descriptions-item label="审核人">{{ detail.auditor }}</el-descriptions-item>
-        <el-descriptions-item label="审核意见">{{ detail.auditReason }}</el-descriptions-item>
-        <el-descriptions-item label="活动介绍" :span="2">{{ detail.description }}</el-descriptions-item>
-      </el-descriptions>
+    <el-dialog title="活动详情" :visible.sync="detailOpen" width="900px" append-to-body>
+      <el-row :gutter="16" style="margin-bottom: 12px">
+        <el-col :span="8">
+          <el-image
+            v-if="detail.coverImage"
+            :src="imageUrl(detail.coverImage)"
+            :preview-src-list="[imageUrl(detail.coverImage)]"
+            style="width: 100%; height: 200px; border-radius: 4px"
+            fit="cover"
+          />
+        </el-col>
+        <el-col :span="16">
+          <el-descriptions :border="true" :column="2" size="small">
+          <el-descriptions-item label="活动名称">{{ detail.name }}</el-descriptions-item>
+          <el-descriptions-item label="类别">{{ detail.category }}</el-descriptions-item>
+          <el-descriptions-item label="主办方">{{ detail.organizer }}</el-descriptions-item>
+          <el-descriptions-item label="联系电话">{{ detail.contactPhone }}</el-descriptions-item>
+          <el-descriptions-item label="开始时间">{{ parseTime(detail.startTime) }}</el-descriptions-item>
+          <el-descriptions-item label="结束时间">{{ parseTime(detail.endTime) }}</el-descriptions-item>
+          <el-descriptions-item label="审核状态"><el-tag :type="auditTagType(detail.auditStatus)">{{ auditText(detail.auditStatus) }}</el-tag></el-descriptions-item>
+          <el-descriptions-item label="状态"><el-tag :type="detail.status === '0' ? 'success' : 'info'">{{ detail.status === '0' ? '正常' : '停用' }}</el-tag></el-descriptions-item>
+          <el-descriptions-item label="审核人">{{ detail.auditor }}</el-descriptions-item>
+          <el-descriptions-item label="审核意见">{{ detail.auditReason }}</el-descriptions-item>
+          <el-descriptions-item label="人数" :span="2">{{ detail.currentParticipants }} / {{ detail.maxParticipants }}</el-descriptions-item>
+          <el-descriptions-item label="活动介绍" :span="2">{{ detail.description }}</el-descriptions-item>
+          </el-descriptions>
+        </el-col>
+      </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button @click="detailOpen = false">关 闭</el-button>
       </div>
@@ -148,13 +170,14 @@
 </template>
 
 <script>
-import { listScenicActivity, getScenicActivity, addScenicActivity, updateScenicActivity, updateScenicActivityStatus, approveScenicActivity, rejectScenicActivity } from '@/api/tourism/scenicActivity'
+import { listScenicActivity, getScenicActivity, addScenicActivity, updateScenicActivity, updateScenicActivityStatus, approveScenicActivity, rejectScenicActivity, delScenicActivity } from '@/api/tourism/scenicActivity'
 import { listScenicVenue } from '@/api/tourism/scenicVenue'
 import Pagination from '@/components/Pagination'
+import ImageUpload from '@/components/ImageUpload'
 
 export default {
   name: 'TourismActivity',
-  components: { Pagination },
+  components: { Pagination, ImageUpload },
   data() {
     return {
       activityList: [],
@@ -185,7 +208,8 @@ export default {
         category: [{ required: true, message: '类别不能为空', trigger: 'blur' }],
         venueId: [{ required: true, message: '所属场馆不能为空', trigger: 'change' }],
         startTime: [{ required: true, message: '开始时间不能为空', trigger: 'change' }],
-        endTime: [{ required: true, message: '结束时间不能为空', trigger: 'change' }]
+        endTime: [{ required: true, message: '结束时间不能为空', trigger: 'change' }],
+        maxParticipants: [{ required: true, message: '最大人数不能为空', trigger: 'blur' }]
       },
       venueOptions: [],
       venueMap: {},
@@ -234,7 +258,7 @@ export default {
       })
     },
     reset() {
-      this.form = { id: undefined, name: undefined, category: undefined, venueId: undefined, organizer: undefined, contactPhone: undefined, startTime: undefined, endTime: undefined, description: undefined, remark: undefined }
+      this.form = { id: undefined, name: undefined, category: undefined, venueId: undefined, organizer: undefined, contactPhone: undefined, startTime: undefined, endTime: undefined, coverImage: undefined, currentParticipants: 0, maxParticipants: 1, description: undefined, remark: undefined }
       this.resetForm && this.resetForm('form')
     },
     handleAdd() {
@@ -242,9 +266,18 @@ export default {
       this.title = '新增特色活动'
       this.reset()
     },
+    handleDelete(row) {
+      const ids = row.id || this.ids
+      this.$modal
+        .confirm('是否确认删除活动编号为"' + ids + '"的数据项？')
+        .then(function () { return delScenicActivity(ids) })
+        .then(() => { this.getList(); this.$modal.msgSuccess('删除成功') })
+        .catch(() => { this.$modal.msgError('删除失败') })
+    },
     submitForm() {
       this.$refs['form'].validate(valid => {
         if (valid) {
+          if (Number(this.form.currentParticipants || 0) > Number(this.form.maxParticipants || 0)) { this.$modal.msgError('当前人数不能大于最大人数'); return }
           if (this.form.id != undefined) {
             updateScenicActivity(this.form).then(() => { this.$modal.msgSuccess('修改成功'); this.open = false; this.getList() })
           } else {
@@ -270,6 +303,11 @@ export default {
     },
     viewDetail(row) {
       getScenicActivity(row.id).then(res => { this.detail = res.data || {}; this.detailOpen = true })
+    },
+    imageUrl(u) {
+      const base = process.env.VUE_APP_BASE_API || ''
+      if (!u) return ''
+      return u.indexOf('http') === 0 ? u : base + u
     },
     venueName(id) { return this.venueMap[id] || ('#' + id) },
     auditText(s) { if (s === '1') return '通过'; if (s === '2') return '拒绝'; return '待审核' },

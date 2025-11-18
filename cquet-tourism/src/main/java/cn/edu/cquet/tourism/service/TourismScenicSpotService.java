@@ -49,4 +49,19 @@ public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
      * 获取景区详情（含图片等关联）
      */
     ScenicSpotDetailVo getDetail(Long id);
+
+    /**
+     * 查询景区关联的场馆列表
+     */
+    java.util.List<cn.edu.cquet.tourism.domain.TourismVenue> getVenuesByScenicSpot(Long scenicSpotId);
+
+    /**
+     * 查询景区关联的图片列表
+     */
+    java.util.List<cn.edu.cquet.tourism.domain.TourismImage> getImagesByScenicSpot(Long scenicSpotId);
+
+    /**
+     * 设置景区关联的图片（覆盖式）
+     */
+    boolean setImagesForScenicSpot(Long scenicSpotId, java.util.List<Integer> imageIds);
 }

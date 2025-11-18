@@ -37,4 +37,24 @@ public interface TourismVenueService extends IService<TourismVenue> {
      * 删除场馆并清理关联
      */
     boolean removeVenueByIds(java.util.List<Integer> ids);
+
+    /**
+     * 查询场馆关联的景区列表
+     */
+    java.util.List<cn.edu.cquet.tourism.domain.TourismScenicSpot> getScenicSpotsByVenue(Long venueId);
+
+    /**
+     * 设置场馆关联的景区（先清除旧关联再重建）
+     */
+    boolean setScenicSpotsForVenue(Long venueId, java.util.List<Long> scenicSpotIds);
+
+    /**
+     * 查询场馆关联的图片列表
+     */
+    java.util.List<cn.edu.cquet.tourism.domain.TourismImage> getImagesByVenue(Long venueId);
+
+    /**
+     * 设置场馆关联的图片（覆盖式）
+     */
+    boolean setImagesForVenue(Long venueId, java.util.List<Integer> imageIds);
 }

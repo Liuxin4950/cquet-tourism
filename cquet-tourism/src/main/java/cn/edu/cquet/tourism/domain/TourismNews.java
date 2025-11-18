@@ -30,7 +30,6 @@ public class TourismNews extends AbsEntity {
 
     @TableField("content")
     @NotBlank(message = "内容不能为空")
-    @Xss(message = "内容不能包含脚本") // 防止xss(脚本)攻击
     private String content;
 
     @Xss(message = "作者不能包含脚本")

@@ -48,7 +48,18 @@
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" sortable="custom" />
-      <el-table-column label="场馆名称" prop="name" min-width="180" :show-overflow-tooltip="true" />
+      <el-table-column label="封面" width="90" align="center">
+        <template slot-scope="scope">
+          <el-image
+            v-if="scope.row._coverUrl"
+            :src="imageUrl(scope.row._coverUrl)"
+            :preview-src-list="[imageUrl(scope.row._coverUrl)]"
+            style="width: 48px; height: 48px; border-radius: 4px"
+            fit="cover"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column label="场馆名称" prop="name" min-width="100" :show-overflow-tooltip="true" />
       <el-table-column label="类别" prop="category" width="120" :show-overflow-tooltip="true" />
       <el-table-column label="所在城市" prop="city" width="120" :show-overflow-tooltip="true" />
       <el-table-column label="所在区县" prop="district" width="120" :show-overflow-tooltip="true" />
@@ -58,6 +69,9 @@
         </template>
       </el-table-column>
       <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" />
+      <el-table-column label="关联景区" width="160" align="center">
+        <template slot-scope="scope">{{ scope.row._scenicName || '-' }}</template>
+      </el-table-column>
       <el-table-column label="状态" prop="status" width="100" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status === '0' ? 'success' : 'info'">{{ scope.row.status === '0' ? '正常' : '停用' }}</el-tag>
@@ -70,7 +84,10 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
         <template slot-scope="scope">
+          <el-button size="mini" type="text" icon="el-icon-document" @click="viewVenueDetail(scope.row)" v-hasPermi="['tourism:venue:query']">详情</el-button>
+          <el-button size="mini" type="text" icon="el-icon-video-play" @click="toggleStatus(scope.row)" v-hasPermi="['tourism:venue:edit']">{{ scope.row.status === '0' ? '停用' : '启用' }}</el-button>
           <el-button size="mini" type="text" icon="el-icon-view" @click="viewActivities(scope.row)" v-hasPermi="['tourism:venue:activity:list']">查看活动</el-button>
+          <el-button size="mini" type="text" icon="el-icon-location" @click="viewScenicSpots(scope.row)" v-hasPermi="['tourism:venue:scenicSpot:list']">查看景区</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['tourism:venue:edit']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:venue:remove']">删除</el-button>
         </template>
@@ -169,6 +186,27 @@
         </el-row>
         <el-row>
           <el-col :span="24">
+            <el-form-item label="关联景区" prop="scenicSpotId">
+              <el-select v-model="form.scenicSpotId" filterable placeholder="请选择关联景区" style="width: 100%" @change="onScenicSpotChange">
+                <el-option v-for="s in scenicSpotOptions" :key="s.id" :label="s.name" :value="s.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="封面图片" prop="coverImage">
+              <image-upload v-model="form.coverImage" :limit="1" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="内容图片">
+              <image-upload v-model="form.imageUrls" :limit="9" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
             <el-form-item label="备注" prop="remark">
               <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
             </el-form-item>
@@ -210,16 +248,148 @@
         <el-button @click="activityOpen = false">关 闭</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="关联景区" :visible.sync="scenicOpen" width="1000px" append-to-body>
+      <el-table :data="scenicList">
+        <el-table-column label="封面" width="90" align="center">
+          <template slot-scope="scope">
+            <el-image
+              v-if="scope.row.coverImage"
+              :src="imageUrl(scope.row.coverImage)"
+              :preview-src-list="[imageUrl(scope.row.coverImage)]"
+              style="width: 48px; height: 48px; border-radius: 4px"
+              fit="cover"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="景区名称" prop="name" min-width="180" :show-overflow-tooltip="true" />
+        <el-table-column label="城市" prop="city" width="140" />
+        <el-table-column label="等级" prop="level" width="100" align="center" />
+        <el-table-column label="票价" prop="ticketPrice" width="120" align="center">
+          <template slot-scope="scope"><span>¥{{ scope.row.ticketPrice }}</span></template>
+        </el-table-column>
+        <el-table-column label="操作" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button type="text" size="mini" icon="el-icon-view" @click="viewScenicDetail(scope.row)">查看详情</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="scenicOpen = false">关 闭</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="景区图片" :visible.sync="scenicImagesOpen" width="900px" append-to-body>
+      <div style="display:flex; flex-wrap: wrap; gap: 8px">
+        <el-image
+          v-for="(img, idx) in scenicImagesList"
+          :key="idx"
+          :src="imageUrl(img.url)"
+          :preview-src-list="scenicImagesPreview"
+          style="width: 120px; height: 90px; border-radius: 4px"
+          fit="cover"
+        />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="scenicImagesOpen = false">关 闭</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="场馆详情" :visible.sync="venueDetailOpen" width="1000px" append-to-body>
+      <el-row :gutter="16">
+        <el-col :span="8">
+          <el-image
+            v-if="venueDetail.coverImage"
+            :src="imageUrl(venueDetail.coverImage)"
+            :preview-src-list="[imageUrl(venueDetail.coverImage)]"
+            style="width: 100%; height: 200px; border-radius: 4px"
+            fit="cover"
+          />
+        </el-col>
+        <el-col :span="16">
+          <el-descriptions :column="2" size="small" border>
+            <el-descriptions-item label="名称">{{ venueDetail.name }}</el-descriptions-item>
+            <el-descriptions-item label="类别">{{ venueDetail.category }}</el-descriptions-item>
+            <el-descriptions-item label="城市">{{ venueDetail.city }}</el-descriptions-item>
+            <el-descriptions-item label="区县">{{ venueDetail.district }}</el-descriptions-item>
+            <el-descriptions-item label="票价">¥{{ venueDetail.ticketPrice }}</el-descriptions-item>
+            <el-descriptions-item label="电话">{{ venueDetail.contactPhone }}</el-descriptions-item>
+            <el-descriptions-item label="开放时间">{{ venueDetail.openingHours }}</el-descriptions-item>
+            <el-descriptions-item label="官网">{{ venueDetail.website }}</el-descriptions-item>
+            <el-descriptions-item label="地址" :span="2">{{ venueDetail.address }}</el-descriptions-item>
+            <el-descriptions-item label="场馆介绍" :span="2">{{ venueDetail.description }}</el-descriptions-item>
+          </el-descriptions>
+        </el-col>
+      </el-row>
+      <div style="margin-top: 12px; font-weight: 600">内容图片</div>
+      <div style="display:flex; flex-wrap: wrap; gap: 8px">
+        <el-image
+          v-for="(img, idx) in (venueDetail.images || [])"
+          :key="idx"
+          :src="imageUrl(img.url)"
+          :preview-src-list="venueDetailImagesPreview"
+          style="width: 120px; height: 90px; border-radius: 4px"
+          fit="cover"
+        />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="venueDetailOpen = false">关 闭</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="景区详情" :visible.sync="scenicDetailOpen" width="1000px" append-to-body>
+      <el-row :gutter="16">
+        <el-col :span="8">
+          <el-image
+            v-if="scenicDetail.coverImage"
+            :src="imageUrl(scenicDetail.coverImage)"
+            :preview-src-list="[imageUrl(scenicDetail.coverImage)]"
+            style="width: 100%; height: 200px; border-radius: 4px"
+            fit="cover"
+          />
+        </el-col>
+        <el-col :span="16">
+          <el-descriptions :column="2" size="small" border>
+            <el-descriptions-item label="名称">{{ scenicDetail.name }}</el-descriptions-item>
+            <el-descriptions-item label="等级">{{ scenicDetail.level }}</el-descriptions-item>
+            <el-descriptions-item label="城市">{{ scenicDetail.city }}</el-descriptions-item>
+            <el-descriptions-item label="区县">{{ scenicDetail.district }}</el-descriptions-item>
+            <el-descriptions-item label="票价">¥{{ scenicDetail.ticketPrice }}</el-descriptions-item>
+            <el-descriptions-item label="电话">{{ scenicDetail.contactPhone }}</el-descriptions-item>
+            <el-descriptions-item label="开放时间">{{ scenicDetail.openingHours }}</el-descriptions-item>
+            <el-descriptions-item label="官网">{{ scenicDetail.website }}</el-descriptions-item>
+            <el-descriptions-item label="地址" :span="2">{{ scenicDetail.address }}</el-descriptions-item>
+            <el-descriptions-item label="景区介绍" :span="2">{{ scenicDetail.description }}</el-descriptions-item>
+          </el-descriptions>
+        </el-col>
+      </el-row>
+      <div style="margin-top: 12px; font-weight: 600">内容图片</div>
+      <div style="display:flex; flex-wrap: wrap; gap: 8px">
+        <el-image
+          v-for="(img, idx) in (scenicDetail.images || [])"
+          :key="idx"
+          :src="imageUrl(img.url)"
+          :preview-src-list="scenicDetailImagesPreview"
+          style="width: 120px; height: 90px; border-radius: 4px"
+          fit="cover"
+        />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="scenicDetailOpen = false">关 闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listScenicVenue, getScenicVenue, addScenicVenue, updateScenicVenue, delScenicVenue, listScenicVenueActivity } from '@/api/tourism/scenicVenue'
+import { listScenicVenue, getScenicVenue, addScenicVenue, updateScenicVenue, delScenicVenue, listScenicVenueActivity, listVenueScenicSpots, setVenueScenicSpots, listVenueImages } from '@/api/tourism/scenicVenue'
+import { listScenicSpot, getScenicSpot } from '@/api/tourism/scenicSpot'
 import Pagination from '@/components/Pagination'
+import ImageUpload from '@/components/ImageUpload'
 
 export default {
   name: 'TourismVenue',
-  components: { Pagination },
+  components: { Pagination, ImageUpload },
   data() {
     return {
       venueList: [],
@@ -252,11 +422,24 @@ export default {
         city: [{ required: true, message: '所在城市不能为空', trigger: 'blur' }]
       },
       activityOpen: false,
-      activityList: []
+      activityList: [],
+      scenicOpen: false,
+      scenicList: [],
+      scenicImagesOpen: false,
+      scenicImagesList: [],
+      scenicImagesPreview: [],
+      venueDetailOpen: false,
+      venueDetail: {},
+      venueDetailImagesPreview: [],
+      scenicDetailOpen: false,
+      scenicDetail: {},
+      scenicDetailImagesPreview: [],
+      scenicSpotOptions: []
     }
   },
   created() {
     this.getList()
+    listScenicSpot({ pageNum: 1, pageSize: 1000 }).then(res => { this.scenicSpotOptions = res.rows || [] })
   },
   methods: {
     handleQuery() {
@@ -266,11 +449,28 @@ export default {
       this.loading = true
       this.queryParams.startTime = this.dateRange[0]
       this.queryParams.endTime = this.dateRange[1]
-      listScenicVenue(this.queryParams).then(response => {
-        this.loading = false
-        this.venueList = response.rows
-        this.total = response.total
-      })
+      listScenicVenue(this.queryParams)
+        .then(res => {
+          const payload = res && res.data && typeof res.data === 'object' ? res.data : res
+          const rows = (payload && payload.rows) || []
+          const total = (payload && (payload.total || payload.count || rows.length)) || 0
+          this.venueList = Array.isArray(rows) ? rows : []
+          ;(this.venueList || []).forEach((v, i) => {
+            listVenueScenicSpots(v.id).then(r => {
+              const arr = Array.isArray(r.data) ? r.data : []
+              const name = arr.length ? arr[0].name : '-'
+              this.$set(this.venueList[i], '_scenicName', name)
+            })
+            listVenueImages(v.id).then(r => {
+              const arr = Array.isArray(r.data) ? r.data : []
+              const cover = v.coverImage || (arr.length ? arr[0].url : '')
+              this.$set(this.venueList[i], '_coverUrl', cover)
+            })
+          })
+          this.total = Number(total) || 0
+        })
+        .catch(() => { this.loading = false })
+        .finally(() => { this.loading = false })
     },
     resetQuery() {
       this.queryParams = {
@@ -300,29 +500,33 @@ export default {
       const id = row.id || this.ids[0]
       getScenicVenue(id).then(response => {
         this.form = response.data
+        listVenueScenicSpots(id).then(r => { const arr = (r.data || []); this.form.scenicSpotId = arr.length ? arr[0].id : undefined })
+        listVenueImages(id).then(r => { const arr = Array.isArray(r.data) ? r.data : []; const urls = arr.map(it => it.url).filter(Boolean); this.$set(this.form, 'imageUrls', urls) })
         this.open = true
         this.title = '修改场馆信息'
       })
     },
     reset() {
-      this.form = {
-        id: undefined,
-        name: undefined,
-        category: undefined,
-        ticketPrice: 0,
-        address: undefined,
-        city: undefined,
-        district: undefined,
-        openingHours: undefined,
-        contactPhone: undefined,
-        website: undefined,
-        description: undefined,
-        longitude: undefined,
-        latitude: undefined,
-        capacity: 0,
-        bookingRequired: '0',
-        remark: undefined
-      }
+        this.form = {
+          id: undefined,
+          name: undefined,
+          category: undefined,
+          ticketPrice: 0,
+          address: undefined,
+          city: undefined,
+          district: undefined,
+          openingHours: undefined,
+          contactPhone: undefined,
+          website: undefined,
+          description: undefined,
+          longitude: undefined,
+          latitude: undefined,
+          capacity: 0,
+          bookingRequired: '0',
+          remark: undefined,
+          scenicSpotId: undefined,
+          imageUrls: []
+        }
       this.resetForm && this.resetForm('form')
     },
     handleAdd() {
@@ -350,12 +554,39 @@ export default {
         if (valid) {
           if (this.form.id != undefined) {
             updateScenicVenue(this.form).then(() => {
+              const ids = this.form.scenicSpotId ? [this.form.scenicSpotId] : []
+              setVenueScenicSpots(this.form.id, ids).then(() => {})
+              import('@/api/tourism/uploadPictures').then((u) => {
+                const urls = Array.isArray(this.form.imageUrls)
+                  ? this.form.imageUrls
+                  : (typeof this.form.imageUrls === 'string' && this.form.imageUrls
+                      ? this.form.imageUrls.split(',').filter(Boolean)
+                      : []);
+                u.batchUploadImageUrls(urls).then((r) => {
+                  const imageIds = (r.data || r.rows || []).map((it) => it.id);
+                  import('@/api/tourism/scenicVenue').then((m) => { m.setVenueImages(this.form.id, imageIds).then(() => {}) })
+                })
+              })
               this.$modal.msgSuccess('修改成功')
               this.open = false
               this.getList()
             })
           } else {
-            addScenicVenue(this.form).then(() => {
+            addScenicVenue(this.form).then((res) => {
+              const vid = (res && res.data && res.data.id) ? res.data.id : this.form.id
+              const ids = this.form.scenicSpotId ? [this.form.scenicSpotId] : []
+              setVenueScenicSpots(vid, ids).then(() => {})
+              import('@/api/tourism/uploadPictures').then((u) => {
+                const urls = Array.isArray(this.form.imageUrls)
+                  ? this.form.imageUrls
+                  : (typeof this.form.imageUrls === 'string' && this.form.imageUrls
+                      ? this.form.imageUrls.split(',').filter(Boolean)
+                      : []);
+                u.batchUploadImageUrls(urls).then((r) => {
+                  const imageIds = (r.data || r.rows || []).map((it) => it.id);
+                  import('@/api/tourism/scenicVenue').then((m) => { m.setVenueImages(vid, imageIds).then(() => {}) })
+                })
+              })
               this.$modal.msgSuccess('新增成功')
               this.open = false
               this.getList()
@@ -374,6 +605,65 @@ export default {
         this.activityOpen = true
       })
     },
+    viewScenicSpots(row) {
+      listVenueScenicSpots(row.id).then(response => {
+        this.scenicList = Array.isArray(response.data) ? response.data : []
+        this.scenicOpen = true
+      })
+    },
+    viewScenicImages(row) {
+      import('@/api/tourism/scenicSpot').then((m) => {
+        m.listScenicSpotImages(row.id).then((response) => {
+          this.scenicImagesList = Array.isArray(response.data) ? response.data : []
+          const base = process.env.VUE_APP_BASE_API || ''
+          this.scenicImagesPreview = this.scenicImagesList.map(it => {
+            const u = it && it.url ? it.url : ''
+            return u.indexOf('http') === 0 ? u : base + u
+          })
+          this.scenicImagesOpen = true
+        })
+      })
+    },
+    viewVenueDetail(row) {
+      getScenicVenue(row.id).then((response) => {
+        this.venueDetail = response && response.data ? response.data : {}
+        const base = process.env.VUE_APP_BASE_API || ''
+        const imgs = Array.isArray(this.venueDetail.images) ? this.venueDetail.images : []
+        this.venueDetailImagesPreview = imgs.map(it => {
+          const u = it && it.url ? it.url : ''
+          return u.indexOf('http') === 0 ? u : base + u
+        })
+        this.venueDetailOpen = true
+      })
+    },
+    viewScenicDetail(row) {
+      getScenicSpot(row.id).then((response) => {
+        this.scenicDetail = response && response.data ? response.data : {}
+        const base = process.env.VUE_APP_BASE_API || ''
+        const imgs = Array.isArray(this.scenicDetail.images) ? this.scenicDetail.images : []
+        this.scenicDetailImagesPreview = imgs.map(it => {
+          const u = it && it.url ? it.url : ''
+          return u.indexOf('http') === 0 ? u : base + u
+        })
+        this.scenicDetailOpen = true
+      })
+    },
+    toggleStatus(row) {
+      const target = row.status === '0' ? '1' : '0'
+      const payload = { id: row.id, status: target }
+      updateScenicVenue(payload).then(() => { this.$modal.msgSuccess('状态已更新'); this.getList() })
+    },
+    onScenicSpotChange(val) {
+      if (!val) return
+      getScenicSpot(val).then(r => {
+        const s = r && r.data ? r.data : {}
+        this.form.city = s.city
+        this.form.district = s.district
+        this.form.address = s.address
+        this.form.longitude = s.longitude
+        this.form.latitude = s.latitude
+      })
+    },
     auditText(s) {
       if (s === '1') return '通过'
       if (s === '2') return '拒绝'
@@ -383,6 +673,11 @@ export default {
       if (s === '1') return 'success'
       if (s === '2') return 'danger'
       return 'warning'
+    },
+    imageUrl(u) {
+      const base = process.env.VUE_APP_BASE_API || ''
+      if (!u) return ''
+      return u.indexOf('http') === 0 ? u : base + u
     }
   }
 }

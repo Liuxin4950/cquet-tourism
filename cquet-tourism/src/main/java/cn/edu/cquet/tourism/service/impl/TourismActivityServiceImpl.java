@@ -140,4 +140,11 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
         if ("rejected".equals(v) || "2".equals(v)) return "2"; // 不通过
         return s; // 未匹配则回传原值
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean removeByIds(java.util.List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return false;
+        return activityMapper.deleteBatchIds(ids) > 0;
+    }
 }

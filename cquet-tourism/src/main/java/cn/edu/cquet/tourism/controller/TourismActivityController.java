@@ -126,4 +126,12 @@ public class TourismActivityController extends BaseController {
         if (r == null || r.isBlank()) return warn("请提供审核不通过原因");
         return toAjax(activityService.reject(id, r));
     }
+
+    @PreAuthorize("@ss.hasPermi('tourism:activity:remove')")
+    @Log(title = "特色活动", businessType = BusinessType.DELETE)
+    @DeleteMapping("/{ids}")
+    @Operation(summary = "删除特色活动")
+    public Result remove(@PathVariable java.util.List<Long> ids) {
+        return toAjax(activityService.removeByIds(ids));
+    }
 }

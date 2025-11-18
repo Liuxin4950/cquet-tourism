@@ -93,3 +93,11 @@ export function rejectScenicActivityApplication(scenicActivityApplicationId, rea
     data: hasQuery ? undefined : { reason }
   })
 }
+
+// 删除特色活动
+export function delScenicActivity(ids) {
+  return request({
+    url: '/tourism/activity/' + ids,
+    method: 'delete'
+  })
+}

@@ -53,4 +53,10 @@ public class TourismActivity extends AbsEntity {
 
     @TableField("auditor")
     private String auditor;
+
+    @TableField("current_participants")
+    private Integer currentParticipants;
+
+    @TableField("max_participants")
+    private Integer maxParticipants;
 }

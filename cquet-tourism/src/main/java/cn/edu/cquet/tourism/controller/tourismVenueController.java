@@ -19,6 +19,8 @@ import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
 import cn.edu.cquet.tourism.domain.TourismActivity;
+import cn.edu.cquet.tourism.domain.TourismScenicSpot;
+import cn.edu.cquet.tourism.domain.TourismImage;
 
 import java.util.List;
 
@@ -94,7 +96,9 @@ public class tourismVenueController extends BaseController {
         if (venue.getId() != null) {
             return warn("新增不需要指定id");
         }
-        return toAjax(tourismVenueService.addVenue(venue));
+        boolean ok = tourismVenueService.addVenue(venue);
+        if (!ok) return warn("该场馆已存在或新增失败");
+        return success(venue);
     }
 
     @PreAuthorize("@ss.hasPermi('tourism:venue:edit')")
@@ -150,5 +154,39 @@ public class tourismVenueController extends BaseController {
         }
         List<TourismActivity> list = ((cn.edu.cquet.tourism.service.impl.TourismVenueServiceImpl)tourismVenueService).getActivitiesByVenueId(id.intValue());
         return success(list);
+    }
+
+    @PreAuthorize("@ss.hasPermi('tourism:venue:scenicSpot:list')")
+    @GetMapping("/{id}/scenic-spots")
+    @Operation(summary = "查看当前场馆的关联景区列表")
+    public Result scenicSpots(@PathVariable Long id) {
+        if (id == null) return warn("场馆id不能为空");
+        java.util.List<TourismScenicSpot> spots = tourismVenueService.getScenicSpotsByVenue(id);
+        return success(spots);
+    }
+
+    @PreAuthorize("@ss.hasPermi('tourism:venue:scenicSpot:edit')")
+    @PutMapping("/{id}/scenic-spots")
+    @Operation(summary = "设置当前场馆的关联景区（覆盖式）")
+    public Result setScenicSpots(@PathVariable Long id, @RequestBody java.util.List<Long> scenicSpotIds) {
+        if (id == null) return warn("场馆id不能为空");
+        return toAjax(tourismVenueService.setScenicSpotsForVenue(id, scenicSpotIds));
+    }
+
+    @PreAuthorize("@ss.hasPermi('tourism:venue:image:list')")
+    @GetMapping("/{id}/images")
+    @Operation(summary = "查看当前场馆的关联图片列表")
+    public Result venueImages(@PathVariable Long id) {
+        if (id == null) return warn("场馆id不能为空");
+        java.util.List<TourismImage> images = tourismVenueService.getImagesByVenue(id);
+        return success(images);
+    }
+
+    @PreAuthorize("@ss.hasPermi('tourism:venue:image:edit')")
+    @PutMapping("/{id}/images")
+    @Operation(summary = "设置当前场馆的关联图片（覆盖式）")
+    public Result setVenueImages(@PathVariable Long id, @RequestBody java.util.List<Integer> imageIds) {
+        if (id == null) return warn("场馆id不能为空");
+        return toAjax(tourismVenueService.setImagesForVenue(id, imageIds));
     }
 }

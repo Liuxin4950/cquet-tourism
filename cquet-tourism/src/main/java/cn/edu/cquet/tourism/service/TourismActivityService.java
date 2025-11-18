@@ -12,4 +12,5 @@ public interface TourismActivityService {
     boolean update(TourismActivity activity);
     boolean approve(Long id, String opinion);
     boolean reject(Long id, String reason);
+    boolean removeByIds(java.util.List<Long> ids);
 }

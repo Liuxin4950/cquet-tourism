@@ -16,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.vo.ScenicSpotDetailVo;
+import cn.edu.cquet.tourism.domain.TourismImage;
+import cn.edu.cquet.tourism.domain.TourismVenue;
 
 import java.util.List;
 
@@ -76,6 +78,32 @@ public class TourismScenicSpotController extends BaseController {
         return success(detail);
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:venue:list')")
+    @GetMapping("/{id}/venues")
+    @Operation(summary = "查看当前景区的关联场馆列表")
+    public Result venues(@PathVariable Long id) {
+        if (id == null) return warn("景区id不能为空");
+        java.util.List<TourismVenue> venues = tourismScenicSpotService.getVenuesByScenicSpot(id);
+        return success(venues);
+    }
+
+    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:image:list')")
+    @GetMapping("/{id}/images")
+    @Operation(summary = "查看当前景区的关联图片列表")
+    public Result spotImages(@PathVariable Long id) {
+        if (id == null) return warn("景区id不能为空");
+        java.util.List<TourismImage> images = tourismScenicSpotService.getImagesByScenicSpot(id);
+        return success(images);
+    }
+
+    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:image:edit')")
+    @PutMapping("/{id}/images")
+    @Operation(summary = "设置当前景区的关联图片（覆盖式）")
+    public Result setSpotImages(@PathVariable Long id, @RequestBody java.util.List<Integer> imageIds) {
+        if (id == null) return warn("景区id不能为空");
+        return toAjax(tourismScenicSpotService.setImagesForScenicSpot(id, imageIds));
+    }
+
     @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:add')")
     @Log(title = "A级景区", businessType = BusinessType.INSERT)
     @PostMapping
@@ -97,7 +125,7 @@ public class TourismScenicSpotController extends BaseController {
         if (!result) {
             return warn("景区名称已存在");
         }
-        return success();
+        return success(scenicSpot);
     }
 
     @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:edit')")
