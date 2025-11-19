@@ -103,6 +103,7 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
           .set(org.springframework.util.StringUtils.hasText(opinion), TourismActivity::getAuditReason, opinion) // 可选记录审核意见
           .set(TourismActivity::getAuditor, SecurityUtils.getUsername()) // 记录审核人
           .set(TourismActivity::getUpdateTime, new java.util.Date()) // 更新时间
+          .set(TourismActivity::getUpdateTime, new java.util.Date()) // 更新时间
           .eq(TourismActivity::getId, id); // 目标记录
         int rows = activityMapper.update(null, uw); // 执行更新
         return rows > 0; // 返回结果

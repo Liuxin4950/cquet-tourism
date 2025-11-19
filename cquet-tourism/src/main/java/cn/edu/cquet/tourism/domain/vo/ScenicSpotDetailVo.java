@@ -2,7 +2,6 @@ package cn.edu.cquet.tourism.domain.vo;
 
 import cn.edu.cquet.tourism.domain.TourismImage;
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
-import cn.edu.cquet.tourism.domain.TourismVenue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -18,6 +17,4 @@ import java.util.List;
 public class ScenicSpotDetailVo extends TourismScenicSpot {
     /** 景区关联的图片列表 */
     private List<TourismImage> images;
-    /** 景区关联的场馆列表 */
-    private List<TourismVenue> venues;
 }

@@ -98,25 +98,30 @@
       v-loading="loading"
       :data="noticeList"
       @selection-change="handleSelectionChange"
+      border
+      :fit="false"
+      style="width: 100%"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column
         label="序号"
         align="center"
         prop="noticeId"
-        width="100"
+        width="120"
       />
       <el-table-column
         label="公告标题"
         align="center"
         prop="noticeTitle"
         :show-overflow-tooltip="true"
+        class-name="title-col"
+        width="240"
       />
       <el-table-column
         label="公告类型"
         align="center"
         prop="noticeType"
-        width="100"
+        width="160"
       >
         <template slot-scope="scope">
           <dict-tag
@@ -125,7 +130,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status" width="100">
+      <el-table-column label="状态" align="center" prop="status" width="160">
         <template slot-scope="scope">
           <dict-tag
             :options="dict.type.sys_notice_status"
@@ -137,13 +142,13 @@
         label="创建者"
         align="center"
         prop="createBy"
-        width="100"
+        width="160"
       />
       <el-table-column
         label="创建时间"
         align="center"
         prop="createTime"
-        width="100"
+        width="180"
       >
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, "{y}-{m}-{d}") }}</span>
@@ -153,8 +158,16 @@
         label="操作"
         align="center"
         class-name="small-padding fixed-width"
+        width="180"
       >
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-document"
+            @click="handleDetail(scope.row)"
+            >详情</el-button
+          >
           <el-button
             size="mini"
             type="text"
@@ -231,6 +244,23 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="公告详情" :visible.sync="detailOpen" width="780px" append-to-body>
+      <div class="detail-header">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <span>标题：{{ detail.noticeTitle }}</span>
+          </el-col>
+          <el-col :span="8">
+            <span>创建人：{{ detail.createBy }}</span>
+          </el-col>
+          <el-col :span="8">
+            <span>创建时间：{{ parseTime(detail.createTime, "{y}-{m}-{d} {h}:{i}:{s}") }}</span>
+          </el-col>
+        </el-row>
+      </div>
+      <div class="detail-content" v-html="detail.noticeContent"></div>
+    </el-dialog>
   </div>
 </template>
 
@@ -285,6 +315,8 @@ export default {
           { required: true, message: "公告类型不能为空", trigger: "change" },
         ],
       },
+      detailOpen: false,
+      detail: {},
     };
   },
   created() {
@@ -379,9 +411,40 @@ export default {
         .then(() => {
           this.getList();
           this.$modal.msgSuccess("删除成功");
-        })
-        .catch(() => {});
+      })
+      .catch(() => {});
+    },
+    handleDetail(row) {
+      const noticeId = row.noticeId;
+      getNotice(noticeId).then((response) => {
+        this.detail = response.data;
+        this.detailOpen = true;
+      });
     },
   },
 };
 </script>
+
+<style scoped>
+.title-col .cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+::v-deep .el-table--border .el-table__row td,
+::v-deep .el-table--border .el-table__header-wrapper th {
+  border-right: 1px solid #EBEEF5 !important;
+}
+::v-deep .el-table--border .el-table__row td:last-child,
+::v-deep .el-table--border .el-table__header-wrapper th:last-child,
+::v-deep .el-table--border .el-table__header-wrapper th.gutter {
+  border-right: 1px solid #EBEEF5 !important;
+}
+.detail-header {
+  margin-bottom: 12px;
+}
+.detail-content {
+  padding: 8px 0;
+  line-height: 1.8;
+}
+</style>

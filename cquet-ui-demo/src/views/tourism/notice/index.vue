@@ -30,20 +30,15 @@
       v-loading="loading"
       :data="noticeList"
       @selection-change="handleSelectionChange"
-      border
-      stripe
-      size="small"
-      highlight-current-row
-      :header-cell-style="{ background: '#fafafa', color: '#606266' }"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="编号" prop="id" width="90" align="center" />
-      <el-table-column label="标题" prop="title" max-width="90" :show-overflow-tooltip="true" />
-      <el-table-column label="创建人" prop="createBy" width="140" :show-overflow-tooltip="true" />
-      <el-table-column label="创建时间" prop="createTime" width="170" align="center">
+      <el-table-column label="编号" prop="id" width="150" align="center" />
+      <el-table-column label="标题" prop="title" min-width="280" :show-overflow-tooltip="true" />
+      <el-table-column label="创建人" prop="createBy" width="280" :show-overflow-tooltip="true" />
+      <el-table-column label="创建时间" prop="createTime" width="280" align="center">
         <template slot-scope="scope"><span>{{ parseTime(scope.row.createTime) }}</span></template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-document" @click="viewDetail(scope.row)" v-hasPermi="['tourism:notice:query']">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['tourism:notice:edit']">修改</el-button>
@@ -54,13 +49,13 @@
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="公告标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入公告标题" />
         </el-form-item>
         <el-form-item label="公告内容" prop="content">
-          <editor v-model="form.content" placeholder="请输入公告内容" />
+          <editor v-model="form.content" :height="300" placeholder="请输入公告内容" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -73,12 +68,12 @@
     </el-dialog>
 
     <el-dialog title="公告详情" :visible.sync="detailOpen" width="900px" append-to-body>
-      <el-descriptions :border="true" :column="2" size="small">
+      <el-descriptions :border="true" :column="3" size="small">
         <el-descriptions-item label="标题">{{ detail.title }}</el-descriptions-item>
         <el-descriptions-item label="创建人">{{ detail.createBy }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ parseTime(detail.createTime) }}</el-descriptions-item>
-        <el-descriptions-item label="内容" :span="2"><div v-html="detail.content"></div></el-descriptions-item>
       </el-descriptions>
+      <div class="detail-article" v-html="detail.content"></div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="detailOpen = false">关 闭</el-button>
       </div>
@@ -160,4 +155,5 @@ export default {
 
 <style lang="scss" scoped>
 .app-container { padding: 20px; }
+.detail-article { padding: 12px 0; line-height: 1.8; }
 </style>

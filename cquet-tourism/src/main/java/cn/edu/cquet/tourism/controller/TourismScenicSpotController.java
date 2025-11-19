@@ -17,7 +17,6 @@ import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.vo.ScenicSpotDetailVo;
 import cn.edu.cquet.tourism.domain.TourismImage;
-import cn.edu.cquet.tourism.domain.TourismVenue;
 
 import java.util.List;
 
@@ -78,14 +77,6 @@ public class TourismScenicSpotController extends BaseController {
         return success(detail);
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:venue:list')")
-    @GetMapping("/{id}/venues")
-    @Operation(summary = "查看当前景区的关联场馆列表")
-    public Result venues(@PathVariable Long id) {
-        if (id == null) return warn("景区id不能为空");
-        java.util.List<TourismVenue> venues = tourismScenicSpotService.getVenuesByScenicSpot(id);
-        return success(venues);
-    }
 
     @PreAuthorize("@ss.hasPermi('tourism:scenic-spot:image:list')")
     @GetMapping("/{id}/images")

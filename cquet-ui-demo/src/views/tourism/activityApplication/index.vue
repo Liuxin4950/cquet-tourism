@@ -26,28 +26,24 @@
       v-loading="loading"
       :data="activityList"
       @selection-change="handleSelectionChange"
-      border
-      stripe
-      size="small"
-      highlight-current-row
-      :header-cell-style="{ background: '#fafafa', color: '#606266' }"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" />
-      <el-table-column label="活动名称" prop="name" min-width="180" :show-overflow-tooltip="true" />
-      <el-table-column label="所属场馆" min-width="160">
+      <el-table-column label="活动名称" prop="name" width="150" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="所属场馆" width="150">
         <template slot-scope="scope">{{ venueName(scope.row.venueId) }}</template>
       </el-table-column>
-      <el-table-column label="审核状态" prop="auditStatus" width="110" align="center">
+      <el-table-column label="审核状态" prop="auditStatus" width="150" align="center">
         <template slot-scope="scope">
           <el-tag :type="auditTagType(scope.row.auditStatus)">{{ auditText(scope.row.auditStatus) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="审核人" prop="auditor" width="120" :show-overflow-tooltip="true" />
-      <el-table-column label="审核时间" prop="auditTime" width="170" align="center">
-        <template slot-scope="scope"><span>{{ parseTime(scope.row.auditTime) }}</span></template>
+      <el-table-column label="审核人" prop="auditor" width="150" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="审核意见" prop="auditReason" width="250" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="审核时间" prop="updateTime" align="center" width="190">
+        <template slot-scope="scope"><span>{{ scope.row.updateTime ? parseTime(scope.row.updateTime) : '暂无...' }}</span></template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="190">
         <template slot-scope="scope">
           <template v-if="scope.row.auditStatus === '0'">
             <el-button size="mini" type="text" icon="el-icon-circle-check" @click="approve(scope.row)" v-hasPermi="['tourism:activityApplication:approve']">通过</el-button>
@@ -103,6 +99,7 @@ export default {
     },
     resetQuery() { this.queryParams = { pageNum: 1, pageSize: 10, name: undefined, venueId: undefined, auditStatus: '0' }; this.getList() },
     handleSelectionChange(selection) { this.ids = selection.map(item => item.id); this.single = selection.length != 1; this.multiple = !selection.length },
+    formatText(row, column, cellValue) { return cellValue || '暂无...' },
     approve(row) {
       this.$prompt('请输入审核意见（可选）', '审核通过', { confirmButtonText: '确定', cancelButtonText: '取消' }).then(({ value }) => {
         passScenicActivityApplication(row.id, value).then(() => { this.$modal.msgSuccess('审核通过'); this.getList() })
@@ -119,7 +116,7 @@ export default {
     },
     auditText(s) { if (s === '1') return '通过'; if (s === '2') return '拒绝'; return '待审核' },
     auditTagType(s) { if (s === '1') return 'success'; if (s === '2') return 'danger'; return 'warning' },
-    venueName(id) { return this.venueMap[id] || ('#' + id) }
+    venueName(id) { const name = this.venueMap[id]; return name ? name : '暂无...' }
   }
 }
 </script>

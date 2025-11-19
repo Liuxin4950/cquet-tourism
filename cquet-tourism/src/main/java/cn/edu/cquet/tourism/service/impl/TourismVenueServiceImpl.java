@@ -27,9 +27,6 @@ import java.util.Set;
 import cn.edu.cquet.common.utils.bean.BeanUtils;
 import cn.edu.cquet.tourism.domain.TourismActivity;
 import cn.edu.cquet.tourism.mapper.TourismActivityMapper;
-import cn.edu.cquet.tourism.domain.TourismVenueScenicSpot;
-import cn.edu.cquet.tourism.mapper.TourismVenueScenicSpotMapper;
-import cn.edu.cquet.tourism.mapper.TourismScenicSpotMapper;
 // duplicate imports removed
 
 @Slf4j
@@ -61,11 +58,6 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
     @Autowired
     private TourismActivityMapper activityMapper; // 活动 Mapper
 
-    @Autowired
-    private TourismVenueScenicSpotMapper venueScenicSpotMapper; // 场馆-景区关联 Mapper
-
-    @Autowired
-    private TourismScenicSpotMapper scenicSpotMapper; // 景区 Mapper
 
     // duplicate fields removed (venueImageMapper, imageMapper)
 
@@ -189,15 +181,6 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
             List<TourismFacilities> facilities = facilitiesMapper.selectBatchIds(fids); // 批量查询设施
             vo.setFacilities(facilities); // 设置设施列表
         }
-        // 追加：场馆关联的景区列表
-        LambdaQueryWrapper<TourismVenueScenicSpot> q3 = new LambdaQueryWrapper<>();
-        q3.eq(TourismVenueScenicSpot::getVenueId, v.getId());
-        java.util.List<TourismVenueScenicSpot> vss = venueScenicSpotMapper.selectList(q3);
-        if (!vss.isEmpty()) {
-            java.util.List<Long> spotIds = vss.stream().map(TourismVenueScenicSpot::getScenicSpotId).collect(java.util.stream.Collectors.toList());
-            java.util.List<cn.edu.cquet.tourism.domain.TourismScenicSpot> spots = scenicSpotMapper.selectBatchIds(spotIds);
-            vo.setScenicSpots(spots);
-        }
         return vo; // 返回详情
     }
 
@@ -215,15 +198,6 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
         return activityMapper.selectList(qw); // 执行查询
     }
 
-    @Override
-    public java.util.List<cn.edu.cquet.tourism.domain.TourismScenicSpot> getScenicSpotsByVenue(Long venueId) {
-        LambdaQueryWrapper<TourismVenueScenicSpot> qw = new LambdaQueryWrapper<>();
-        qw.eq(TourismVenueScenicSpot::getVenueId, venueId);
-        java.util.List<TourismVenueScenicSpot> rels = venueScenicSpotMapper.selectList(qw);
-        if (rels.isEmpty()) return java.util.Collections.emptyList();
-        java.util.List<Long> ids = rels.stream().map(TourismVenueScenicSpot::getScenicSpotId).collect(java.util.stream.Collectors.toList());
-        return scenicSpotMapper.selectBatchIds(ids);
-    }
 
     @Override
     public java.util.List<cn.edu.cquet.tourism.domain.TourismImage> getImagesByVenue(Long venueId) {
@@ -254,23 +228,6 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
         return true;
     }
 
-    @Override
-    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-    public boolean setScenicSpotsForVenue(Long venueId, java.util.List<Long> scenicSpotIds) {
-        LambdaQueryWrapper<TourismVenueScenicSpot> del = new LambdaQueryWrapper<>();
-        del.eq(TourismVenueScenicSpot::getVenueId, venueId);
-        venueScenicSpotMapper.delete(del);
-        if (scenicSpotIds != null) {
-            for (Long sid : scenicSpotIds) {
-                TourismVenueScenicSpot rel = new TourismVenueScenicSpot();
-                rel.setVenueId(venueId);
-                rel.setScenicSpotId(sid);
-                rel.setSort(0);
-                venueScenicSpotMapper.insert(rel);
-            }
-        }
-        return true;
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -287,11 +244,7 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
         LambdaQueryWrapper<TourismVenueFacilities> del2 = new LambdaQueryWrapper<>(); // 删除设施关联
         del2.in(TourismVenueFacilities::getVenueId, ids);
         venueFacilitiesMapper.delete(del2);
-
-        LambdaQueryWrapper<TourismVenueScenicSpot> del3 = new LambdaQueryWrapper<>(); // 删除景区关联
-        del3.in(TourismVenueScenicSpot::getVenueId, ids.stream().map(Integer::longValue).collect(java.util.stream.Collectors.toList()));
-        venueScenicSpotMapper.delete(del3);
-
+        
         // 删除当前场馆下的特色活动（以确保联动清理申报与评论等）
         LambdaQueryWrapper<TourismActivity> delAct = new LambdaQueryWrapper<>();
         delAct.in(TourismActivity::getVenueId, ids);

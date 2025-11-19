@@ -51,22 +51,6 @@ export function listScenicVenueActivity(scenicVenueId) {
   })
 }
 
-// 查询场馆关联的景区列表
-export function listVenueScenicSpots(venueId) {
-  return request({
-    url: '/tourism/venue/' + venueId + '/scenic-spots',
-    method: 'get'
-  })
-}
-
-// 设置场馆关联的景区（覆盖式）
-export function setVenueScenicSpots(venueId, scenicSpotIds) {
-  return request({
-    url: '/tourism/venue/' + venueId + '/scenic-spots',
-    method: 'put',
-    data: scenicSpotIds || []
-  })
-}
 
 // 查询场馆关联图片
 export function listVenueImages(venueId) {

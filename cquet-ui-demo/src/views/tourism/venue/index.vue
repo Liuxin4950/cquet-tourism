@@ -4,7 +4,7 @@
       <el-form-item label="场馆名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入场馆名称" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <el-form-item label="详细地址" prop="address">
+      <!-- <el-form-item label="详细地址" prop="address">
         <el-input v-model="queryParams.address" placeholder="请输入详细地址" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
@@ -12,7 +12,7 @@
           <el-option label="正常" value="0" />
           <el-option label="停用" value="1" />
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="创建时间">
         <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
@@ -40,11 +40,6 @@
       :data="venueList"
       @selection-change="handleSelectionChange"
       @sort-change="handleSortChange"
-      border
-      stripe
-      size="small"
-      highlight-current-row
-      :header-cell-style="{ background: '#fafafa', color: '#606266' }"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" sortable="custom" />
@@ -59,19 +54,16 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="场馆名称" prop="name" min-width="100" :show-overflow-tooltip="true" />
-      <el-table-column label="类别" prop="category" width="120" :show-overflow-tooltip="true" />
-      <el-table-column label="所在城市" prop="city" width="120" :show-overflow-tooltip="true" />
-      <el-table-column label="所在区县" prop="district" width="120" :show-overflow-tooltip="true" />
+      <el-table-column label="场馆名称" prop="name" min-width="100" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="类别" prop="category" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="所在城市" prop="city" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="所在区县" prop="district" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="门票价格" prop="ticketPrice" width="110" align="center">
         <template slot-scope="scope">
-          <span>¥{{ scope.row.ticketPrice }}</span>
+          <span>{{ scope.row.ticketPrice != null ? ('¥' + scope.row.ticketPrice) : '暂无...' }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" />
-      <el-table-column label="关联景区" width="160" align="center">
-        <template slot-scope="scope">{{ scope.row._scenicName || '-' }}</template>
-      </el-table-column>
+      <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="状态" prop="status" width="100" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status === '0' ? 'success' : 'info'">{{ scope.row.status === '0' ? '正常' : '停用' }}</el-tag>
@@ -79,7 +71,7 @@
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="170">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
+          <span>{{ scope.row.createTime ? parseTime(scope.row.createTime) : '暂无...' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
@@ -87,7 +79,6 @@
           <el-button size="mini" type="text" icon="el-icon-document" @click="viewVenueDetail(scope.row)" v-hasPermi="['tourism:venue:query']">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-video-play" @click="toggleStatus(scope.row)" v-hasPermi="['tourism:venue:edit']">{{ scope.row.status === '0' ? '停用' : '启用' }}</el-button>
           <el-button size="mini" type="text" icon="el-icon-view" @click="viewActivities(scope.row)" v-hasPermi="['tourism:venue:activity:list']">查看活动</el-button>
-          <el-button size="mini" type="text" icon="el-icon-location" @click="viewScenicSpots(scope.row)" v-hasPermi="['tourism:venue:scenicSpot:list']">查看景区</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['tourism:venue:edit']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:venue:remove']">删除</el-button>
         </template>
@@ -106,7 +97,9 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="类别" prop="category">
-              <el-input v-model="form.category" placeholder="请输入类别" />
+              <el-select v-model="form.category" placeholder="请选择类别" filterable clearable style="width: 100%">
+                <el-option v-for="opt in categoryOptions" :key="opt" :label="opt" :value="opt" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -123,14 +116,16 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
-            <el-form-item label="所在城市" prop="city">
-              <el-input v-model="form.city" placeholder="请输入所在城市" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="所在区县" prop="district">
-              <el-input v-model="form.district" placeholder="请输入所在区县" />
+          <el-col :span="24">
+            <el-form-item label="所在地区">
+              <el-cascader
+                :options="areaOptions"
+                v-model="areaValue"
+                :props="{ checkStrictly: true }"
+                clearable
+                style="width: 100%"
+                @change="onAreaChange"
+              />
             </el-form-item>
           </el-col>
         </el-row>
@@ -144,7 +139,9 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="开放时间" prop="openingHours">
-              <el-input v-model="form.openingHours" placeholder="请输入开放时间" />
+              <el-select v-model="form.openingHours" placeholder="请选择开放时间" clearable style="width: 100%">
+                <el-option v-for="opt in openingHoursOptions" :key="opt" :label="opt" :value="opt" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -184,15 +181,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="关联景区" prop="scenicSpotId">
-              <el-select v-model="form.scenicSpotId" filterable placeholder="请选择关联景区" style="width: 100%" @change="onScenicSpotChange">
-                <el-option v-for="s in scenicSpotOptions" :key="s.id" :label="s.name" :value="s.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        
         <el-row>
           <el-col :span="12">
             <el-form-item label="封面图片" prop="coverImage">
@@ -249,141 +238,53 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="关联景区" :visible.sync="scenicOpen" width="1000px" append-to-body>
-      <el-table :data="scenicList">
-        <el-table-column label="封面" width="90" align="center">
-          <template slot-scope="scope">
-            <el-image
-              v-if="scope.row.coverImage"
-              :src="imageUrl(scope.row.coverImage)"
-              :preview-src-list="[imageUrl(scope.row.coverImage)]"
-              style="width: 48px; height: 48px; border-radius: 4px"
-              fit="cover"
-            />
-          </template>
-        </el-table-column>
-        <el-table-column label="景区名称" prop="name" min-width="180" :show-overflow-tooltip="true" />
-        <el-table-column label="城市" prop="city" width="140" />
-        <el-table-column label="等级" prop="level" width="100" align="center" />
-        <el-table-column label="票价" prop="ticketPrice" width="120" align="center">
-          <template slot-scope="scope"><span>¥{{ scope.row.ticketPrice }}</span></template>
-        </el-table-column>
-        <el-table-column label="操作" width="120" align="center">
-          <template slot-scope="scope">
-            <el-button type="text" size="mini" icon="el-icon-view" @click="viewScenicDetail(scope.row)">查看详情</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="scenicOpen = false">关 闭</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog title="景区图片" :visible.sync="scenicImagesOpen" width="900px" append-to-body>
-      <div style="display:flex; flex-wrap: wrap; gap: 8px">
-        <el-image
-          v-for="(img, idx) in scenicImagesList"
-          :key="idx"
-          :src="imageUrl(img.url)"
-          :preview-src-list="scenicImagesPreview"
-          style="width: 120px; height: 90px; border-radius: 4px"
-          fit="cover"
-        />
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="scenicImagesOpen = false">关 闭</el-button>
-      </div>
-    </el-dialog>
-
     <el-dialog title="场馆详情" :visible.sync="venueDetailOpen" width="1000px" append-to-body>
-      <el-row :gutter="16">
-        <el-col :span="8">
+      <div class="detail-module">
+        <div class="main-img-wrapper">
           <el-image
             v-if="venueDetail.coverImage"
             :src="imageUrl(venueDetail.coverImage)"
             :preview-src-list="[imageUrl(venueDetail.coverImage)]"
-            style="width: 100%; height: 200px; border-radius: 4px"
+            class="main-img"
             fit="cover"
           />
-        </el-col>
-        <el-col :span="16">
-          <el-descriptions :column="2" size="small" border>
-            <el-descriptions-item label="名称">{{ venueDetail.name }}</el-descriptions-item>
-            <el-descriptions-item label="类别">{{ venueDetail.category }}</el-descriptions-item>
-            <el-descriptions-item label="城市">{{ venueDetail.city }}</el-descriptions-item>
-            <el-descriptions-item label="区县">{{ venueDetail.district }}</el-descriptions-item>
-            <el-descriptions-item label="票价">¥{{ venueDetail.ticketPrice }}</el-descriptions-item>
-            <el-descriptions-item label="电话">{{ venueDetail.contactPhone }}</el-descriptions-item>
-            <el-descriptions-item label="开放时间">{{ venueDetail.openingHours }}</el-descriptions-item>
-            <el-descriptions-item label="官网">{{ venueDetail.website }}</el-descriptions-item>
-            <el-descriptions-item label="地址" :span="2">{{ venueDetail.address }}</el-descriptions-item>
-            <el-descriptions-item label="场馆介绍" :span="2">{{ venueDetail.description }}</el-descriptions-item>
-          </el-descriptions>
-        </el-col>
-      </el-row>
-      <div style="margin-top: 12px; font-weight: 600">内容图片</div>
-      <div style="display:flex; flex-wrap: wrap; gap: 8px">
-        <el-image
-          v-for="(img, idx) in (venueDetail.images || [])"
-          :key="idx"
-          :src="imageUrl(img.url)"
-          :preview-src-list="venueDetailImagesPreview"
-          style="width: 120px; height: 90px; border-radius: 4px"
-          fit="cover"
-        />
+          <div v-else class="empty-tip">暂无图片</div>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-row">
+          <div class="detail-item"><div class="label">名称</div><div class="value">{{ venueDetail.name || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">类别</div><div class="value">{{ venueDetail.category || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">城市</div><div class="value">{{ venueDetail.city || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">区县</div><div class="value">{{ venueDetail.district || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">票价</div><div class="value">{{ venueDetail.ticketPrice != null ? ('¥' + venueDetail.ticketPrice) : '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">电话</div><div class="value">{{ venueDetail.contactPhone || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">开放时间</div><div class="value">{{ venueDetail.openingHours || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">官网</div><div class="value">{{ venueDetail.website || '暂无' }}</div></div>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-row single">
+          <div class="detail-item"><div class="label">地址</div><div class="value">{{ venueDetail.address || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">场馆介绍</div><div class="value">{{ venueDetail.description || '暂无' }}</div></div>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="content-img-group" v-if="venueDetail.images && venueDetail.images.length">
+          <el-image v-for="(img, idx) in venueDetail.images" :key="idx" :src="imageUrl(img.url)" class="content-img-item" fit="cover" />
+        </div>
+        <div v-else class="empty-tip">暂无图片</div>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="venueDetailOpen = false">关 闭</el-button>
+        <el-button class="detail-close-btn" @click="venueDetailOpen = false">关 闭</el-button>
       </div>
     </el-dialog>
-
-    <el-dialog title="景区详情" :visible.sync="scenicDetailOpen" width="1000px" append-to-body>
-      <el-row :gutter="16">
-        <el-col :span="8">
-          <el-image
-            v-if="scenicDetail.coverImage"
-            :src="imageUrl(scenicDetail.coverImage)"
-            :preview-src-list="[imageUrl(scenicDetail.coverImage)]"
-            style="width: 100%; height: 200px; border-radius: 4px"
-            fit="cover"
-          />
-        </el-col>
-        <el-col :span="16">
-          <el-descriptions :column="2" size="small" border>
-            <el-descriptions-item label="名称">{{ scenicDetail.name }}</el-descriptions-item>
-            <el-descriptions-item label="等级">{{ scenicDetail.level }}</el-descriptions-item>
-            <el-descriptions-item label="城市">{{ scenicDetail.city }}</el-descriptions-item>
-            <el-descriptions-item label="区县">{{ scenicDetail.district }}</el-descriptions-item>
-            <el-descriptions-item label="票价">¥{{ scenicDetail.ticketPrice }}</el-descriptions-item>
-            <el-descriptions-item label="电话">{{ scenicDetail.contactPhone }}</el-descriptions-item>
-            <el-descriptions-item label="开放时间">{{ scenicDetail.openingHours }}</el-descriptions-item>
-            <el-descriptions-item label="官网">{{ scenicDetail.website }}</el-descriptions-item>
-            <el-descriptions-item label="地址" :span="2">{{ scenicDetail.address }}</el-descriptions-item>
-            <el-descriptions-item label="景区介绍" :span="2">{{ scenicDetail.description }}</el-descriptions-item>
-          </el-descriptions>
-        </el-col>
-      </el-row>
-      <div style="margin-top: 12px; font-weight: 600">内容图片</div>
-      <div style="display:flex; flex-wrap: wrap; gap: 8px">
-        <el-image
-          v-for="(img, idx) in (scenicDetail.images || [])"
-          :key="idx"
-          :src="imageUrl(img.url)"
-          :preview-src-list="scenicDetailImagesPreview"
-          style="width: 120px; height: 90px; border-radius: 4px"
-          fit="cover"
-        />
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="scenicDetailOpen = false">关 闭</el-button>
-      </div>
-    </el-dialog>
+    
   </div>
 </template>
 
 <script>
-import { listScenicVenue, getScenicVenue, addScenicVenue, updateScenicVenue, delScenicVenue, listScenicVenueActivity, listVenueScenicSpots, setVenueScenicSpots, listVenueImages } from '@/api/tourism/scenicVenue'
-import { listScenicSpot, getScenicSpot } from '@/api/tourism/scenicSpot'
+import { listScenicVenue, getScenicVenue, addScenicVenue, updateScenicVenue, delScenicVenue, listScenicVenueActivity, listVenueImages } from '@/api/tourism/scenicVenue'
 import Pagination from '@/components/Pagination'
 import ImageUpload from '@/components/ImageUpload'
 
@@ -423,23 +324,21 @@ export default {
       },
       activityOpen: false,
       activityList: [],
-      scenicOpen: false,
-      scenicList: [],
       scenicImagesOpen: false,
       scenicImagesList: [],
       scenicImagesPreview: [],
       venueDetailOpen: false,
       venueDetail: {},
       venueDetailImagesPreview: [],
-      scenicDetailOpen: false,
-      scenicDetail: {},
-      scenicDetailImagesPreview: [],
-      scenicSpotOptions: []
+      areaOptions: [],
+      areaValue: [],
+      openingHoursOptions: ['全天','6:00-18:30','7:30-17:30','9:00-17:00','9:00-21:00','10:00-18:00'],
+      categoryOptions: ['体育场馆类','文化艺术类场馆','会议展览类场馆','教育科研类场馆','娱乐休闲类场馆','商业服务类场馆','医疗健康类场馆']
     }
   },
   created() {
     this.getList()
-    listScenicSpot({ pageNum: 1, pageSize: 1000 }).then(res => { this.scenicSpotOptions = res.rows || [] })
+    this.initAreaOptions()
   },
   methods: {
     handleQuery() {
@@ -456,11 +355,6 @@ export default {
           const total = (payload && (payload.total || payload.count || rows.length)) || 0
           this.venueList = Array.isArray(rows) ? rows : []
           ;(this.venueList || []).forEach((v, i) => {
-            listVenueScenicSpots(v.id).then(r => {
-              const arr = Array.isArray(r.data) ? r.data : []
-              const name = arr.length ? arr[0].name : '-'
-              this.$set(this.venueList[i], '_scenicName', name)
-            })
             listVenueImages(v.id).then(r => {
               const arr = Array.isArray(r.data) ? r.data : []
               const cover = v.coverImage || (arr.length ? arr[0].url : '')
@@ -471,6 +365,9 @@ export default {
         })
         .catch(() => { this.loading = false })
         .finally(() => { this.loading = false })
+    },
+    formatText(row, column, cellValue) {
+      return cellValue || '暂无...'
     },
     resetQuery() {
       this.queryParams = {
@@ -500,7 +397,6 @@ export default {
       const id = row.id || this.ids[0]
       getScenicVenue(id).then(response => {
         this.form = response.data
-        listVenueScenicSpots(id).then(r => { const arr = (r.data || []); this.form.scenicSpotId = arr.length ? arr[0].id : undefined })
         listVenueImages(id).then(r => { const arr = Array.isArray(r.data) ? r.data : []; const urls = arr.map(it => it.url).filter(Boolean); this.$set(this.form, 'imageUrls', urls) })
         this.open = true
         this.title = '修改场馆信息'
@@ -524,10 +420,10 @@ export default {
           capacity: 0,
           bookingRequired: '0',
           remark: undefined,
-          scenicSpotId: undefined,
           imageUrls: []
         }
       this.resetForm && this.resetForm('form')
+      this.areaValue = []
     },
     handleAdd() {
       this.open = true
@@ -554,8 +450,6 @@ export default {
         if (valid) {
           if (this.form.id != undefined) {
             updateScenicVenue(this.form).then(() => {
-              const ids = this.form.scenicSpotId ? [this.form.scenicSpotId] : []
-              setVenueScenicSpots(this.form.id, ids).then(() => {})
               import('@/api/tourism/uploadPictures').then((u) => {
                 const urls = Array.isArray(this.form.imageUrls)
                   ? this.form.imageUrls
@@ -574,8 +468,6 @@ export default {
           } else {
             addScenicVenue(this.form).then((res) => {
               const vid = (res && res.data && res.data.id) ? res.data.id : this.form.id
-              const ids = this.form.scenicSpotId ? [this.form.scenicSpotId] : []
-              setVenueScenicSpots(vid, ids).then(() => {})
               import('@/api/tourism/uploadPictures').then((u) => {
                 const urls = Array.isArray(this.form.imageUrls)
                   ? this.form.imageUrls
@@ -605,25 +497,6 @@ export default {
         this.activityOpen = true
       })
     },
-    viewScenicSpots(row) {
-      listVenueScenicSpots(row.id).then(response => {
-        this.scenicList = Array.isArray(response.data) ? response.data : []
-        this.scenicOpen = true
-      })
-    },
-    viewScenicImages(row) {
-      import('@/api/tourism/scenicSpot').then((m) => {
-        m.listScenicSpotImages(row.id).then((response) => {
-          this.scenicImagesList = Array.isArray(response.data) ? response.data : []
-          const base = process.env.VUE_APP_BASE_API || ''
-          this.scenicImagesPreview = this.scenicImagesList.map(it => {
-            const u = it && it.url ? it.url : ''
-            return u.indexOf('http') === 0 ? u : base + u
-          })
-          this.scenicImagesOpen = true
-        })
-      })
-    },
     viewVenueDetail(row) {
       getScenicVenue(row.id).then((response) => {
         this.venueDetail = response && response.data ? response.data : {}
@@ -636,33 +509,44 @@ export default {
         this.venueDetailOpen = true
       })
     },
-    viewScenicDetail(row) {
-      getScenicSpot(row.id).then((response) => {
-        this.scenicDetail = response && response.data ? response.data : {}
-        const base = process.env.VUE_APP_BASE_API || ''
-        const imgs = Array.isArray(this.scenicDetail.images) ? this.scenicDetail.images : []
-        this.scenicDetailImagesPreview = imgs.map(it => {
-          const u = it && it.url ? it.url : ''
-          return u.indexOf('http') === 0 ? u : base + u
-        })
-        this.scenicDetailOpen = true
-      })
-    },
     toggleStatus(row) {
       const target = row.status === '0' ? '1' : '0'
       const payload = { id: row.id, status: target }
       updateScenicVenue(payload).then(() => { this.$modal.msgSuccess('状态已更新'); this.getList() })
     },
-    onScenicSpotChange(val) {
-      if (!val) return
-      getScenicSpot(val).then(r => {
-        const s = r && r.data ? r.data : {}
-        this.form.city = s.city
-        this.form.district = s.district
-        this.form.address = s.address
-        this.form.longitude = s.longitude
-        this.form.latitude = s.latitude
-      })
+    initAreaOptions() {
+      try {
+        const data = require('china-area-data/data.json')
+        const provinces = data['86'] || {}
+        const toChildren = (code) => {
+          const obj = data[code] || {}
+          return Object.keys(obj).map(c => ({ label: obj[c], value: c, children: (data[c] ? toChildren(c) : undefined) })).filter(Boolean)
+        }
+        this.areaOptions = Object.keys(provinces).map(p => ({ label: provinces[p], value: p, children: toChildren(p) }))
+      } catch (e) {
+        this.areaOptions = []
+      }
+    },
+    onAreaChange(value) {
+      const labels = []
+      const find = (opts, idx) => {
+        if (!opts || idx >= (value ? value.length : 0)) return
+        const code = value[idx]
+        const node = opts.find(o => o.value === code)
+        if (node) {
+          labels.push(node.label)
+          find(node.children || [], idx + 1)
+        }
+      }
+      find(this.areaOptions, 0)
+      const province = labels[0] || ''
+      let city = labels[1] || ''
+      const district = labels[2] || undefined
+      if (city === '市辖区' || city === '县' || city === '省直辖县级行政区划') {
+        city = ''
+      }
+      this.form.city = (province || '') + (city || '')
+      this.form.district = district
     },
     auditText(s) {
       if (s === '1') return '通过'
@@ -687,4 +571,22 @@ export default {
 .app-container {
   padding: 20px;
 }
+
+.detail-module { margin-bottom: 16px; }
+.main-img-wrapper { width: 100%; max-width: 1200px; overflow: hidden; border-radius: 8px; margin: 0 auto 24px; }
+.main-img { width: 100%; height: 350px; }
+::v-deep .main-img .el-image__inner { width: 100%; height: 350px; object-fit: cover; }
+.detail-card { padding: 16px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 16px; transition: box-shadow .2s ease; }
+.detail-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.detail-row { display: flex; flex-wrap: wrap; gap: 24px; }
+.detail-row.single .detail-item { flex: 1 1 100%; }
+.detail-item { flex: 0 0 calc((100% - 24px * 3) / 4); }
+.detail-item .label { font-size: 12px; color: #909399; margin-bottom: 4px; }
+.detail-item .value { font-size: 14px; color: #303133; font-weight: 500; word-break: break-word; }
+.content-img-group { display: flex; gap: 16px; max-width: 1200px; margin: 20px auto 0; }
+.content-img-item { flex: 1; aspect-ratio: 4/3; overflow: hidden; border-radius: 8px; }
+::v-deep .content-img-item .el-image__inner { width: 100%; height: 100%; object-fit: cover; }
+.empty-tip { text-align: center; color: #909399; font-size: 12px; }
+.detail-close-btn { display: inline-block; margin: 0 auto; }
+.detail-close-btn:hover { color: #409eff; border-color: #409eff; }
 </style>

@@ -88,25 +88,25 @@
       :data="newsList"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="编号" prop="id" width="120" />
+      <el-table-column type="selection" width="60" align="center" />
+      <el-table-column label="编号" prop="id" width="110" />
       <el-table-column
         label="标题"
         prop="title"
         :show-overflow-tooltip="true"
-        width="150"
+        min-width="200"
       />
       <el-table-column
         label="创建人"
         prop="createBy"
         :show-overflow-tooltip="true"
-        width="150"
+        width="200"
       />
       <el-table-column
         label="创建时间"
         align="center"
         prop="createTime"
-        width="180"
+        width="250"
       >
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -116,6 +116,8 @@
         label="操作"
         align="center"
         class-name="small-padding fixed-width"
+        fixed="right"
+        width="220"
       >
         <template slot-scope="scope">
           <el-button
@@ -165,7 +167,7 @@
           <el-input v-model="form.author" placeholder="请输入作者" />
         </el-form-item>
         <el-form-item label="新闻内容" prop="content">
-          <editor v-model="form.content" placeholder="请输入新闻内容" />
+          <editor v-model="form.content" :height="300" placeholder="请输入新闻内容" />
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
@@ -177,14 +179,14 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="新闻详情" :visible.sync="detailOpen" width="900px" append-to-body>
-      <el-descriptions :border="true" :column="2" size="small">
+    <el-dialog title="新闻详情" :visible.sync="detailOpen" width="1000px" append-to-body>
+      <el-descriptions :border="true" :column="4" size="small">
         <el-descriptions-item label="标题">{{ detail.title }}</el-descriptions-item>
         <el-descriptions-item label="作者">{{ detail.author }}</el-descriptions-item>
         <el-descriptions-item label="创建人">{{ detail.createBy }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ parseTime(detail.createTime) }}</el-descriptions-item>
-        <el-descriptions-item label="内容" :span="2"><div v-html="detail.content"></div></el-descriptions-item>
       </el-descriptions>
+      <div class="detail-article" v-html="detail.content"></div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="detailOpen = false">关 闭</el-button>
       </div>
@@ -396,4 +398,5 @@ export default {
     margin-top: 10px;
   }
 }
+.detail-article { padding: 12px 0; line-height: 1.8; }
 </style>

@@ -1318,24 +1318,5 @@ CREATE TABLE `tourism_venue_image`  (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for tourism_venue_scenic_spot
--- ----------------------------
-DROP TABLE IF EXISTS `tourism_venue_scenic_spot`;
-CREATE TABLE `tourism_venue_scenic_spot`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '关联记录主键',
-  `venue_id` bigint NOT NULL COMMENT '关联的场馆ID（外键）',
-  `scenic_spot_id` bigint NOT NULL COMMENT '关联的景区ID（外键）',
-  `sort` int NULL DEFAULT 0 COMMENT '排序',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uk_venue_spot`(`venue_id` ASC, `scenic_spot_id` ASC) USING BTREE,
-  INDEX `scenic_spot_id`(`scenic_spot_id` ASC) USING BTREE,
-  CONSTRAINT `tourism_venue_scenic_spot_ibfk_1` FOREIGN KEY (`venue_id`) REFERENCES `tourism_venue` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `tourism_venue_scenic_spot_ibfk_2` FOREIGN KEY (`scenic_spot_id`) REFERENCES `tourism_scenic_spot` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '场馆-景区关联表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of tourism_venue_scenic_spot
--- ----------------------------
-INSERT INTO `tourism_venue_scenic_spot` VALUES (7, 10, 28, 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

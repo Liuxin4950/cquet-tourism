@@ -16,12 +16,6 @@
           <el-option label="拒绝" value="2" />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="活动状态" clearable style="width: 240px">
-          <el-option label="正常" value="0" />
-          <el-option label="停用" value="1" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
@@ -48,44 +42,41 @@
       :data="activityList"
       @selection-change="handleSelectionChange"
       @sort-change="handleSortChange"
-      border
-      stripe
-      size="small"
-      highlight-current-row
-      :header-cell-style="{ background: '#fafafa', color: '#606266' }"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" sortable="custom" />
-      <el-table-column label="活动名称" prop="name" min-width="180" :show-overflow-tooltip="true" />
+      <el-table-column label="活动名称" prop="name" min-width="180" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="所属场馆" min-width="160">
         <template slot-scope="scope">{{ venueName(scope.row.venueId) }}</template>
       </el-table-column>
-      <el-table-column label="类别" prop="category" width="120" :show-overflow-tooltip="true" />
-      <el-table-column label="主办方" prop="organizer" width="140" :show-overflow-tooltip="true" />
-      <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" />
+      <el-table-column label="类别" prop="category" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="主办方" prop="organizer" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="开始时间" prop="startTime" width="170" align="center">
-        <template slot-scope="scope"><span>{{ parseTime(scope.row.startTime) }}</span></template>
+        <template slot-scope="scope"><span>{{ scope.row.startTime ? parseTime(scope.row.startTime) : '暂无...' }}</span></template>
       </el-table-column>
       <el-table-column label="结束时间" prop="endTime" width="170" align="center">
-        <template slot-scope="scope"><span>{{ parseTime(scope.row.endTime) }}</span></template>
+        <template slot-scope="scope"><span>{{ scope.row.endTime ? parseTime(scope.row.endTime) : '暂无...' }}</span></template>
       </el-table-column>
       <el-table-column label="人数" prop="currentParticipants" width="120" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.currentParticipants }} / {{ scope.row.maxParticipants }}</span>
+          <span>{{ (scope.row.currentParticipants != null && scope.row.maxParticipants != null) ? (scope.row.currentParticipants + ' / ' + scope.row.maxParticipants) : '暂无...' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="审核状态" prop="auditStatus" width="110" align="center">
         <template slot-scope="scope">
-          <el-tag :type="auditTagType(scope.row.auditStatus)">{{ auditText(scope.row.auditStatus) }}</el-tag>
+          <span v-if="scope.row.auditStatus === undefined || scope.row.auditStatus === null || scope.row.auditStatus === ''">暂无...</span>
+          <el-tag v-else :type="auditTagType(scope.row.auditStatus)">{{ auditText(scope.row.auditStatus) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="运行状态" prop="status" width="100" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status === '0' ? 'success' : 'info'">{{ scope.row.status === '0' ? '正常' : '停用' }}</el-tag>
+          <span v-if="scope.row.status === undefined || scope.row.status === null || scope.row.status === ''">暂无...</span>
+          <el-tag v-else :type="scope.row.status === '0' ? 'success' : 'info'">{{ scope.row.status === '0' ? '正常' : '停用' }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" prop="createTime" width="170" align="center">
-        <template slot-scope="scope"><span>{{ parseTime(scope.row.createTime) }}</span></template>
+        <template slot-scope="scope"><span>{{ scope.row.createTime ? parseTime(scope.row.createTime) : '暂无...' }}</span></template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="240">
         <template slot-scope="scope">
@@ -103,14 +94,16 @@
         <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="12"><el-form-item label="活动名称" prop="name"><el-input v-model="form.name" placeholder="请输入活动名称" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="类别" prop="category"><el-input v-model="form.category" placeholder="请输入类别" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="类别" prop="category"><el-select v-model="form.category" placeholder="请选择类别" filterable clearable style="width: 100%"><el-option v-for="opt in categoryOptions" :key="opt" :label="opt" :value="opt" /></el-select></el-form-item></el-col>
         </el-row>
         <el-row>
           <el-col :span="12"><el-form-item label="所属场馆" prop="venueId"><el-select v-model="form.venueId" placeholder="选择场馆" style="width: 100%"><el-option v-for="v in venueOptions" :key="v.id" :label="v.name" :value="v.id" /></el-select></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="联系电话" prop="contactPhone"><el-input v-model="form.contactPhone" placeholder="请输入联系电话" /></el-form-item></el-col>
         </el-row>
         <el-row>
-          <el-col :span="12"><el-form-item label="主办方" prop="organizer"><el-input v-model="form.organizer" placeholder="请输入主办方" /></el-form-item></el-col>
+          <el-col :span="24"><el-form-item label="主办方" prop="organizer"><el-input v-model="form.organizer" placeholder="请输入主办方" /></el-form-item></el-col>
+        </el-row>
+        <el-row>
           <el-col :span="12"><el-form-item label="封面图片" prop="coverImage"><image-upload v-model="form.coverImage" :limit="1" /></el-form-item></el-col>
         </el-row>
         <el-row>
@@ -135,36 +128,39 @@
     </el-dialog>
 
     <el-dialog title="活动详情" :visible.sync="detailOpen" width="900px" append-to-body>
-      <el-row :gutter="16" style="margin-bottom: 12px">
-        <el-col :span="8">
+      <div class="detail-module">
+        <div class="main-img-wrapper">
           <el-image
             v-if="detail.coverImage"
             :src="imageUrl(detail.coverImage)"
             :preview-src-list="[imageUrl(detail.coverImage)]"
-            style="width: 100%; height: 200px; border-radius: 4px"
+            class="main-img"
             fit="cover"
           />
-        </el-col>
-        <el-col :span="16">
-          <el-descriptions :border="true" :column="2" size="small">
-          <el-descriptions-item label="活动名称">{{ detail.name }}</el-descriptions-item>
-          <el-descriptions-item label="类别">{{ detail.category }}</el-descriptions-item>
-          <el-descriptions-item label="主办方">{{ detail.organizer }}</el-descriptions-item>
-          <el-descriptions-item label="联系电话">{{ detail.contactPhone }}</el-descriptions-item>
-          <el-descriptions-item label="开始时间">{{ parseTime(detail.startTime) }}</el-descriptions-item>
-          <el-descriptions-item label="结束时间">{{ parseTime(detail.endTime) }}</el-descriptions-item>
-          <el-descriptions-item label="审核状态"><el-tag :type="auditTagType(detail.auditStatus)">{{ auditText(detail.auditStatus) }}</el-tag></el-descriptions-item>
-          <el-descriptions-item label="状态"><el-tag :type="detail.status === '0' ? 'success' : 'info'">{{ detail.status === '0' ? '正常' : '停用' }}</el-tag></el-descriptions-item>
-          <el-descriptions-item label="审核人">{{ detail.auditor }}</el-descriptions-item>
-          <el-descriptions-item label="审核意见">{{ detail.auditReason }}</el-descriptions-item>
-          <el-descriptions-item label="人数" :span="2">{{ detail.currentParticipants }} / {{ detail.maxParticipants }}</el-descriptions-item>
-          <el-descriptions-item label="活动介绍" :span="2">{{ detail.description }}</el-descriptions-item>
-          </el-descriptions>
-        </el-col>
-      </el-row>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="detailOpen = false">关 闭</el-button>
+          <div v-else class="empty-tip">暂无图片</div>
+        </div>
       </div>
+      <div class="detail-card">
+        <div class="detail-row">
+          <div class="detail-item"><div class="label">活动名称</div><div class="value">{{ detail.name || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">类别</div><div class="value">{{ detail.category || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">主办方</div><div class="value">{{ detail.organizer || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">联系电话</div><div class="value">{{ detail.contactPhone || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">开始时间</div><div class="value">{{ detail.startTime ? parseTime(detail.startTime) : '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">结束时间</div><div class="value">{{ detail.endTime ? parseTime(detail.endTime) : '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">审核状态</div><div class="value"><el-tag :type="auditTagType(detail.auditStatus)">{{ auditText(detail.auditStatus) }}</el-tag></div></div>
+          <div class="detail-item"><div class="label">状态</div><div class="value"><el-tag :type="detail.status === '0' ? 'success' : 'info'">{{ detail.status === '0' ? '正常' : '停用' }}</el-tag></div></div>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-row single">
+          <div class="detail-item"><div class="label">审核人</div><div class="value">{{ detail.auditor || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">审核意见</div><div class="value">{{ detail.auditReason || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">人数</div><div class="value">{{ (detail.currentParticipants != null && detail.maxParticipants != null) ? (detail.currentParticipants + ' / ' + detail.maxParticipants) : '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">活动介绍</div><div class="value">{{ detail.description || '暂无' }}</div></div>
+        </div>
+      </div>
+      <div slot="footer" class="dialog-footer"><el-button class="detail-close-btn" @click="detailOpen = false">关 闭</el-button></div>
     </el-dialog>
   </div>
 </template>
@@ -213,6 +209,7 @@ export default {
       },
       venueOptions: [],
       venueMap: {},
+      categoryOptions: ['展览', '演出', '讲座'],
       detailOpen: false,
       detail: {}
     }
@@ -221,8 +218,8 @@ export default {
     this.getList()
     listScenicVenue({ pageNum: 1, pageSize: 1000 }).then(res => { this.venueOptions = res.rows || []; this.venueMap = (this.venueOptions || []).reduce((m, v) => { m[v.id] = v.name; return m }, {}) })
   },
-  methods: {
-    handleQuery() { this.getList() },
+    methods: {
+      handleQuery() { this.getList() },
     getList() {
       this.loading = true
       this.queryParams.startTime = this.dateRange[0]
@@ -309,13 +306,31 @@ export default {
       if (!u) return ''
       return u.indexOf('http') === 0 ? u : base + u
     },
-    venueName(id) { return this.venueMap[id] || ('#' + id) },
+    venueName(id) { const name = this.venueMap[id]; return name ? name : '暂无...' },
+    formatText(row, column, cellValue) { return cellValue || '暂无...' },
     auditText(s) { if (s === '1') return '通过'; if (s === '2') return '拒绝'; return '待审核' },
     auditTagType(s) { if (s === '1') return 'success'; if (s === '2') return 'danger'; return 'warning' }
+    }
   }
-}
 </script>
 
 <style lang="scss" scoped>
 .app-container { padding: 20px; }
+.detail-module { margin-bottom: 16px; }
+.main-img-wrapper { width: 100%; max-width: 1200px; overflow: hidden; border-radius: 8px; margin: 0 auto 24px; }
+.main-img { width: 100%; height: 350px; }
+::v-deep .main-img .el-image__inner { width: 100%; height: 350px; object-fit: cover; }
+.detail-card { padding: 16px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 16px; transition: box-shadow .2s ease; }
+.detail-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.detail-row { display: flex; flex-wrap: wrap; gap: 24px; }
+.detail-row.single .detail-item { flex: 0 0 calc((100% - 24px) / 2); }
+.detail-item { flex: 0 0 calc((100% - 24px * 3) / 4); }
+.detail-item .label { font-size: 12px; color: #909399; margin-bottom: 4px; }
+.detail-item .value { font-size: 14px; color: #303133; font-weight: 500; word-break: break-word; }
+.content-img-group { display: flex; gap: 16px; max-width: 1200px; margin: 20px auto 0; }
+.content-img-item { flex: 1; aspect-ratio: 4/3; overflow: hidden; border-radius: 8px; }
+::v-deep .content-img-item .el-image__inner { width: 100%; height: 100%; object-fit: cover; }
+.empty-tip { text-align: center; color: #909399; font-size: 12px; }
+.detail-close-btn { display: inline-block; margin: 0 auto; }
+.detail-close-btn:hover { color: #409eff; border-color: #409eff; }
 </style>

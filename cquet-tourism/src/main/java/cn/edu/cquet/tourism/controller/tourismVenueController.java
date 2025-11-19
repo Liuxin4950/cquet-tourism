@@ -3,7 +3,6 @@ package cn.edu.cquet.tourism.controller;
 import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
 import cn.edu.cquet.common.core.page.TableDataInfo;
-import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import cn.edu.cquet.tourism.domain.TourismVenue;
 import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
 import cn.edu.cquet.tourism.mapper.TourismVenueMapper;
@@ -156,22 +155,6 @@ public class tourismVenueController extends BaseController {
         return success(list);
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:venue:scenicSpot:list')")
-    @GetMapping("/{id}/scenic-spots")
-    @Operation(summary = "查看当前场馆的关联景区列表")
-    public Result scenicSpots(@PathVariable Long id) {
-        if (id == null) return warn("场馆id不能为空");
-        java.util.List<TourismScenicSpot> spots = tourismVenueService.getScenicSpotsByVenue(id);
-        return success(spots);
-    }
-
-    @PreAuthorize("@ss.hasPermi('tourism:venue:scenicSpot:edit')")
-    @PutMapping("/{id}/scenic-spots")
-    @Operation(summary = "设置当前场馆的关联景区（覆盖式）")
-    public Result setScenicSpots(@PathVariable Long id, @RequestBody java.util.List<Long> scenicSpotIds) {
-        if (id == null) return warn("场馆id不能为空");
-        return toAjax(tourismVenueService.setScenicSpotsForVenue(id, scenicSpotIds));
-    }
 
     @PreAuthorize("@ss.hasPermi('tourism:venue:image:list')")
     @GetMapping("/{id}/images")
