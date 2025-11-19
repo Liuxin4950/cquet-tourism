@@ -1,0 +1,28 @@
+erDiagram
+    TOURISM_NEWS {
+        int id
+        varchar title
+        text content
+        varchar author
+        datetime create_time
+        varchar create_by
+        datetime update_time
+        varchar update_by
+        int del_flag
+        int status
+        varchar remark
+    }
+
+    SYS_USER {
+        bigint user_id
+        varchar user_name
+        varchar nick_name
+    }
+
+    SYS_USER ||--o{ TOURISM_NEWS : "creates (create_by → user_name)"
+    SYS_USER ||--o{ TOURISM_NEWS : "updates (update_by → user_name)"
+
+    %% 说明：
+    %% - 本图基于 ruoyi.sql 的 `tourism_news` 表结构
+    %% - 与 `sys_user` 的关系为逻辑关联（非外键），通过 `create_by/update_by` 字符串与 `sys_user.user_name` 对应
+    %% - 约束：`del_flag`：0=存在，2=删除；`status`：0=正常，1=停用
