@@ -1,5 +1,6 @@
 package cn.edu.cquet.tourism.service;
 
+import cn.edu.cquet.tourism.domain.TourismImage;
 import cn.edu.cquet.tourism.domain.TourismVenue;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
@@ -15,6 +16,11 @@ public interface TourismVenueService extends IService<TourismVenue> {
      * @return          符合条件数据
      */
     List<TourismVenue> getVenueByNameAndAddress(String name, String address);
+
+    /**
+     * 根据名称、地址、城市模糊查询
+     */
+    List<TourismVenue> getVenueList(String name, String address, String city);
 
     /**
      * 添加场馆
@@ -42,10 +48,10 @@ public interface TourismVenueService extends IService<TourismVenue> {
     /**
      * 查询场馆关联的图片列表
      */
-    java.util.List<cn.edu.cquet.tourism.domain.TourismImage> getImagesByVenue(Long venueId);
+    java.util.List<TourismImage> getImagesByVenue(Long venueId);
 
     /**
      * 设置场馆关联的图片（覆盖式）
      */
-    boolean setImagesForVenue(Long venueId, java.util.List<Integer> imageIds);
+    boolean setImagesForVenue(Long venueId, List<Integer> imageIds);
 }

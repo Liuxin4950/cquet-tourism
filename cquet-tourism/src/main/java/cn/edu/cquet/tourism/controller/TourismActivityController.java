@@ -5,8 +5,12 @@ import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
 import cn.edu.cquet.common.core.page.TableDataInfo;
 import cn.edu.cquet.common.enums.BusinessType;
+import cn.edu.cquet.common.utils.bean.BeanUtils;
 import cn.edu.cquet.tourism.domain.TourismActivity;
+import cn.edu.cquet.tourism.domain.TourismActivityApproval;
+import cn.edu.cquet.tourism.domain.vo.TourismActivityVo;
 import cn.edu.cquet.tourism.service.TourismActivityService;
+import cn.edu.cquet.tourism.service.TourismActivityApprovalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,9 @@ public class TourismActivityController extends BaseController {
     @Autowired
     private TourismActivityService activityService;
 
+    @Autowired
+    private TourismActivityApprovalService approvalService;
+
     @PreAuthorize("@ss.hasPermi('tourism:activity:list')")
     @GetMapping("/list")
     @Operation(summary = "活动列表（含审核状态筛选）")
@@ -38,7 +45,12 @@ public class TourismActivityController extends BaseController {
                               @RequestParam(required = false) Integer venueId,
                               @RequestParam(required = false) String auditStatus) {
         startPage();
-        return getDataTable(activityService.list(name, venueId, auditStatus));
+        java.util.List<TourismActivity> list = activityService.list(name, venueId, auditStatus);
+        java.util.List<TourismActivityVo> vos = new java.util.ArrayList<>(list.size());
+        for (TourismActivity a : list) {
+            vos.add(toVo(a));
+        }
+        return getDataTable(vos);
     }
 
     @PreAuthorize("@ss.hasPermi('tourism:activity:query')")
@@ -52,7 +64,16 @@ public class TourismActivityController extends BaseController {
     public Result detail(@PathVariable Long id) {
         TourismActivity a = activityService.detail(id);
         if (a == null) return warn("活动不存在");
-        return success(a);
+        return success(toVo(a));
+    }
+
+    private TourismActivityVo toVo(TourismActivity a) {
+        TourismActivityVo vo = new TourismActivityVo();
+        BeanUtils.copyProperties(a, vo);
+        java.util.List<TourismActivityApproval> h = approvalService.history(a.getId());
+        TourismActivityApproval latest = (h == null || h.isEmpty()) ? null : h.get(0);
+        if (latest == null) { vo.setAuditStatus("0"); } else { vo.setAuditStatus(latest.getAuditStatus()); vo.setAuditReason(latest.getReason()); vo.setAuditor(latest.getAuditor()); vo.setAuditTime(latest.getAuditTime()); }
+        return vo;
     }
 
     @PreAuthorize("@ss.hasPermi('tourism:activity:edit')")
@@ -78,7 +99,13 @@ public class TourismActivityController extends BaseController {
      */
     public Result add(@RequestBody TourismActivity activity) {
         if (activity.getId() != null) return warn("新增不需要指定id");
-        return toAjax(activityService.create(activity));
+        try {
+            boolean ok = activityService.create(activity);
+            if (!ok) return warn("活动名称重复或同一场馆同时间段已被占用");
+            return success(activity);
+        } catch (Exception e) {
+            return warn(e.getMessage() != null ? e.getMessage() : "新增失败");
+        }
     }
 
     @PreAuthorize("@ss.hasPermi('tourism:activity:edit')")
@@ -107,7 +134,7 @@ public class TourismActivityController extends BaseController {
                           @RequestBody(required = false) java.util.Map<String, String> body) {
         String op = opinion;
         if ((op == null || op.isBlank()) && body != null) op = body.get("opinion");
-        return toAjax(activityService.approve(id, op));
+        return toAjax(approvalService.approve(id, op));
     }
 
     @PreAuthorize("@ss.hasPermi('tourism:activity:reject')")
@@ -124,7 +151,7 @@ public class TourismActivityController extends BaseController {
         String r = reason;
         if ((r == null || r.isBlank()) && body != null) r = body.get("reason");
         if (r == null || r.isBlank()) return warn("请提供审核不通过原因");
-        return toAjax(activityService.reject(id, r));
+        return toAjax(approvalService.reject(id, r));
     }
 
     @PreAuthorize("@ss.hasPermi('tourism:activity:remove')")

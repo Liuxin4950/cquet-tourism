@@ -1,5 +1,6 @@
 package cn.edu.cquet.tourism.service;
 
+import cn.edu.cquet.tourism.domain.TourismImage;
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
 import cn.edu.cquet.tourism.domain.vo.ScenicSpotDetailVo;
@@ -54,10 +55,10 @@ public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
     /**
      * 查询景区关联的图片列表
      */
-    java.util.List<cn.edu.cquet.tourism.domain.TourismImage> getImagesByScenicSpot(Long scenicSpotId);
+    List<TourismImage> getImagesByScenicSpot(Long scenicSpotId);
 
     /**
      * 设置景区关联的图片（覆盖式）
      */
-    boolean setImagesForScenicSpot(Long scenicSpotId, java.util.List<Integer> imageIds);
+    boolean setImagesForScenicSpot(Long scenicSpotId, List<Integer> imageIds);
 }

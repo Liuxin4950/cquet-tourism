@@ -1,6 +1,5 @@
 package cn.edu.cquet.tourism.service.impl;
 
-import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.tourism.domain.TourismVenue;
 import cn.edu.cquet.tourism.mapper.TourismVenueMapper;
 import cn.edu.cquet.tourism.service.TourismVenueService;
@@ -58,8 +57,10 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
     @Autowired
     private TourismActivityMapper activityMapper; // 活动 Mapper
 
+    @Autowired
+    private cn.edu.cquet.tourism.service.TourismActivityApprovalService approvalService; // 审批记录服务
 
-    // duplicate fields removed (venueImageMapper, imageMapper)
+
 
     @Override
     /**
@@ -72,6 +73,16 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
                 .like(address != null && !address.isBlank(), TourismVenue::getAddress, address); // 地址模糊查询
         queryWrapper.eq(TourismVenue::getDelFlag, "0"); // 仅查询未删除的数据
         return tourismVenueMapper.selectList(queryWrapper); // 执行查询
+    }
+
+    @Override
+    public List<TourismVenue> getVenueList(String name, String address, String city) {
+        LambdaQueryWrapper<TourismVenue> qw = new LambdaQueryWrapper<>();
+        qw.like(name != null && !name.isBlank(), TourismVenue::getName, name)
+          .like(address != null && !address.isBlank(), TourismVenue::getAddress, address)
+          .like(city != null && !city.isBlank(), TourismVenue::getCity, city)
+          .eq(TourismVenue::getDelFlag, "0");
+        return tourismVenueMapper.selectList(qw);
     }
 
     @Override
@@ -189,36 +200,44 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
      * 条件：未删除、审核通过、状态正常；按创建时间倒序
      */
     public List<TourismActivity> getActivitiesByVenueId(Integer venueId) {
-        LambdaQueryWrapper<TourismActivity> qw = new LambdaQueryWrapper<>(); // 构造查询
-        qw.eq(TourismActivity::getVenueId, venueId) // 指定场馆ID
-          .eq(TourismActivity::getDelFlag, "0") // 未删除
-          .eq(TourismActivity::getAuditStatus, "1") // 审核通过
-          .eq(TourismActivity::getStatus, "0") // 状态正常
-          .orderByDesc(TourismActivity::getCreateTime); // 按创建时间倒序
-        return activityMapper.selectList(qw); // 执行查询
+        LambdaQueryWrapper<TourismActivity> qw = new LambdaQueryWrapper<>();
+        qw.eq(TourismActivity::getVenueId, venueId)
+          .eq(TourismActivity::getDelFlag, "0")
+          .eq(TourismActivity::getStatus, "0")
+          .orderByDesc(TourismActivity::getCreateTime);
+        java.util.List<TourismActivity> all = activityMapper.selectList(qw);
+        java.util.List<TourismActivity> passed = new java.util.ArrayList<>();
+        for (TourismActivity a : all) {
+            java.util.List<cn.edu.cquet.tourism.domain.TourismActivityApproval> h = approvalService.history(a.getId());
+            cn.edu.cquet.tourism.domain.TourismActivityApproval latest = (h == null || h.isEmpty()) ? null : h.get(0);
+            if (latest != null && "1".equals(latest.getAuditStatus())) {
+                passed.add(a);
+            }
+        }
+        return passed;
     }
 
 
     @Override
-    public java.util.List<cn.edu.cquet.tourism.domain.TourismImage> getImagesByVenue(Long venueId) {
-        LambdaQueryWrapper<cn.edu.cquet.tourism.domain.TourismVenueImage> qw = new LambdaQueryWrapper<>();
-        qw.eq(cn.edu.cquet.tourism.domain.TourismVenueImage::getVenueId, venueId.intValue());
-        java.util.List<cn.edu.cquet.tourism.domain.TourismVenueImage> rels = venueImageMapper.selectList(qw);
+    public java.util.List<TourismImage> getImagesByVenue(Long venueId) {
+        LambdaQueryWrapper<TourismVenueImage> qw = new LambdaQueryWrapper<>();
+        qw.eq(TourismVenueImage::getVenueId, venueId.intValue());
+        java.util.List<TourismVenueImage> rels = venueImageMapper.selectList(qw);
         if (rels.isEmpty()) return java.util.Collections.emptyList();
-        java.util.List<Integer> imageIds = rels.stream().map(cn.edu.cquet.tourism.domain.TourismVenueImage::getImageId).collect(java.util.stream.Collectors.toList());
+        java.util.List<Integer> imageIds = rels.stream().map(TourismVenueImage::getImageId).collect(java.util.stream.Collectors.toList());
         return imageMapper.selectBatchIds(imageIds);
     }
 
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public boolean setImagesForVenue(Long venueId, java.util.List<Integer> imageIds) {
-        LambdaQueryWrapper<cn.edu.cquet.tourism.domain.TourismVenueImage> del = new LambdaQueryWrapper<>();
-        del.eq(cn.edu.cquet.tourism.domain.TourismVenueImage::getVenueId, venueId.intValue());
+        LambdaQueryWrapper<TourismVenueImage> del = new LambdaQueryWrapper<>();
+        del.eq(TourismVenueImage::getVenueId, venueId.intValue());
         venueImageMapper.delete(del);
         if (imageIds != null) {
             int sort = 0;
             for (Integer imgId : imageIds) {
-                cn.edu.cquet.tourism.domain.TourismVenueImage rel = new cn.edu.cquet.tourism.domain.TourismVenueImage();
+                TourismVenueImage rel = new TourismVenueImage();
                 rel.setVenueId(venueId.intValue());
                 rel.setImageId(imgId);
                 rel.setSort(sort++);

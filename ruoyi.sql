@@ -11,7 +11,7 @@
  Target Server Version : 80407 (8.4.7)
  File Encoding         : 65001
 
- Date: 18/11/2025 19:30:13
+ Date: 19/11/2025 15:28:20
 */
 
 SET NAMES utf8mb4;
@@ -315,7 +315,7 @@ CREATE TABLE `sys_logininfor`  (
   PRIMARY KEY (`info_id`) USING BTREE,
   INDEX `idx_sys_logininfor_s`(`status` ASC) USING BTREE,
   INDEX `idx_sys_logininfor_lt`(`login_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 96 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 100 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '系统访问记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_logininfor
@@ -376,6 +376,10 @@ INSERT INTO `sys_logininfor` VALUES (92, 'admin', '127.0.0.1', '内网IP', 'Chro
 INSERT INTO `sys_logininfor` VALUES (93, 'admin', '127.0.0.1', '内网IP', 'Chrome 13', 'Windows 10', '0', '登录成功', '2025-11-17 16:06:31', '2025-11-17 16:06:31', 0, NULL);
 INSERT INTO `sys_logininfor` VALUES (94, 'admin', '127.0.0.1', '内网IP', 'Chrome 13', 'Windows 10', '0', '登录成功', '2025-11-18 15:30:13', '2025-11-18 15:30:13', 0, NULL);
 INSERT INTO `sys_logininfor` VALUES (95, 'admin', '127.0.0.1', '内网IP', 'Chrome 13', 'Windows 10', '0', '登录成功', '2025-11-18 18:01:24', '2025-11-18 18:01:24', 0, NULL);
+INSERT INTO `sys_logininfor` VALUES (96, 'admin', '127.0.0.1', '内网IP', 'Chrome 13', 'Windows 10', '0', '登录成功', '2025-11-18 20:15:09', '2025-11-18 20:15:09', 0, NULL);
+INSERT INTO `sys_logininfor` VALUES (97, 'admin', '127.0.0.1', '内网IP', 'Chrome 13', 'Windows 10', '0', '登录成功', '2025-11-19 10:44:04', '2025-11-19 10:44:04', 0, NULL);
+INSERT INTO `sys_logininfor` VALUES (98, 'admin', '127.0.0.1', '内网IP', 'Chrome 13', 'Windows 10', '0', '登录成功', '2025-11-19 12:06:02', '2025-11-19 12:06:02', 0, NULL);
+INSERT INTO `sys_logininfor` VALUES (99, 'admin', '127.0.0.1', '内网IP', 'Chrome 13', 'Windows 10', '0', '登录成功', '2025-11-19 14:10:48', '2025-11-19 14:10:48', 0, NULL);
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -546,7 +550,7 @@ CREATE TABLE `sys_oper_log`  (
   INDEX `idx_sys_oper_log_bt`(`business_type` ASC) USING BTREE,
   INDEX `idx_sys_oper_log_s`(`status` ASC) USING BTREE,
   INDEX `idx_sys_oper_log_ot`(`oper_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 250 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '操作日志记录' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 279 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '操作日志记录' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_oper_log
@@ -687,6 +691,35 @@ INSERT INTO `sys_oper_log` VALUES (246, '特色活动', 1, 'cn.edu.cquet.tourism
 INSERT INTO `sys_oper_log` VALUES (247, '特色活动申报', 2, 'cn.edu.cquet.tourism.controller.TourismActivityApplicationController.approve()', 'POST', 1, 'admin', '研发部门', '/tourism/activityApplication/11/approve', '127.0.0.1', '内网IP', '{\"opinion\":\"测试通过\"}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 26, '2025-11-18 19:24:26', 0, NULL);
 INSERT INTO `sys_oper_log` VALUES (248, '特色活动', 2, 'cn.edu.cquet.tourism.controller.TourismActivityController.edit()', 'PUT', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"auditReason\":\"测试通过\",\"auditStatus\":\"1\",\"auditor\":\"admin\",\"category\":\"比赛\",\"contactPhone\":\"\",\"coverImage\":\"/profile/upload/2025/11/18/椎名_20251118192225A003.png\",\"createBy\":\"admin\",\"createTime\":\"2025-11-18 19:22:46\",\"delFlag\":\"0\",\"description\":\"低开吗\",\"endTime\":\"2025-11-26 00:00:00\",\"id\":11,\"name\":\"低代码大赛\",\"organizer\":\"重庆市电子科技\",\"params\":{},\"startTime\":\"2025-11-18 00:00:00\",\"status\":\"0\",\"updateBy\":\"admin\",\"updateTime\":\"2025-11-18 19:25:56\",\"venueId\":10}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 18, '2025-11-18 19:25:57', 0, NULL);
 INSERT INTO `sys_oper_log` VALUES (249, '特色活动', 2, 'cn.edu.cquet.tourism.controller.TourismActivityController.edit()', 'PUT', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"auditReason\":\"测试通过\",\"auditStatus\":\"1\",\"auditor\":\"admin\",\"category\":\"比赛\",\"contactPhone\":\"\",\"coverImage\":\"/profile/upload/2025/11/18/椎名_20251118192225A003.png\",\"createBy\":\"admin\",\"createTime\":\"2025-11-18 19:22:46\",\"currentParticipants\":0,\"delFlag\":\"0\",\"description\":\"低开吗\",\"endTime\":\"2025-11-26 00:00:00\",\"id\":11,\"maxParticipants\":4,\"name\":\"低代码大赛\",\"organizer\":\"重庆市电子科技\",\"params\":{},\"startTime\":\"2025-11-18 00:00:00\",\"status\":\"0\",\"updateBy\":\"admin\",\"updateTime\":\"2025-11-18 19:29:33\",\"venueId\":10}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 36, '2025-11-18 19:29:33', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (250, 'A级景区', 2, 'cn.edu.cquet.tourism.controller.TourismScenicSpotController.update()', 'PUT', 1, 'admin', '研发部门', '/tourism/scenic-spot', '127.0.0.1', '内网IP', '{\"address\":\"重庆市两江新区\",\"city\":\"重庆市\",\"collectionCount\":0,\"contactPhone\":\"18983432250\",\"coverImage\":\"/profile/upload/2025/11/18/小川_20251118192010A001.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-18 19:20:17\",\"delFlag\":\"0\",\"description\":\"重庆市永川区\",\"district\":\"重庆市两江新区\",\"id\":28,\"latitude\":3,\"level\":\"AAAAA\",\"longitude\":2,\"name\":\"重庆电子科技职业大学\",\"openingHours\":\"全天\",\"params\":{},\"remark\":\"测试\",\"status\":\"0\",\"ticketPrice\":50,\"updateBy\":\"admin\",\"updateTime\":\"2025-11-19 11:35:46\",\"viewCount\":0,\"website\":\"cquet\"}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 42, '2025-11-19 11:35:47', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (251, '图片管理', 1, 'cn.edu.cquet.tourism.controller.TourismImageController.addBatch()', 'POST', 1, 'admin', '研发部门', '/tourism/images/batch', '127.0.0.1', '内网IP', '[]', '{\"msg\":\"操作成功\",\"code\":200,\"data\":[]}', '0', '', NULL, 5, '2025-11-19 11:35:47', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (252, 'A级景区', 2, 'cn.edu.cquet.tourism.controller.TourismScenicSpotController.update()', 'PUT', 1, 'admin', '研发部门', '/tourism/scenic-spot', '127.0.0.1', '内网IP', '{\"address\":\"本地辖区\",\"city\":\"广东省广州市\",\"collectionCount\":0,\"contactPhone\":\"18983432250\",\"coverImage\":\"/profile/upload/2025/11/19/06FD0C357EA5C119D8FA89F6D5C8833F_20251119113731A002.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-18 19:20:17\",\"delFlag\":\"0\",\"description\":\"广州著名景点\",\"district\":\"市辖区\",\"id\":28,\"latitude\":3,\"level\":\"AAAAA\",\"longitude\":2,\"name\":\"广州塔\",\"openingHours\":\"全天\",\"params\":{},\"remark\":\"测试\",\"status\":\"0\",\"ticketPrice\":50,\"updateBy\":\"admin\",\"updateTime\":\"2025-11-19 11:37:34\",\"viewCount\":0,\"website\":\"cquet\"}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 20, '2025-11-19 11:37:35', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (253, '图片管理', 1, 'cn.edu.cquet.tourism.controller.TourismImageController.addBatch()', 'POST', 1, 'admin', '研发部门', '/tourism/images/batch', '127.0.0.1', '内网IP', '[]', '{\"msg\":\"操作成功\",\"code\":200,\"data\":[]}', '0', '', NULL, 4, '2025-11-19 11:37:35', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (254, 'A级景区', 1, 'cn.edu.cquet.tourism.controller.TourismScenicSpotController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/scenic-spot', '127.0.0.1', '内网IP', '{\"address\":\"测试\",\"city\":\"北京市\",\"contactPhone\":\"18988444455\",\"coverImage\":\"/profile/upload/2025/11/19/redis-cover_20251119113845A003.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 11:38:54\",\"delFlag\":\"0\",\"district\":\"丰台区\",\"id\":29,\"level\":\"AAAAA\",\"name\":\"测试景区\",\"openingHours\":\"9:00-21:00\",\"params\":{},\"ticketPrice\":0,\"website\":\"测试\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"address\":\"测试\",\"city\":\"北京市\",\"contactPhone\":\"18988444455\",\"coverImage\":\"/profile/upload/2025/11/19/redis-cover_20251119113845A003.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 11:38:54\",\"delFlag\":\"0\",\"district\":\"丰台区\",\"id\":29,\"level\":\"AAAAA\",\"name\":\"测试景区\",\"openingHours\":\"9:00-21:00\",\"params\":{},\"ticketPrice\":0,\"website\":\"测试\"}}', '0', '', NULL, 19, '2025-11-19 11:38:55', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (255, '图片管理', 1, 'cn.edu.cquet.tourism.controller.TourismImageController.addBatch()', 'POST', 1, 'admin', '研发部门', '/tourism/images/batch', '127.0.0.1', '内网IP', '[]', '{\"msg\":\"操作成功\",\"code\":200,\"data\":[]}', '0', '', NULL, 4, '2025-11-19 11:38:55', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (256, '场馆管理', 1, 'cn.edu.cquet.tourism.controller.tourismVenueController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/venue', '127.0.0.1', '内网IP', '{\"address\":\"测试\",\"bookingRequired\":\"1\",\"capacity\":15,\"category\":\"教育科研类场馆\",\"city\":\"北京市\",\"contactPhone\":\"18983432250\",\"coverImage\":\"/profile/upload/2025/11/19/704257_143708003_2_20251119115714A001.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 11:57:25\",\"delFlag\":\"0\",\"description\":\"测试\",\"district\":\"东城区\",\"id\":11,\"latitude\":-10,\"longitude\":7,\"name\":\"科技馆\",\"openingHours\":\"9:00-17:00\",\"params\":{},\"remark\":\"测试\",\"ticketPrice\":0,\"website\":\"无\"}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"address\":\"测试\",\"bookingRequired\":\"1\",\"capacity\":15,\"category\":\"教育科研类场馆\",\"city\":\"北京市\",\"contactPhone\":\"18983432250\",\"coverImage\":\"/profile/upload/2025/11/19/704257_143708003_2_20251119115714A001.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 11:57:25\",\"delFlag\":\"0\",\"description\":\"测试\",\"district\":\"东城区\",\"id\":11,\"latitude\":-10,\"longitude\":7,\"name\":\"科技馆\",\"openingHours\":\"9:00-17:00\",\"params\":{},\"remark\":\"测试\",\"ticketPrice\":0,\"website\":\"无\"}}', '0', '', NULL, 21, '2025-11-19 11:57:26', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (257, '图片管理', 1, 'cn.edu.cquet.tourism.controller.TourismImageController.addBatch()', 'POST', 1, 'admin', '研发部门', '/tourism/images/batch', '127.0.0.1', '内网IP', '[]', '{\"msg\":\"操作成功\",\"code\":200,\"data\":[]}', '0', '', NULL, 4, '2025-11-19 11:57:26', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (258, 'A级景区', 2, 'cn.edu.cquet.tourism.controller.TourismScenicSpotController.update()', 'PUT', 1, 'admin', '研发部门', '/tourism/scenic-spot', '127.0.0.1', '内网IP', '{\"address\":\"测试\",\"city\":\"北京市\",\"collectionCount\":0,\"contactPhone\":\"18988444455\",\"coverImage\":\"/profile/upload/2025/11/19/redis-cover_20251119113845A003.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 11:38:55\",\"delFlag\":\"0\",\"district\":\"东城区\",\"id\":29,\"latitude\":0,\"level\":\"AAAAA\",\"longitude\":0,\"name\":\"测试景区\",\"openingHours\":\"9:00-21:00\",\"params\":{},\"remark\":\"测试\",\"status\":\"0\",\"ticketPrice\":5,\"updateBy\":\"admin\",\"updateTime\":\"2025-11-19 11:59:27\",\"viewCount\":0,\"website\":\"测试\"}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 20, '2025-11-19 11:59:28', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (259, '图片管理', 1, 'cn.edu.cquet.tourism.controller.TourismImageController.addBatch()', 'POST', 1, 'admin', '研发部门', '/tourism/images/batch', '127.0.0.1', '内网IP', '[]', '{\"msg\":\"操作成功\",\"code\":200,\"data\":[]}', '0', '', NULL, 4, '2025-11-19 11:59:28', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (260, '场馆管理', 2, 'cn.edu.cquet.tourism.controller.tourismVenueController.edit()', 'PUT', 1, 'admin', '研发部门', '/tourism/venue', '127.0.0.1', '内网IP', '{\"address\":\"重庆市两江新区\",\"bookingRequired\":\"0\",\"capacity\":0,\"category\":\"教学\",\"city\":\"重庆市\",\"collectionCount\":0,\"contactPhone\":\"18983432250\",\"coverImage\":\"/profile/upload/2025/11/18/蓝莓草莓_20251118192135A002.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-18 19:21:37\",\"delFlag\":\"0\",\"description\":\"教学\",\"district\":\"武隆区\",\"id\":10,\"latitude\":3,\"longitude\":2,\"name\":\"教学楼\",\"openingHours\":\"早上8:00-晚上22:00\",\"params\":{},\"status\":\"0\",\"ticketPrice\":0,\"updateBy\":\"admin\",\"updateTime\":\"2025-11-19 12:17:44\",\"viewCount\":0,\"website\":\"\"}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 42, '2025-11-19 12:17:45', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (261, '图片管理', 1, 'cn.edu.cquet.tourism.controller.TourismImageController.addBatch()', 'POST', 1, 'admin', '研发部门', '/tourism/images/batch', '127.0.0.1', '内网IP', '[]', '{\"msg\":\"操作成功\",\"code\":200,\"data\":[]}', '0', '', NULL, 3, '2025-11-19 12:17:45', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (262, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"需要场地\",\"applyTime\":\"2025-11-19 14:15:43.837\",\"auditStatus\":\"0\",\"category\":\"展览\",\"contactPhone\":\"11144555544\",\"coverImage\":\"/profile/upload/2025/11/19/ComfyUI_00001__20251119141508A001.png\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 14:15:43\",\"currentParticipants\":0,\"delFlag\":\"0\",\"description\":\"测试\",\"endTime\":\"2025-11-28T00:00:00\",\"maxParticipants\":11,\"name\":\"读书会\",\"organizer\":\"学校\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-19T14:15:18\",\"status\":\"0\",\"venueId\":10}', '', '1', '\r\n### Error updating database.  Cause: java.sql.SQLSyntaxErrorException: Unknown column \'applicant_user_id\' in \'field list\'\r\n### The error may exist in cn/edu/cquet/tourism/mapper/TourismActivityMapper.java (best guess)\r\n### The error may involve cn.edu.cquet.tourism.mapper.TourismActivityMapper.insert-Inline\r\n### The error occurred while setting parameters\r\n### SQL: INSERT INTO tourism_activity  ( name, cover_image, start_time, end_time, category, venue_id, organizer, contact_phone, description, status, audit_status,   current_participants, max_participants, applicant_user_id, applicant_name, apply_reason, apply_time, create_time,  del_flag, create_by,  remark )  VALUES (  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,   ?, ?, ?, ?, ?, ?, ?,  ?, ?,  ?  )\r\n### Cause: java.sql.SQLSyntaxErrorException: Unknown column \'applicant_user_id\' in \'field list\'\n; bad SQL grammar []', NULL, 73, '2025-11-19 14:15:44', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (263, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"需要场地\",\"applyTime\":\"2025-11-19 14:33:42.086\",\"category\":\"展览\",\"contactPhone\":\"11144555544\",\"coverImage\":\"/profile/upload/2025/11/19/ComfyUI_00001__20251119141508A001.png\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 14:33:42\",\"currentParticipants\":0,\"delFlag\":\"0\",\"description\":\"测试\",\"endTime\":\"2025-11-28T00:00:00\",\"id\":12,\"maxParticipants\":11,\"name\":\"读书会\",\"organizer\":\"学校\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-19T14:15:18\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 120, '2025-11-19 14:33:42', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (264, '特色活动审批', 2, 'cn.edu.cquet.tourism.controller.TourismActivityApprovalController.pass()', 'POST', 1, 'admin', '研发部门', '/tourism/activity-approval/12/pass', '127.0.0.1', '内网IP', '{\"opinion\":\"可以通过\"}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 31, '2025-11-19 14:37:01', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (265, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applyReason\":\"测试\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"currentParticipants\":0,\"description\":\"测试\",\"endTime\":\"2025-11-29T00:00:00\",\"maxParticipants\":1,\"name\":\"测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-26T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"操作失败\",\"code\":500}', '0', '', NULL, 58, '2025-11-19 14:50:21', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (266, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applyReason\":\"测试\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"currentParticipants\":0,\"description\":\"测试\",\"endTime\":\"2025-11-29T00:00:00\",\"maxParticipants\":1,\"name\":\"测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-26T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"操作失败\",\"code\":500}', '0', '', NULL, 15, '2025-11-19 14:50:25', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (267, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applyReason\":\"测试\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"currentParticipants\":0,\"description\":\"测试\",\"endTime\":\"2025-11-29T00:00:00\",\"maxParticipants\":1,\"name\":\"测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-26T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"操作失败\",\"code\":500}', '0', '', NULL, 13, '2025-11-19 14:50:38', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (268, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applyReason\":\"测试\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"currentParticipants\":0,\"description\":\"测试\",\"endTime\":\"2025-11-29T00:00:00\",\"maxParticipants\":1,\"name\":\"测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-26T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"活动名称重复或同一场馆同时间段已被占用\",\"code\":601}', '0', '', NULL, 40, '2025-11-19 14:53:28', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (269, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applyReason\":\"测试\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"currentParticipants\":0,\"description\":\"测试\",\"endTime\":\"2025-11-29T00:00:00\",\"maxParticipants\":1,\"name\":\"测试测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-26T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"活动名称重复或同一场馆同时间段已被占用\",\"code\":601}', '0', '', NULL, 16, '2025-11-19 14:53:32', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (270, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applyReason\":\"测试\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"currentParticipants\":0,\"description\":\"测试\",\"endTime\":\"2025-11-29T00:00:00\",\"maxParticipants\":1,\"name\":\"测试测试测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-26T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"活动名称重复或同一场馆同时间段已被占用\",\"code\":601}', '0', '', NULL, 21, '2025-11-19 14:53:39', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (271, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applyReason\":\"测试\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"currentParticipants\":0,\"description\":\"测试\",\"endTime\":\"2025-11-29T00:00:00\",\"maxParticipants\":1,\"name\":\"测试测试测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-26T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"活动名称重复或同一场馆同时间段已被占用\",\"code\":601}', '0', '', NULL, 14, '2025-11-19 14:53:41', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (272, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"测试\",\"applyTime\":\"2025-11-19 14:54:05.634\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 14:54:05\",\"currentParticipants\":0,\"delFlag\":\"0\",\"description\":\"测试\",\"endTime\":\"2025-12-04T00:00:00\",\"id\":13,\"maxParticipants\":1,\"name\":\"测试测试测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-30T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"测试\",\"applyTime\":\"2025-11-19 14:54:05.634\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 14:54:05\",\"currentParticipants\":0,\"delFlag\":\"0\",\"description\":\"测试\",\"endTime\":\"2025-12-04T00:00:00\",\"id\":13,\"maxParticipants\":1,\"name\":\"测试测试测试\",\"organizer\":\"我\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-11-30T00:00:00\",\"status\":\"0\",\"venueId\":10}}', '0', '', NULL, 28, '2025-11-19 14:54:06', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (273, '特色活动审批', 2, 'cn.edu.cquet.tourism.controller.TourismActivityApprovalController.reject()', 'POST', 1, 'admin', '研发部门', '/tourism/activity-approval/13/reject', '127.0.0.1', '内网IP', '{\"reason\":\"不行\"}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 40, '2025-11-19 14:54:20', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (274, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"测试\",\"applyTime\":\"2025-11-19 15:06:15.196\",\"category\":\"展览\",\"contactPhone\":\"17744775544\",\"coverImage\":\"/profile/upload/2025/11/19/redis-cover_20251119150545A001.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 15:06:15\",\"currentParticipants\":0,\"delFlag\":\"0\",\"description\":\"测试\",\"endTime\":\"2026-02-11T00:00:00\",\"id\":14,\"maxParticipants\":100,\"name\":\"测试通过\",\"organizer\":\"彩色\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-12-25T00:00:00\",\"status\":\"0\",\"venueId\":11}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"测试\",\"applyTime\":\"2025-11-19 15:06:15.196\",\"category\":\"展览\",\"contactPhone\":\"17744775544\",\"coverImage\":\"/profile/upload/2025/11/19/redis-cover_20251119150545A001.jpg\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 15:06:15\",\"currentParticipants\":0,\"delFlag\":\"0\",\"description\":\"测试\",\"endTime\":\"2026-02-11T00:00:00\",\"id\":14,\"maxParticipants\":100,\"name\":\"测试通过\",\"organizer\":\"彩色\",\"params\":{},\"remark\":\"测试\",\"startTime\":\"2025-12-25T00:00:00\",\"status\":\"0\",\"venueId\":11}}', '0', '', NULL, 100, '2025-11-19 15:06:15', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (275, '特色活动审批', 2, 'cn.edu.cquet.tourism.controller.TourismActivityApprovalController.pass()', 'POST', 1, 'admin', '研发部门', '/tourism/activity-approval/14/pass', '127.0.0.1', '内网IP', '{\"opinion\":\"可以\"}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 29, '2025-11-19 15:06:27', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (276, '特色活动', 2, 'cn.edu.cquet.tourism.controller.TourismActivityController.updateStatus()', 'PUT', 1, 'admin', '研发部门', '/tourism/activity/14/status/1', '127.0.0.1', '内网IP', '14 \"1\"', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 15, '2025-11-19 15:09:51', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (277, '特色活动', 2, 'cn.edu.cquet.tourism.controller.TourismActivityController.edit()', 'PUT', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"测试\",\"category\":\"演出\",\"contactPhone\":\"18983432250\",\"coverImage\":\"\",\"currentParticipants\":0,\"description\":\"测试2\",\"endTime\":\"2025-12-04T00:00:00\",\"id\":13,\"maxParticipants\":1,\"name\":\"测试测试测试\",\"organizer\":\"我\",\"params\":{},\"startTime\":\"2025-11-30T00:00:00\",\"status\":\"0\",\"updateBy\":\"admin\",\"updateTime\":\"2025-11-19 15:16:08\",\"venueId\":10}', '{\"msg\":\"操作成功\",\"code\":200}', '0', '', NULL, 40, '2025-11-19 15:16:09', 0, NULL);
+INSERT INTO `sys_oper_log` VALUES (278, '特色活动', 1, 'cn.edu.cquet.tourism.controller.TourismActivityController.add()', 'POST', 1, 'admin', '研发部门', '/tourism/activity', '127.0.0.1', '内网IP', '{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"测试\",\"applyTime\":\"2025-11-19T15:17:58.314+08:00\",\"category\":\"展览\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 15:17:58\",\"currentParticipants\":0,\"delFlag\":\"0\",\"endTime\":\"2029-11-16T00:00:00\",\"id\":15,\"maxParticipants\":5,\"name\":\"测\",\"params\":{},\"startTime\":\"2028-11-01T00:00:00\",\"status\":\"0\",\"venueId\":10}', '{\"msg\":\"操作成功\",\"code\":200,\"data\":{\"applicantName\":\"admin\",\"applicantUserId\":1,\"applyReason\":\"测试\",\"applyTime\":\"2025-11-19T15:17:58.314+08:00\",\"category\":\"展览\",\"createBy\":\"admin\",\"createTime\":\"2025-11-19 15:17:58\",\"currentParticipants\":0,\"delFlag\":\"0\",\"endTime\":\"2029-11-16T00:00:00\",\"id\":15,\"maxParticipants\":5,\"name\":\"测\",\"params\":{},\"startTime\":\"2028-11-01T00:00:00\",\"status\":\"0\",\"venueId\":10}}', '0', '', NULL, 27, '2025-11-19 15:17:58', 0, NULL);
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -862,7 +895,7 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 103, 'admin', 'CQUET', '00', 'CQUET@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2025-11-18 18:01:24', 'admin', '2024-09-04 06:22:51', NULL, '2025-11-18 18:01:24', '管理员');
+INSERT INTO `sys_user` VALUES (1, 103, 'admin', 'CQUET', '00', 'CQUET@163.com', '15888888888', '1', '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', '2025-11-19 14:10:48', 'admin', '2024-09-04 06:22:51', NULL, '2025-11-19 14:10:48', '管理员');
 INSERT INTO `sys_user` VALUES (2, 105, 'ry', '测试', '00', 'ry@qq.com', '15666666666', '1', '', '$2a$10$TZh50TgviSV8zEftiwy7ZuNHrdw7a.yloDmWLbNSDO1PSTacSvLRG', '0', '0', '127.0.0.1', '2025-10-25 21:23:26', 'admin', '2024-09-04 06:22:51', NULL, '2025-10-25 21:23:26', '测试员1');
 INSERT INTO `sys_user` VALUES (105, NULL, 'liyuan', 'liyuan', '00', '', '', '0', '', '$2a$10$tgq/ctqpuY/moLaKttk/peQyxTfsy1X7nRW3MVYNCZYIuNvbqfVGK', '0', '0', '127.0.0.1', '2025-11-14 17:03:38', NULL, '2025-10-27 15:12:23', NULL, '2025-11-14 17:03:38', NULL);
 
@@ -916,6 +949,10 @@ CREATE TABLE `tourism_activity`  (
   `registration_start` datetime NULL DEFAULT NULL COMMENT '报名开始时间',
   `registration_end` datetime NULL DEFAULT NULL COMMENT '报名结束时间',
   `max_participants` int NULL DEFAULT 0 COMMENT '最大参与人数（0表示不限制）',
+  `applicant_user_id` bigint NULL DEFAULT NULL,
+  `applicant_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '',
+  `apply_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '',
+  `apply_time` datetime NULL DEFAULT NULL,
   `current_participants` int NULL DEFAULT 0 COMMENT '当前报名人数',
   `fee` decimal(10, 2) NULL DEFAULT 0.00 COMMENT '活动费用（0表示免费）',
   `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '活动详细介绍',
@@ -923,10 +960,6 @@ CREATE TABLE `tourism_activity`  (
   `view_count` int NULL DEFAULT 0 COMMENT '浏览次数',
   `comment_count` int NULL DEFAULT 0 COMMENT '评论次数',
   `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '状态（0正常 1停用）',
-  `audit_status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '审核状态（0待审核 1审核通过 2审核拒绝）',
-  `audit_reason` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '审核意见',
-  `auditor` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '审核人',
-  `audit_time` datetime NULL DEFAULT NULL COMMENT '审核时间',
   `create_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '创建者',
   `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
   `update_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '更新者',
@@ -939,20 +972,20 @@ CREATE TABLE `tourism_activity`  (
   INDEX `idx_venue_id`(`venue_id` ASC) USING BTREE,
   INDEX `idx_start_time`(`start_time` ASC) USING BTREE,
   INDEX `idx_status`(`status` ASC) USING BTREE,
-  INDEX `idx_audit_status`(`audit_status` ASC) USING BTREE,
   INDEX `idx_create_time`(`create_time` ASC) USING BTREE,
+  INDEX `idx_activity_time`(`start_time` ASC, `end_time` ASC) USING BTREE,
+  INDEX `idx_activity_venue`(`venue_id` ASC) USING BTREE,
+  INDEX `idx_activity_name`(`name` ASC) USING BTREE,
   CONSTRAINT `fk_activity_venue` FOREIGN KEY (`venue_id`) REFERENCES `tourism_venue` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '特色活动信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '特色活动信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tourism_activity
 -- ----------------------------
-INSERT INTO `tourism_activity` VALUES (1, '测试001', '1', '文化体验', 1, '测试001', '12344556677', '2025-11-16 16:52:45', '2025-11-15 16:52:48', '2025-11-15 16:52:53', '2025-11-15 16:52:54', 0, 0, 0.00, '111', NULL, 0, 0, '1', '2', '测试', 'admin', NULL, '', NULL, 'admin', '2025-11-18 16:08:17', NULL, '2');
-INSERT INTO `tourism_activity` VALUES (7, '重庆非遗展览季', 'https://cdn.example.com/images/feiyi-expo.jpg', '展览', 1, '重庆市文化和旅游委员会', '13800138000', '2025-12-01 09:00:00', '2025-12-15 17:30:00', NULL, NULL, 0, 0, 0.00, '集中展示川渝地区非遗项目与工艺，含互动体验。', NULL, 0, 0, '0', '1', '可以', 'admin', NULL, 'admin', '2025-11-15 17:58:32', 'admin', '2025-11-18 16:11:14', '', '2');
-INSERT INTO `tourism_activity` VALUES (8, '重庆非遗展览季', 'https://cdn.example.com/images/feiyi-expo.jpg', '展览', 1, '重庆市文化和旅游委员会', '13800138000', '2025-12-01 09:00:00', '2025-12-15 17:30:00', NULL, NULL, 0, 0, 0.00, '集中展示川渝地区非遗项目与工艺，含互动体验。', NULL, 0, 0, '1', '1', '可以的', 'admin', NULL, 'admin', '2025-11-15 17:58:34', 'admin', '2025-11-18 16:11:04', '', '2');
-INSERT INTO `tourism_activity` VALUES (9, '士大夫', '', '是的', 7, '', '5562+', '2025-11-18 16:31:27', '2025-11-21 00:00:00', NULL, NULL, 0, 0, 0.00, NULL, NULL, 0, 0, '0', '1', '', 'admin', NULL, 'admin', '2025-11-18 16:31:29', '', '2025-11-18 16:31:46', NULL, '2');
-INSERT INTO `tourism_activity` VALUES (10, '水果排队', '/profile/upload/2025/11/18/ComfyUI_00001__20251118183359A009.png', '是的', 9, '是的官方', '18983432250', '2025-11-18 18:28:42', '2025-11-28 00:00:00', NULL, NULL, 0, 0, 0.00, NULL, NULL, 0, 0, '0', '1', '可以', 'admin', NULL, 'admin', '2025-11-18 18:28:44', 'admin', '2025-11-18 18:34:03', NULL, '2');
-INSERT INTO `tourism_activity` VALUES (11, '低代码大赛', '/profile/upload/2025/11/18/椎名_20251118192225A003.png', '比赛', 10, '重庆市电子科技', '', '2025-11-18 00:00:00', '2025-11-26 00:00:00', NULL, NULL, 4, 0, 0.00, '低开吗', NULL, 0, 0, '0', '1', '测试通过', 'admin', NULL, 'admin', '2025-11-18 19:22:46', 'admin', '2025-11-18 19:29:33', NULL, '0');
+INSERT INTO `tourism_activity` VALUES (12, '读书会', '/profile/upload/2025/11/19/ComfyUI_00001__20251119141508A001.png', '展览', 10, '学校', '11144555544', '2025-11-19 14:15:18', '2025-11-28 00:00:00', NULL, NULL, 11, 1, 'admin', '需要场地', '2025-11-19 14:33:42', 0, 0.00, '测试', NULL, 0, 0, '0', 'admin', '2025-11-19 14:33:42', '', '2025-11-19 14:37:01', '测试', '0');
+INSERT INTO `tourism_activity` VALUES (13, '测试测试测试', '', '演出', 10, '我', '18983432250', '2025-11-30 00:00:00', '2025-12-04 00:00:00', NULL, NULL, 1, 1, 'admin', '测试', '2025-11-19 14:54:06', 0, 0.00, '测试2', NULL, 0, 0, '0', 'admin', '2025-11-19 14:54:06', 'admin', '2025-11-19 15:16:08', '测试', '0');
+INSERT INTO `tourism_activity` VALUES (14, '测试通过', '/profile/upload/2025/11/19/redis-cover_20251119150545A001.jpg', '展览', 11, '彩色', '17744775544', '2025-12-25 00:00:00', '2026-02-11 00:00:00', NULL, NULL, 100, 1, 'admin', '测试', '2025-11-19 15:06:15', 0, 0.00, '测试', NULL, 0, 0, '1', 'admin', '2025-11-19 15:06:15', 'admin', '2025-11-19 15:09:51', '测试', '0');
+INSERT INTO `tourism_activity` VALUES (15, '测', '', '展览', 10, '', '', '2028-11-01 00:00:00', '2029-11-16 00:00:00', NULL, NULL, 5, 1, 'admin', '测试', '2025-11-19 15:17:58', 0, 0.00, NULL, NULL, 0, 0, '0', 'admin', '2025-11-19 15:17:58', '', NULL, NULL, '0');
 
 -- ----------------------------
 -- Table structure for tourism_activity_application
@@ -988,6 +1021,36 @@ CREATE TABLE `tourism_activity_application`  (
 -- ----------------------------
 -- Records of tourism_activity_application
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for tourism_activity_approval
+-- ----------------------------
+DROP TABLE IF EXISTS `tourism_activity_approval`;
+CREATE TABLE `tourism_activity_approval`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '审批记录ID',
+  `activity_id` bigint NOT NULL COMMENT '活动ID',
+  `auditor` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '审核人',
+  `audit_status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '审核状态（0待审核 1审核通过 2审核拒绝）',
+  `reason` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '审核意见/不通过原因',
+  `audit_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '审核时间',
+  `create_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `del_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '删除标志（0存在 2删除）',
+  `status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '状态（预留，兼容基础实体）',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_approval_activity_time`(`activity_id` ASC, `audit_time` ASC) USING BTREE,
+  CONSTRAINT `fk_approval_activity` FOREIGN KEY (`activity_id`) REFERENCES `tourism_activity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '特色活动审批记录' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of tourism_activity_approval
+-- ----------------------------
+INSERT INTO `tourism_activity_approval` VALUES (1, 12, 'admin', '1', '可以通过', '2025-11-19 14:37:01', 'admin', '2025-11-19 14:37:01', '', NULL, NULL, '0', '0');
+INSERT INTO `tourism_activity_approval` VALUES (2, 13, 'admin', '2', '不行', '2025-11-19 14:54:19', 'admin', '2025-11-19 14:54:19', '', NULL, NULL, '0', '0');
+INSERT INTO `tourism_activity_approval` VALUES (3, 14, 'admin', '1', '可以', '2025-11-19 15:06:27', 'admin', '2025-11-19 15:06:27', '', NULL, NULL, '0', '0');
 
 -- ----------------------------
 -- Table structure for tourism_activity_comment
@@ -1127,7 +1190,7 @@ CREATE TABLE `tourism_notice`  (
 -- ----------------------------
 -- Records of tourism_notice
 -- ----------------------------
-INSERT INTO `tourism_notice` VALUES (1, '重庆文旅网站正式上线', '欢迎使用重庆文化旅游服务平台！本平台为您提供A级景区信息、文化场馆介绍、特色活动报名等服务。', '2', '1', 0, '0', 'admin', '2025-11-02 12:19:13', '', NULL, '系统通知', '0');
+INSERT INTO `tourism_notice` VALUES (1, '重庆文旅网站正式上线', '<p><strong>欢迎使用重庆文化旅游服务平台</strong>！本平台为您提供A级景区信息、文化场馆介绍、特色活动报名等服务。</p>', '2', '1', 0, '0', 'admin', '2025-11-02 12:19:13', 'admin', '2025-11-19 10:44:25', '系统通知', '0');
 INSERT INTO `tourism_notice` VALUES (2, '春节期间活动安排通知', '春节期间，各大景区和文化场馆将举办丰富多彩的文化活动，欢迎广大市民和游客参与。', '1', '0', 0, '0', 'admin', '2025-11-02 12:19:13', '', NULL, '节日通知', '0');
 INSERT INTO `tourism_notice` VALUES (3, '测是', '<p>是额</p>', '1', '0', 0, '0', 'admin', '2025-11-18 19:17:52', '', NULL, '是', '0');
 
@@ -1165,7 +1228,7 @@ CREATE TABLE `tourism_scenic_spot`  (
   INDEX `idx_city`(`city` ASC) USING BTREE,
   INDEX `idx_status`(`status` ASC) USING BTREE,
   INDEX `idx_create_time`(`create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'A级景区信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'A级景区信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tourism_scenic_spot
@@ -1176,7 +1239,8 @@ INSERT INTO `tourism_scenic_spot` VALUES (24, '测试001', 'AAA', '', 0.00, '测
 INSERT INTO `tourism_scenic_spot` VALUES (25, '重庆解放碑', 'AAAAA', '/profile/upload/2025/11/18/未标题-1_20251118181325A003.png', 0.00, '重庆市', '重庆市', '重庆市', '全天', '18983432250', 'cq.com', '解放碑', 6.0000000, -6.0000000, 0, 0, '0', 'admin', '2025-11-18 15:32:04', 'admin', '2025-11-18 18:22:21', NULL, '2');
 INSERT INTO `tourism_scenic_spot` VALUES (26, '测试', 'A', '/profile/upload/2025/11/18/mmexport1762929757923_20251118172249A001.jpeg', 0.00, '彩色', '测试', '', '测试', '', '', NULL, 3.0000000, 3.0000000, 0, 0, '0', 'admin', '2025-11-18 17:23:13', 'admin', '2025-11-18 18:10:59', NULL, '2');
 INSERT INTO `tourism_scenic_spot` VALUES (27, '测试测试', 'A', '/profile/upload/2025/11/18/mmexport1762929757923_20251118172249A001.jpeg', 0.00, '彩色', '测试', '', '测试', '', '', NULL, 3.0000000, 3.0000000, 0, 0, '0', 'admin', '2025-11-18 17:23:23', '', NULL, NULL, '2');
-INSERT INTO `tourism_scenic_spot` VALUES (28, '重庆电子科技职业大学', 'AAAAA', '/profile/upload/2025/11/18/小川_20251118192010A001.jpg', 0.00, '重庆市两江新区', '重庆市', '重庆市两江新区', '全天', '18983432250', 'cquet', '重庆市永川区', 2.0000000, 3.0000000, 0, 0, '0', 'admin', '2025-11-18 19:20:17', '', NULL, '测试', '0');
+INSERT INTO `tourism_scenic_spot` VALUES (28, '广州塔', 'AAAAA', '/profile/upload/2025/11/19/06FD0C357EA5C119D8FA89F6D5C8833F_20251119113731A002.jpg', 50.00, '本地辖区', '广东省广州市', '市辖区', '全天', '18983432250', 'cquet', '广州著名景点', 2.0000000, 3.0000000, 0, 0, '0', 'admin', '2025-11-18 19:20:17', 'admin', '2025-11-19 11:37:35', '测试', '0');
+INSERT INTO `tourism_scenic_spot` VALUES (29, '测试景区', 'AAAAA', '/profile/upload/2025/11/19/redis-cover_20251119113845A003.jpg', 5.00, '测试', '北京市', '东城区', '9:00-21:00', '18988444455', '测试', NULL, 0.0000000, 0.0000000, 0, 0, '0', 'admin', '2025-11-19 11:38:55', 'admin', '2025-11-19 11:59:28', '测试', '0');
 
 -- ----------------------------
 -- Table structure for tourism_scenic_spot_image
@@ -1261,7 +1325,7 @@ CREATE TABLE `tourism_venue`  (
   INDEX `idx_city`(`city` ASC) USING BTREE,
   INDEX `idx_status`(`status` ASC) USING BTREE,
   INDEX `idx_create_time`(`create_time` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '场馆信息表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '场馆信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tourism_venue
@@ -1275,7 +1339,8 @@ INSERT INTO `tourism_venue` VALUES (6, '重庆科技馆2', '科技馆', 'http://
 INSERT INTO `tourism_venue` VALUES (7, '科技馆', '文旅', '/profile/upload/2025/11/18/未标题-1_20251118181611A005.png', 4.00, '重庆市', '重庆市', '重庆市', '下午', '18983432250', '', '解放碑科技', 6.0000000, -6.0000000, 0, '0', 0, 0, '0', 'admin', '2025-11-18 16:28:46', 'admin', '2025-11-18 18:16:19', NULL, '2');
 INSERT INTO `tourism_venue` VALUES (8, '就订啊', '酒店', '', 0.00, '重庆市', '重庆市', '重庆市', '', '', '', NULL, 6.0000000, -6.0000000, 0, '0', 0, 0, '0', 'admin', '2025-11-18 16:32:27', '', NULL, NULL, '2');
 INSERT INTO `tourism_venue` VALUES (9, '是的', '是的', '/profile/upload/2025/11/18/sala4_20251118182804A008.jpg', 0.00, '四川省阿坝藏族羌族自治州九寨沟县', '阿坝州', '九寨沟县', '', '18983432250', '', NULL, 103.9180000, 33.2540000, 2, '0', 0, 0, '0', 'admin', '2025-11-18 18:28:06', 'admin', '2025-11-18 18:30:53', NULL, '2');
-INSERT INTO `tourism_venue` VALUES (10, '教学楼', '教学', '/profile/upload/2025/11/18/蓝莓草莓_20251118192135A002.jpg', 0.00, '重庆市两江新区', '重庆市', '重庆市两江新区', '早上8:00-晚上22:00', '', '', '教学', 2.0000000, 3.0000000, 0, '0', 0, 0, '0', 'admin', '2025-11-18 19:21:37', '', NULL, NULL, '0');
+INSERT INTO `tourism_venue` VALUES (10, '教学楼', '教学', '/profile/upload/2025/11/18/蓝莓草莓_20251118192135A002.jpg', 0.00, '重庆市两江新区', '重庆市', '武隆区', '早上8:00-晚上22:00', '18983432250', '', '教学', 2.0000000, 3.0000000, 0, '0', 0, 0, '0', 'admin', '2025-11-18 19:21:37', 'admin', '2025-11-19 12:17:45', NULL, '0');
+INSERT INTO `tourism_venue` VALUES (11, '科技馆', '教育科研类场馆', '/profile/upload/2025/11/19/704257_143708003_2_20251119115714A001.jpg', 0.00, '测试', '北京市', '东城区', '9:00-17:00', '18983432250', '无', '测试', 7.0000000, -10.0000000, 15, '1', 0, 0, '0', 'admin', '2025-11-19 11:57:26', '', NULL, '测试', '0');
 
 -- ----------------------------
 -- Table structure for tourism_venue_facilities
@@ -1318,5 +1383,24 @@ CREATE TABLE `tourism_venue_image`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for tourism_venue_scenic_spot
+-- ----------------------------
+DROP TABLE IF EXISTS `tourism_venue_scenic_spot`;
+CREATE TABLE `tourism_venue_scenic_spot`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '关联记录主键',
+  `venue_id` bigint NOT NULL COMMENT '关联的场馆ID（外键）',
+  `scenic_spot_id` bigint NOT NULL COMMENT '关联的景区ID（外键）',
+  `sort` int NULL DEFAULT 0 COMMENT '排序',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_venue_spot`(`venue_id` ASC, `scenic_spot_id` ASC) USING BTREE,
+  INDEX `scenic_spot_id`(`scenic_spot_id` ASC) USING BTREE,
+  CONSTRAINT `tourism_venue_scenic_spot_ibfk_1` FOREIGN KEY (`venue_id`) REFERENCES `tourism_venue` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `tourism_venue_scenic_spot_ibfk_2` FOREIGN KEY (`scenic_spot_id`) REFERENCES `tourism_scenic_spot` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '场馆-景区关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of tourism_venue_scenic_spot
+-- ----------------------------
+INSERT INTO `tourism_venue_scenic_spot` VALUES (7, 10, 28, 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

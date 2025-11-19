@@ -16,7 +16,7 @@ import org.apache.poi.hpsf.Decimal;
 import java.math.BigDecimal;
 import java.util.List;
 
-// AbsEntity: 抽象实体类
+
 @TableName("tourism_venue")
 @Schema(description = "场馆信息") // 描述
 @EqualsAndHashCode(callSuper = true) // 继承父类属性, 重写所有equals和hashCode方法
@@ -44,9 +44,6 @@ public class TourismVenue extends AbsEntity {
     @Schema(description = "场馆封面图片")
     @TableField("cover_image")
     private String coverImage;
-
-//    @Schema(description = "场馆图片URL列表, 数组")
-//    private String imageUrls;
 
     @Schema(description = "门票价格")
     // Decimal: BigDecimal，常用于金融，高精度计算
@@ -86,9 +83,6 @@ public class TourismVenue extends AbsEntity {
     @Schema(description = "场馆容纳人数")
     private Integer capacity;
 
-//    @Schema(description = "设施信息")
-//    private String facilities;
-
     @Schema(description = "是否需要预约")
     @TableField("booking_required")
     private String bookingRequired;
@@ -101,12 +95,14 @@ public class TourismVenue extends AbsEntity {
     @TableField("view_count")
     private Integer viewCount;
 
-    @Schema(description = "场馆状态")
-    private String status; // 0：正常，1：停用
+    @Schema(description = "场馆状态：0-正常，1-停用")
+    private String status;
 
     @TableField(exist = false)
     private List<Integer> imageIds;
 
+    // 说明：
+    // - 场馆设施ID列表，用于批量绑定关联。暂未开发
     @TableField(exist = false)
     private List<Integer> facilitiesIds;
 }

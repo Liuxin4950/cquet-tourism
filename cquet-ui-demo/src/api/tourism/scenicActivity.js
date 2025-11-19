@@ -68,7 +68,7 @@ export function rejectScenicActivity(id, reason) {
 // 查询特色活动申报列表（含待审核/通过/不通过）
 export function listScenicActivityApplication(query) {
   return request({
-    url: '/tourism/activityApplication/list',
+    url: '/tourism/activity-approval/list',
     method: 'get',
     params: query
   })
@@ -78,7 +78,7 @@ export function listScenicActivityApplication(query) {
 export function passScenicActivityApplication(scenicActivityApplicationId, opinion) {
   const hasQuery = opinion && typeof opinion === 'string' && opinion.length > 0
   return request({
-    url: '/tourism/activityApplication/' + scenicActivityApplicationId + '/approve' + (hasQuery ? ('?opinion=' + encodeURIComponent(opinion)) : ''),
+    url: '/tourism/activity-approval/' + scenicActivityApplicationId + '/pass' + (hasQuery ? ('?opinion=' + encodeURIComponent(opinion)) : ''),
     method: 'post',
     data: hasQuery ? undefined : (opinion ? { opinion } : undefined)
   })
@@ -88,7 +88,7 @@ export function passScenicActivityApplication(scenicActivityApplicationId, opini
 export function rejectScenicActivityApplication(scenicActivityApplicationId, reason) {
   const hasQuery = reason && typeof reason === 'string' && reason.length > 0
   return request({
-    url: '/tourism/activityApplication/' + scenicActivityApplicationId + '/reject' + (hasQuery ? ('?reason=' + encodeURIComponent(reason)) : ''),
+    url: '/tourism/activity-approval/' + scenicActivityApplicationId + '/reject' + (hasQuery ? ('?reason=' + encodeURIComponent(reason)) : ''),
     method: 'post',
     data: hasQuery ? undefined : { reason }
   })

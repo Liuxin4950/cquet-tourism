@@ -52,17 +52,22 @@
       <el-table-column label="类别" prop="category" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="主办方" prop="organizer" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="申报人" prop="applicantName" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="开始时间" prop="startTime" width="170" align="center">
         <template slot-scope="scope"><span>{{ scope.row.startTime ? parseTime(scope.row.startTime) : '暂无...' }}</span></template>
       </el-table-column>
       <el-table-column label="结束时间" prop="endTime" width="170" align="center">
         <template slot-scope="scope"><span>{{ scope.row.endTime ? parseTime(scope.row.endTime) : '暂无...' }}</span></template>
       </el-table-column>
+      <el-table-column label="申报时间" prop="applyTime" width="170" align="center">
+        <template slot-scope="scope"><span>{{ scope.row.applyTime ? parseTime(scope.row.applyTime) : '暂无...' }}</span></template>
+      </el-table-column>
       <el-table-column label="人数" prop="currentParticipants" width="120" align="center">
         <template slot-scope="scope">
           <span>{{ (scope.row.currentParticipants != null && scope.row.maxParticipants != null) ? (scope.row.currentParticipants + ' / ' + scope.row.maxParticipants) : '暂无...' }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="申报理由" prop="applyReason" width="200" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="审核状态" prop="auditStatus" width="110" align="center">
         <template slot-scope="scope">
           <span v-if="scope.row.auditStatus === undefined || scope.row.auditStatus === null || scope.row.auditStatus === ''">暂无...</span>
@@ -105,6 +110,7 @@
         </el-row>
         <el-row>
           <el-col :span="12"><el-form-item label="封面图片" prop="coverImage"><image-upload v-model="form.coverImage" :limit="1" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="运行状态" prop="status"><el-select v-model="form.status" placeholder="选择状态" style="width: 100%"><el-option label="正常" value="0" /><el-option label="停用" value="1" /></el-select></el-form-item></el-col>
         </el-row>
         <el-row>
           <el-col :span="12"><el-form-item label="当前人数" prop="currentParticipants"><el-input-number v-model="form.currentParticipants" :min="0" style="width: 100%" /></el-form-item></el-col>
@@ -116,6 +122,9 @@
         </el-row>
         <el-row>
           <el-col :span="24"><el-form-item label="活动介绍" prop="description"><el-input v-model="form.description" type="textarea" :rows="4" placeholder="请输入活动介绍" /></el-form-item></el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24"><el-form-item label="申报理由" prop="applyReason"><el-input v-model="form.applyReason" type="textarea" :rows="3" placeholder="请输入申报理由" /></el-form-item></el-col>
         </el-row>
         <el-row>
           <el-col :span="24"><el-form-item label="备注" prop="remark"><el-input v-model="form.remark" type="textarea" placeholder="请输入内容" /></el-form-item></el-col>
@@ -154,8 +163,9 @@
       </div>
       <div class="detail-card">
         <div class="detail-row single">
-          <div class="detail-item"><div class="label">审核人</div><div class="value">{{ detail.auditor || '暂无' }}</div></div>
-          <div class="detail-item"><div class="label">审核意见</div><div class="value">{{ detail.auditReason || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">申报人</div><div class="value">{{ detail.applicantName || '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">申报时间</div><div class="value">{{ detail.applyTime ? parseTime(detail.applyTime) : '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">申报理由</div><div class="value">{{ detail.applyReason || '暂无' }}</div></div>
           <div class="detail-item"><div class="label">人数</div><div class="value">{{ (detail.currentParticipants != null && detail.maxParticipants != null) ? (detail.currentParticipants + ' / ' + detail.maxParticipants) : '暂无' }}</div></div>
           <div class="detail-item"><div class="label">活动介绍</div><div class="value">{{ detail.description || '暂无' }}</div></div>
         </div>
@@ -205,7 +215,8 @@ export default {
         venueId: [{ required: true, message: '所属场馆不能为空', trigger: 'change' }],
         startTime: [{ required: true, message: '开始时间不能为空', trigger: 'change' }],
         endTime: [{ required: true, message: '结束时间不能为空', trigger: 'change' }],
-        maxParticipants: [{ required: true, message: '最大人数不能为空', trigger: 'blur' }]
+        maxParticipants: [{ required: true, message: '最大人数不能为空', trigger: 'blur' }],
+        applyReason: [{ required: true, message: '申报理由不能为空', trigger: 'blur' }]
       },
       venueOptions: [],
       venueMap: {},
@@ -255,7 +266,7 @@ export default {
       })
     },
     reset() {
-      this.form = { id: undefined, name: undefined, category: undefined, venueId: undefined, organizer: undefined, contactPhone: undefined, startTime: undefined, endTime: undefined, coverImage: undefined, currentParticipants: 0, maxParticipants: 1, description: undefined, remark: undefined }
+      this.form = { id: undefined, name: undefined, category: undefined, venueId: undefined, organizer: undefined, contactPhone: undefined, startTime: undefined, endTime: undefined, coverImage: undefined, status: '0', currentParticipants: 0, maxParticipants: 1, description: undefined, applyReason: undefined, remark: undefined }
       this.resetForm && this.resetForm('form')
     },
     handleAdd() {
@@ -275,10 +286,22 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           if (Number(this.form.currentParticipants || 0) > Number(this.form.maxParticipants || 0)) { this.$modal.msgError('当前人数不能大于最大人数'); return }
+          const payload = { ...this.form }
+          delete payload.applyTime
+          delete payload.auditTime
+          delete payload.auditStatus
+          delete payload.auditor
+          delete payload.auditReason
+          delete payload.createTime
+          delete payload.updateTime
+          delete payload.createBy
+          delete payload.updateBy
+          delete payload.delFlag
           if (this.form.id != undefined) {
-            updateScenicActivity(this.form).then(() => { this.$modal.msgSuccess('修改成功'); this.open = false; this.getList() })
+            updateScenicActivity(payload).then(() => { this.$modal.msgSuccess('修改成功'); this.open = false; this.getList() })
           } else {
-            addScenicActivity(this.form).then(() => { this.$modal.msgSuccess('新增成功'); this.open = false; this.getList() })
+            delete payload.id
+            addScenicActivity(payload).then(() => { this.$modal.msgSuccess('新增成功'); this.open = false; this.getList() })
           }
         }
       })

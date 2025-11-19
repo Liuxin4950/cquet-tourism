@@ -33,6 +33,8 @@
       <el-table-column label="所属场馆" width="150">
         <template slot-scope="scope">{{ venueName(scope.row.venueId) }}</template>
       </el-table-column>
+      <el-table-column label="申报人" prop="applicantName" width="150" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="申报理由" prop="applyReason" width="250" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="审核状态" prop="auditStatus" width="150" align="center">
         <template slot-scope="scope">
           <el-tag :type="auditTagType(scope.row.auditStatus)">{{ auditText(scope.row.auditStatus) }}</el-tag>
@@ -40,15 +42,15 @@
       </el-table-column>
       <el-table-column label="审核人" prop="auditor" width="150" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="审核意见" prop="auditReason" width="250" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="审核时间" prop="updateTime" align="center" width="190">
-        <template slot-scope="scope"><span>{{ scope.row.updateTime ? parseTime(scope.row.updateTime) : '暂无...' }}</span></template>
+      <el-table-column label="审核时间" prop="auditTime" align="center" width="190">
+        <template slot-scope="scope"><span>{{ scope.row.auditTime ? parseTime(scope.row.auditTime) : '暂无...' }}</span></template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="190">
         <template slot-scope="scope">
           <template v-if="scope.row.auditStatus === '0'">
-            <el-button size="mini" type="text" icon="el-icon-circle-check" @click="approve(scope.row)" v-hasPermi="['tourism:activityApplication:approve']">通过</el-button>
-            <el-button size="mini" type="text" icon="el-icon-circle-close" @click="reject(scope.row)" v-hasPermi="['tourism:activityApplication:reject']">拒绝</el-button>
-          </template>
+            <el-button size="mini" type="text" icon="el-icon-circle-check" @click="approve(scope.row)" v-hasPermi="['tourism:activityApproval:approve']">通过</el-button>
+            <el-button size="mini" type="text" icon="el-icon-circle-close" @click="reject(scope.row)" v-hasPermi="['tourism:activityApproval:reject']">拒绝</el-button>
+        </template>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:activity:remove']">删除</el-button>
         </template>
       </el-table-column>

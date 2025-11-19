@@ -142,7 +142,7 @@
         align="center"
       >
         <template slot-scope="scope">
-          <span>¥{{ scope.row.ticketPrice }}</span>
+          <span>{{ Number(scope.row.ticketPrice) === 0 ? '免费' : (scope.row.ticketPrice != null ? ('¥' + scope.row.ticketPrice) : '暂无...') }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -250,13 +250,14 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="门票价格" prop="ticketPrice">
-              <el-input-number
-                v-model="form.ticketPrice"
-                :min="0"
-                :precision="2"
-                style="width: 100%"
-              />
+            <el-form-item label="票务" prop="feeType">
+              <el-radio-group v-model="form.feeType" @change="onFeeTypeChange">
+                <el-radio label="free">免费</el-radio>
+                <el-radio label="paid">收费</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="form.feeType === 'paid'" label="门票价格" prop="ticketPrice">
+              <el-input-number v-model="form.ticketPrice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -402,7 +403,7 @@
           </div>
           <div class="detail-item">
             <div class="label">票价</div>
-            <div class="value">{{ scenicDetail.ticketPrice != null ? ('¥' + scenicDetail.ticketPrice) : '暂无' }}</div>
+            <div class="value">{{ Number(scenicDetail.ticketPrice) === 0 ? '免费' : (scenicDetail.ticketPrice != null ? ('¥' + scenicDetail.ticketPrice) : '暂无') }}</div>
           </div>
           <div class="detail-item">
             <div class="label">电话</div>
@@ -527,7 +528,11 @@ export default {
           { required: true, message: "景区等级不能为空", trigger: "change" },
         ],
         ticketPrice: [
-          { required: true, message: "门票价格不能为空", trigger: "blur" },
+          { validator: (rule, value, callback) => {
+              const isPaid = this && this.form && this.form.feeType === 'paid'
+              if (isPaid && (!value || Number(value) <= 0)) return callback(new Error('请填写有效票价'))
+              callback()
+            }, trigger: 'blur' }
         ],
         city: [
           { required: true, message: "所在城市不能为空", trigger: "blur" },
@@ -633,6 +638,8 @@ export default {
       const scenicSpotId = row.id || this.ids[0];
       getScenicSpot(scenicSpotId).then((response) => {
         this.form = response.data;
+        this.$set(this.form, 'feeType', Number(this.form.ticketPrice || 0) > 0 ? 'paid' : 'free')
+        this.setAreaValueFromForm(this.form.city, this.form.district)
         // 加载已关联图片
         import('@/api/tourism/scenicSpot').then((m) => {
           m.listScenicSpotImages(scenicSpotId).then((r) => {
@@ -668,6 +675,7 @@ export default {
         level: undefined,
         coverImage: undefined,
         imageUrls: [],
+        feeType: 'free',
         ticketPrice: 0,
         address: undefined,
         city: undefined,
@@ -712,6 +720,7 @@ export default {
       this.$refs["form"].validate((valid) => {
         if (valid) {
           const formData = { ...this.form };
+          if (formData.feeType === 'free') { formData.ticketPrice = 0 } else { if (!(Number(formData.ticketPrice) > 0)) { this.$modal.msgError('请填写有效票价'); return } }
           if (formData.id != undefined) {
             updateScenicSpot(formData).then((response) => {
               // 同步图片关联
@@ -763,6 +772,30 @@ export default {
     cancel: function () {
       this.open = false;
       this.resetForm("form");
+    },
+    onFeeTypeChange(val) {
+      if (val === 'free') this.form.ticketPrice = 0
+    },
+    setAreaValueFromForm(cityStr, districtLabel) {
+      try {
+        const provinces = this.areaOptions || []
+        for (const p of provinces) {
+          const pLabel = p.label || ''
+          const children = p.children || []
+          for (const c of children) {
+            const cLabel = c.label || ''
+            if ((pLabel + cLabel) === (cityStr || '')) {
+              const path = [p.value, c.value]
+              if (districtLabel && c.children && c.children.length) {
+                const d = c.children.find(x => x.label === districtLabel)
+                if (d) path.push(d.value)
+              }
+              this.areaValue = path
+              return
+            }
+          }
+        }
+      } catch (e) {}
     },
     imageUrl(u) {
       const base = process.env.VUE_APP_BASE_API || '';

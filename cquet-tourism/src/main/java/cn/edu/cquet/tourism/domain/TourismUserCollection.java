@@ -24,7 +24,7 @@ public class TourismUserCollection extends AbsEntity {
     private Integer userId;
 
     @Schema(description = "收藏目标类型")
-    @TableField("target_id")
+    @TableField("target_type")
     private String targetType;
 
     @Schema(description = "收藏目标id")

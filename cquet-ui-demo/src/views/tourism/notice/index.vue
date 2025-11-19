@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
-      <el-form-item label="公告标题" prop="title">
-        <el-input v-model="queryParams.title" placeholder="请输入公告标题" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
+      <el-form-item label="通知标题" prop="title">
+        <el-input v-model="queryParams.title" placeholder="请输入通知标题" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />

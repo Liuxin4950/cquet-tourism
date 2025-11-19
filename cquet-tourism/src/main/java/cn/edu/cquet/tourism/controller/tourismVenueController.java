@@ -4,10 +4,8 @@ import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
 import cn.edu.cquet.common.core.page.TableDataInfo;
 import cn.edu.cquet.tourism.domain.TourismVenue;
-import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
-import cn.edu.cquet.tourism.mapper.TourismVenueMapper;
 import cn.edu.cquet.tourism.service.TourismVenueService;
-import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.web.bind.annotation.RequestParam;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
+import cn.edu.cquet.tourism.domain.vo.TourismActivityVo;
 import cn.edu.cquet.tourism.domain.TourismActivity;
-import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import cn.edu.cquet.tourism.domain.TourismImage;
+import cn.edu.cquet.tourism.domain.TourismActivityApproval;
 
 import java.util.List;
 
@@ -40,6 +39,9 @@ public class tourismVenueController extends BaseController {
     @Autowired
     private TourismVenueService tourismVenueService;
 
+    @Autowired
+    private cn.edu.cquet.tourism.service.TourismActivityApprovalService approvalService;
+
     @PreAuthorize("@ss.hasPermi('tourism:venue:list')")
     @GetMapping("/list")
     @Operation(summary = "获取场馆列表")
@@ -51,10 +53,11 @@ public class tourismVenueController extends BaseController {
      * 入参：`name`、`address`（均为可选模糊查询条件）
      * 返回：分页表格数据 `TableDataInfo`
      */
-    public TableDataInfo getList(@Param("name") String name, @Param("address") String address) {
-        startPage(); // 分页开始
-        // 根据条件查询，查询符合条件的数据
-        List<TourismVenue> list = tourismVenueService.getVenueByNameAndAddress(name, address);
+    public TableDataInfo getList(@RequestParam(required = false) String name,
+                                 @RequestParam(required = false) String address,
+                                 @RequestParam(required = false) String city) {
+        startPage();
+        List<TourismVenue> list = tourismVenueService.getVenueList(name, address, city);
         // 将数据转换为TableDataInfo对象返回
         return getDataTable(list);
     }
@@ -145,14 +148,25 @@ public class tourismVenueController extends BaseController {
      * 路径：`GET /tourism/venue/{id}/activities`
      * 权限：`tourism:venue:activity:list`
      * 入参：路径参数 `id`
-     * 返回：`Result` 包装的活动列表
+     * 返回：`Result` 包装的活动列表（含审批派生字段）
      */
     public Result activities(@PathVariable Long id) {
         if (id == null) {
             return warn("场馆id不能为空");
         }
         List<TourismActivity> list = ((cn.edu.cquet.tourism.service.impl.TourismVenueServiceImpl)tourismVenueService).getActivitiesByVenueId(id.intValue());
-        return success(list);
+        java.util.List<TourismActivityVo> vos = new java.util.ArrayList<>(list.size());
+        for (TourismActivity a : list) {
+            TourismActivityVo vo = new TourismActivityVo();
+            vo.setId(a.getId()); vo.setName(a.getName()); vo.setCategory(a.getCategory()); vo.setStartTime(a.getStartTime()); vo.setEndTime(a.getEndTime());
+            vo.setStatus(a.getStatus());
+            java.util.List<TourismActivityApproval> h = approvalService.history(a.getId());
+            TourismActivityApproval latest = (h == null || h.isEmpty()) ? null : h.get(0);
+            if (latest == null) { vo.setAuditStatus("0"); }
+            else { vo.setAuditStatus(latest.getAuditStatus()); vo.setAuditReason(latest.getReason()); vo.setAuditor(latest.getAuditor()); vo.setAuditTime(latest.getAuditTime()); }
+            vos.add(vo);
+        }
+        return success(vos);
     }
 
 
@@ -161,14 +175,14 @@ public class tourismVenueController extends BaseController {
     @Operation(summary = "查看当前场馆的关联图片列表")
     public Result venueImages(@PathVariable Long id) {
         if (id == null) return warn("场馆id不能为空");
-        java.util.List<TourismImage> images = tourismVenueService.getImagesByVenue(id);
+        List<TourismImage> images = tourismVenueService.getImagesByVenue(id);
         return success(images);
     }
 
     @PreAuthorize("@ss.hasPermi('tourism:venue:image:edit')")
     @PutMapping("/{id}/images")
     @Operation(summary = "设置当前场馆的关联图片（覆盖式）")
-    public Result setVenueImages(@PathVariable Long id, @RequestBody java.util.List<Integer> imageIds) {
+    public Result setVenueImages(@PathVariable Long id, @RequestBody List<Integer> imageIds) {
         if (id == null) return warn("场馆id不能为空");
         return toAjax(tourismVenueService.setImagesForVenue(id, imageIds));
     }

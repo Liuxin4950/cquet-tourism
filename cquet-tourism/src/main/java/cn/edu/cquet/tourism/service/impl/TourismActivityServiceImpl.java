@@ -24,6 +24,9 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
     @Autowired
     private TourismActivityMapper activityMapper; // 活动表 Mapper
 
+    @Autowired
+    private cn.edu.cquet.tourism.service.TourismActivityApprovalService approvalService; // 审批记录服务
+
     @Override
     /**
      * 列表查询
@@ -31,13 +34,28 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
      */
     public List<TourismActivity> list(String name, Integer venueId, String auditStatus) {
         LambdaQueryWrapper<TourismActivity> qw = new LambdaQueryWrapper<>(); // 创建查询构造器
-        String as = normalizeAuditStatus(auditStatus); // 归一化审核状态
         qw.like(StringUtils.hasText(name), TourismActivity::getName, name) // 名称模糊
           .eq(venueId != null, TourismActivity::getVenueId, venueId) // 场馆过滤
-          .eq(StringUtils.hasText(as), TourismActivity::getAuditStatus, as) // 审核状态过滤
           .eq(TourismActivity::getDelFlag, "0") // 未删除
           .orderByDesc(TourismActivity::getCreateTime); // 创建时间倒序
-        return activityMapper.selectList(qw); // 执行查询
+        List<TourismActivity> list = activityMapper.selectList(qw);
+        // 若携带审核状态筛选，则根据最新审批记录进行过滤
+        if (StringUtils.hasText(auditStatus)) {
+            String as = normalizeAuditStatus(auditStatus);
+            if ("0".equals(as)) {
+                list = list.stream().filter(a -> {
+                    List<cn.edu.cquet.tourism.domain.TourismActivityApproval> h = approvalService.history(a.getId());
+                    return h == null || h.isEmpty();
+                }).toList();
+            } else if ("1".equals(as) || "2".equals(as)) {
+                list = list.stream().filter(a -> {
+                    List<cn.edu.cquet.tourism.domain.TourismActivityApproval> h = approvalService.history(a.getId());
+                    cn.edu.cquet.tourism.domain.TourismActivityApproval latest = (h == null || h.isEmpty()) ? null : h.get(0);
+                    return latest != null && as.equals(latest.getAuditStatus());
+                }).toList();
+            }
+        }
+        return list;
     }
 
     @Override
@@ -70,8 +88,26 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
      */
     public boolean create(TourismActivity activity) {
         if (activity == null) return false; // 基本校验
-        String as = normalizeAuditStatus(activity.getAuditStatus()); // 归一化传入的审核状态
-        activity.setAuditStatus(StringUtils.hasText(as) ? as : "0"); // 默认待审核
+        // 名称重复校验（同名活动不允许，忽略删除记录）
+        if (StringUtils.hasText(activity.getName())) {
+            LambdaQueryWrapper<TourismActivity> qwName = new LambdaQueryWrapper<>();
+            qwName.eq(TourismActivity::getDelFlag, "0").eq(TourismActivity::getName, activity.getName());
+            if (activityMapper.selectCount(qwName) > 0) return false;
+        }
+        // 同场馆同时间段占用校验（有交集视为冲突，忽略已删除）
+        if (activity.getVenueId() != null && activity.getStartTime() != null && activity.getEndTime() != null) {
+            LambdaQueryWrapper<TourismActivity> qwTime = new LambdaQueryWrapper<>();
+            qwTime.eq(TourismActivity::getDelFlag, "0")
+                 .eq(TourismActivity::getVenueId, activity.getVenueId())
+                 .lt(TourismActivity::getStartTime, activity.getEndTime())
+                 .gt(TourismActivity::getEndTime, activity.getStartTime());
+            if (activityMapper.selectCount(qwTime) > 0) return false;
+        }
+        // 申报信息补全
+        activity.setApplicantUserId(cn.edu.cquet.common.utils.SecurityUtils.getUserId());
+        activity.setApplicantName(cn.edu.cquet.common.utils.SecurityUtils.getUsername());
+        if (activity.getApplyReason() == null) activity.setApplyReason(activity.getDescription());
+        activity.setApplyTime(new java.util.Date());
         return activityMapper.insert(activity) > 0; // 插入记录
     }
 
@@ -81,52 +117,8 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
      * 更新活动
      */
     public boolean update(TourismActivity activity) {
-        if (activity == null || activity.getId() == null) return false; // 校验
-        String as = normalizeAuditStatus(activity.getAuditStatus()); // 归一化审核状态
-        activity.setAuditStatus(StringUtils.hasText(as) ? as : activity.getAuditStatus()); // 若归一化结果为空则保留原值
-        return activityMapper.updateById(activity) > 0; // 更新记录
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    /**
-     * 审核通过
-     * 效果：审核状态=通过、活动状态=正常；记录审核意见/人/时间
-     */
-    public boolean approve(Long id, String opinion) {
-        if (id == null) return false; // 校验
-        TourismActivity exist = activityMapper.selectById(id); // 查询是否存在
-        if (exist == null) return false; // 不存在
-        com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<TourismActivity> uw = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>(); // 构造更新器
-        uw.set(TourismActivity::getAuditStatus, "1") // 审核通过
-          .set(TourismActivity::getStatus, "0") // 启动状态
-          .set(org.springframework.util.StringUtils.hasText(opinion), TourismActivity::getAuditReason, opinion) // 可选记录审核意见
-          .set(TourismActivity::getAuditor, SecurityUtils.getUsername()) // 记录审核人
-          .set(TourismActivity::getUpdateTime, new java.util.Date()) // 更新时间
-          .set(TourismActivity::getUpdateTime, new java.util.Date()) // 更新时间
-          .eq(TourismActivity::getId, id); // 目标记录
-        int rows = activityMapper.update(null, uw); // 执行更新
-        return rows > 0; // 返回结果
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    /**
-     * 审核不通过
-     * 效果：审核状态=不通过；记录原因、审核人与时间
-     */
-    public boolean reject(Long id, String reason) {
-        if (id == null || !StringUtils.hasText(reason)) return false; // 校验：必须提供原因
-        TourismActivity exist = activityMapper.selectById(id); // 查询是否存在
-        if (exist == null) return false; // 不存在
-        com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<TourismActivity> uw = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>(); // 构造更新器
-        uw.set(TourismActivity::getAuditStatus, "2") // 审核不通过
-          .set(TourismActivity::getAuditReason, reason) // 记录原因
-          .set(TourismActivity::getAuditor, SecurityUtils.getUsername()) // 审核人
-          .set(TourismActivity::getUpdateTime, new java.util.Date()) // 更新时间
-          .eq(TourismActivity::getId, id); // 目标记录
-        int rows = activityMapper.update(null, uw); // 执行更新
-        return rows > 0; // 返回结果
+        if (activity == null || activity.getId() == null) return false;
+        return activityMapper.updateById(activity) > 0;
     }
 
     /**

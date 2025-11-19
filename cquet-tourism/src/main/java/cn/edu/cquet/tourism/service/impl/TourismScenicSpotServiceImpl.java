@@ -41,11 +41,6 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     private TourismImageMapper imageMapper; // 图片表
 
 
-    @Autowired
-    private cn.edu.cquet.tourism.service.TourismVenueService venueService; // 场馆服务，用于级联删除
-
-    // 删除重复字段声明，保留前面的 scenicSpotImageMapper 定义
-
     @Override
     /**
      * 按条件分页查询景区列表
@@ -55,8 +50,8 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         LambdaQueryWrapper<TourismScenicSpot> queryWrapper = new LambdaQueryWrapper<>(); // 创建类型安全查询构造器
         // 名称模糊匹配（仅当 name 非空）
         queryWrapper.like(queryVo.getName() != null && !queryVo.getName().isBlank(), TourismScenicSpot::getName, queryVo.getName())
-                // 城市精确匹配（仅当 city 非空）
-                .eq(queryVo.getCity() != null && !queryVo.getCity().isBlank(), TourismScenicSpot::getCity, queryVo.getCity())
+                // 城市模糊匹配（仅当 city 非空），支持输入“成都”匹配“四川省成都市”
+                .like(queryVo.getCity() != null && !queryVo.getCity().isBlank(), TourismScenicSpot::getCity, queryVo.getCity())
                 // 景区等级精确匹配（仅当 level 非空）
                 .eq(queryVo.getLevel() != null && !queryVo.getLevel().isBlank(), TourismScenicSpot::getLevel, queryVo.getLevel())
                 // 票价下限（仅当 minTicketPrice 非空）
@@ -195,20 +190,28 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         return vo; // 返回详情
     }
 
-
+    // 说明：
+    // - 按景区ID查询关联图片，返回图片列表。
+    // - 若不存在关联记录，返回空列表。
     @Override
-    public java.util.List<TourismImage> getImagesByScenicSpot(Long scenicSpotId) {
+    public List<TourismImage> getImagesByScenicSpot(Long scenicSpotId) {
         LambdaQueryWrapper<TourismScenicSpotImage> qw = new LambdaQueryWrapper<>();
         qw.eq(TourismScenicSpotImage::getScenicSpotId, scenicSpotId.intValue());
-        java.util.List<TourismScenicSpotImage> rels = scenicSpotImageMapper.selectList(qw);
+        List<TourismScenicSpotImage> rels = scenicSpotImageMapper.selectList(qw);
         if (rels.isEmpty()) return java.util.Collections.emptyList();
         java.util.List<Integer> imageIds = rels.stream().map(TourismScenicSpotImage::getImageId).collect(java.util.stream.Collectors.toList());
         return imageMapper.selectBatchIds(imageIds);
     }
-
+    // 说明：
+    // - 按景区ID查询关联图片，返回图片列表。
+    // - 若不存在关联记录，返回空列表。
     @Override
-    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public boolean setImagesForScenicSpot(Long scenicSpotId, java.util.List<Integer> imageIds) {
+        if (scenicSpotId == null || imageIds == null) { // 基本校验
+            log.error("设置关联图片时，景区ID或图片ID不能为空");
+            return false;
+        }
         LambdaQueryWrapper<TourismScenicSpotImage> del = new LambdaQueryWrapper<>();
         del.eq(TourismScenicSpotImage::getScenicSpotId, scenicSpotId.intValue());
         scenicSpotImageMapper.delete(del);

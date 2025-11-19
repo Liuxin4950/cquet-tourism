@@ -18,20 +18,23 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "旅游新闻") // 描述
 public class TourismNews extends AbsEntity {
 
-    @Schema(description = "主键，整型") // 描述
+    @Schema(description = "主键，整型")
     @TableId(type = IdType.AUTO) // 主键自增
     private Integer id;
 
-    @TableField("title") // 数据库的字段名
+    @TableField("title")
+    @Schema(description = "新闻标题")
     @NotBlank(message = "标题不能为空") // 不能为空
     @Xss(message = "标题不能包含脚本")
     @Size(min = 5, max = 30, message = "标题长度不能小于5位或大于30位")
     private String title;
 
     @TableField("content")
+    @Schema(description = "新闻内容（富文本）")
     @NotBlank(message = "内容不能为空")
     private String content;
 
+    @Schema(description = "作者")
     @Xss(message = "作者不能包含脚本")
     private String author;
 

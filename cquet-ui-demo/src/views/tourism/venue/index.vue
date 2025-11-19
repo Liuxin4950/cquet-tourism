@@ -60,7 +60,7 @@
       <el-table-column label="所在区县" prop="district" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
       <el-table-column label="门票价格" prop="ticketPrice" width="110" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.ticketPrice != null ? ('¥' + scope.row.ticketPrice) : '暂无...' }}</span>
+          <span>{{ Number(scope.row.ticketPrice) === 0 ? '免费' : (scope.row.ticketPrice != null ? ('¥' + scope.row.ticketPrice) : '暂无...') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
@@ -105,7 +105,13 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="门票价格" prop="ticketPrice">
+            <el-form-item label="票务" prop="feeType">
+              <el-radio-group v-model="form.feeType" @change="onFeeTypeChange">
+                <el-radio label="free">免费</el-radio>
+                <el-radio label="paid">收费</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="form.feeType === 'paid'" label="门票价格" prop="ticketPrice">
               <el-input-number v-model="form.ticketPrice" :min="0" :precision="2" style="width: 100%" />
             </el-form-item>
           </el-col>
@@ -257,7 +263,7 @@
           <div class="detail-item"><div class="label">类别</div><div class="value">{{ venueDetail.category || '暂无' }}</div></div>
           <div class="detail-item"><div class="label">城市</div><div class="value">{{ venueDetail.city || '暂无' }}</div></div>
           <div class="detail-item"><div class="label">区县</div><div class="value">{{ venueDetail.district || '暂无' }}</div></div>
-          <div class="detail-item"><div class="label">票价</div><div class="value">{{ venueDetail.ticketPrice != null ? ('¥' + venueDetail.ticketPrice) : '暂无' }}</div></div>
+          <div class="detail-item"><div class="label">票价</div><div class="value">{{ Number(venueDetail.ticketPrice) === 0 ? '免费' : (venueDetail.ticketPrice != null ? ('¥' + venueDetail.ticketPrice) : '暂无') }}</div></div>
           <div class="detail-item"><div class="label">电话</div><div class="value">{{ venueDetail.contactPhone || '暂无' }}</div></div>
           <div class="detail-item"><div class="label">开放时间</div><div class="value">{{ venueDetail.openingHours || '暂无' }}</div></div>
           <div class="detail-item"><div class="label">官网</div><div class="value">{{ venueDetail.website || '暂无' }}</div></div>
@@ -318,7 +324,7 @@ export default {
       rules: {
         name: [{ required: true, message: '场馆名称不能为空', trigger: 'blur' }],
         category: [{ required: true, message: '类别不能为空', trigger: 'blur' }],
-        ticketPrice: [{ required: true, message: '门票价格不能为空', trigger: 'blur' }],
+        ticketPrice: [{ validator: (rule, value, callback) => { const isPaid = this && this.form && this.form.feeType === 'paid'; if (isPaid && (!value || Number(value) <= 0)) return callback(new Error('请填写有效票价')); callback() }, trigger: 'blur' }],
         address: [{ required: true, message: '详细地址不能为空', trigger: 'blur' }],
         city: [{ required: true, message: '所在城市不能为空', trigger: 'blur' }]
       },
@@ -397,7 +403,14 @@ export default {
       const id = row.id || this.ids[0]
       getScenicVenue(id).then(response => {
         this.form = response.data
+        this.$set(this.form, 'feeType', Number(this.form.ticketPrice || 0) > 0 ? 'paid' : 'free')
         listVenueImages(id).then(r => { const arr = Array.isArray(r.data) ? r.data : []; const urls = arr.map(it => it.url).filter(Boolean); this.$set(this.form, 'imageUrls', urls) })
+        if (!this.areaOptions || this.areaOptions.length === 0) {
+          this.initAreaOptions()
+          this.$nextTick(() => this.setAreaValueFromForm(this.form.city, this.form.district))
+        } else {
+          this.setAreaValueFromForm(this.form.city, this.form.district)
+        }
         this.open = true
         this.title = '修改场馆信息'
       })
@@ -407,6 +420,7 @@ export default {
           id: undefined,
           name: undefined,
           category: undefined,
+          feeType: 'free',
           ticketPrice: 0,
           address: undefined,
           city: undefined,
@@ -448,6 +462,7 @@ export default {
     submitForm() {
       this.$refs['form'].validate(valid => {
         if (valid) {
+          if (this.form.feeType === 'free') { this.form.ticketPrice = 0 } else { if (!(Number(this.form.ticketPrice) > 0)) { this.$modal.msgError('请填写有效票价'); return } }
           if (this.form.id != undefined) {
             updateScenicVenue(this.form).then(() => {
               import('@/api/tourism/uploadPictures').then((u) => {
@@ -562,6 +577,48 @@ export default {
       const base = process.env.VUE_APP_BASE_API || ''
       if (!u) return ''
       return u.indexOf('http') === 0 ? u : base + u
+    },
+    onFeeTypeChange(val) {
+      if (val === 'free') this.form.ticketPrice = 0
+    },
+    setAreaValueFromForm(cityStr, districtLabel) {
+      try {
+        const target = cityStr || ''
+        const provinces = this.areaOptions || []
+        for (const p of provinces) {
+          const pLabel = p.label || ''
+          const children = p.children || []
+          for (const c of children) {
+            const cLabel = c.label || ''
+            if (target && ((pLabel + cLabel) === target || cLabel === target)) {
+              const path = [p.value, c.value]
+              if (districtLabel && c.children && c.children.length) {
+                const d = c.children.find(x => x.label === districtLabel)
+                if (d) path.push(d.value)
+              }
+              this.areaValue = path
+              return
+            }
+          }
+          if (!target || pLabel === target) {
+            if (districtLabel && children && children.length) {
+              for (const c of children) {
+                const d = (c.children || []).find(x => x.label === districtLabel)
+                if (d) { this.areaValue = [p.value, c.value, d.value]; return }
+              }
+            }
+            if (pLabel === target) { this.areaValue = [p.value]; return }
+          }
+        }
+        if (districtLabel) {
+          for (const p of provinces) {
+            for (const c of (p.children || [])) {
+              const d = (c.children || []).find(x => x.label === districtLabel)
+              if (d) { this.areaValue = [p.value, c.value, d.value]; return }
+            }
+          }
+        }
+      } catch (e) {}
     }
   }
 }
