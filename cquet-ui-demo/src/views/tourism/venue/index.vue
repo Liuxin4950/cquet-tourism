@@ -78,7 +78,7 @@
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-document" @click="viewVenueDetail(scope.row)" v-hasPermi="['tourism:venue:query']">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-video-play" @click="toggleStatus(scope.row)" v-hasPermi="['tourism:venue:edit']">{{ scope.row.status === '0' ? '停用' : '启用' }}</el-button>
-          <el-button size="mini" type="text" icon="el-icon-view" @click="viewActivities(scope.row)" v-hasPermi="['tourism:venue:activity:list']">查看活动</el-button>
+          <el-button size="mini" type="text" icon="el-icon-view" @click="viewActivities(scope.row)" v-hasPermi="['tourism:venueActivity:list']">查看活动</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['tourism:venue:edit']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:venue:remove']">删除</el-button>
         </template>

@@ -191,7 +191,7 @@
             type="text"
             icon="el-icon-document"
             @click="viewScenicDetail(scope.row)"
-            v-hasPermi="['tourism:scenic-spot:query']"
+            v-hasPermi="['tourism:scenicSpot:query']"
             >详情</el-button>
 
           <el-button

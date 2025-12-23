@@ -42,6 +42,7 @@ public class TourismNoticeController extends BaseController {
         return getDataTable(list);
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:notice:query')")
     @GetMapping("/{id}")
     @Operation(summary = "获取通知公告详情")
     /**
@@ -54,6 +55,7 @@ public class TourismNoticeController extends BaseController {
 
     @PostMapping
     @Operation(summary = "新增通知公告（标题、内容、发布时间）")
+    @PreAuthorize("@ss.hasPermi('tourism:notice:add')")
     /**
      * 新增
      * 约束：新增无需指定 `id`
@@ -64,6 +66,7 @@ public class TourismNoticeController extends BaseController {
     }
 
     @PutMapping
+    @PreAuthorize("@ss.hasPermi('tourism:notice:edit')")
     @Operation(summary = "修改通知公告")
     /**
      * 修改
@@ -76,6 +79,7 @@ public class TourismNoticeController extends BaseController {
 
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除通知公告")
+    @PreAuthorize("@ss.hasPermi('tourism:notice:remove')")
     /**
      * 删除
      * 入参：路径参数 `ids`

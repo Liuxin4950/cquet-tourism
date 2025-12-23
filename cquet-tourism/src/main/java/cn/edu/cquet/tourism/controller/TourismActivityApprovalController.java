@@ -30,7 +30,7 @@ public class TourismActivityApprovalController extends BaseController {
     @Autowired
     private TourismActivityApprovalService approvalService;
 
-    @PreAuthorize("@ss.hasPermi('tourism:activityApproval:list')")
+    @PreAuthorize("@ss.hasPermi('tourism:activityApplication:list')")
     @GetMapping("/list")
     @Operation(summary = "待审核活动列表")
     public TableDataInfo list(@RequestParam(required = false) String name,
@@ -45,7 +45,7 @@ public class TourismActivityApprovalController extends BaseController {
         return getDataTable(vos);
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:activityApproval:history')")
+    @PreAuthorize("@ss.hasPermi('tourism:activityApplication:history')")
     @GetMapping("/{activityId}/history")
     @Operation(summary = "查看审批历史")
     public Result history(@PathVariable Long activityId) {
@@ -53,7 +53,7 @@ public class TourismActivityApprovalController extends BaseController {
         return success(list);
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:activityApproval:approve')")
+    @PreAuthorize("@ss.hasPermi('tourism:activityApplication:approve')")
     @Log(title = "特色活动审批", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/pass")
     @Operation(summary = "审批通过")
@@ -65,7 +65,7 @@ public class TourismActivityApprovalController extends BaseController {
         return toAjax(approvalService.approve(id, op));
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:activityApproval:reject')")
+    @PreAuthorize("@ss.hasPermi('tourism:activityApplication:reject')")
     @Log(title = "特色活动审批", businessType = BusinessType.UPDATE)
     @PostMapping("/{id}/reject")
     @Operation(summary = "审批拒绝")

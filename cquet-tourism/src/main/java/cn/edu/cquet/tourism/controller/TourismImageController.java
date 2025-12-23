@@ -3,6 +3,7 @@ package cn.edu.cquet.tourism.controller;
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
+import cn.edu.cquet.common.core.page.TableDataInfo;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.TourismImage;
 import cn.edu.cquet.tourism.service.TourismImageService;
@@ -70,6 +71,23 @@ public class TourismImageController extends BaseController {
         List<TourismImage> created = imageService.createBatch(urls);
         return success(created);
     }
+    @PreAuthorize("@ss.hasPermi('tourism:image:list')")
+    @GetMapping("/list")
+    @Operation(summary = "获取图片列表")
+    /**
+     * 获取图片列表
+     *
+     * 路径：`GET /tourism/images/list`
+     * 权限：`tourism:image:list`
+     * 返回：分页表格数据 `TableDataInfo`
+     */
+    public TableDataInfo list() {
+        startPage();
+        List<TourismImage> list = imageService.list();
+        return getDataTable(list);
+    }
+
+
 
     @PreAuthorize("@ss.hasPermi('tourism:image:query')")
     @GetMapping("/{id}")

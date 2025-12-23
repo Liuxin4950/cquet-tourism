@@ -47,6 +47,7 @@ public class TourismNewsController extends BaseController {
         return getDataTable(list);
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:news:query')")
     @GetMapping("/{id}")
     @Operation(summary = "获取新闻信息")
     /**
@@ -59,6 +60,7 @@ public class TourismNewsController extends BaseController {
         return success(news);
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:news:add')")
     @PostMapping
     @Operation(summary = "新增新闻")
     // @Validated: 新增时，进行实体类的数据校验
@@ -73,6 +75,7 @@ public class TourismNewsController extends BaseController {
         return toAjax(tourismNewsService.addNews(News));
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:news:edit')")
     @PutMapping
     @Operation(summary = "修改新闻")
     /**
@@ -86,6 +89,7 @@ public class TourismNewsController extends BaseController {
         return toAjax(tourismNewsService.updateById(News));
     }
 
+    @PreAuthorize("@ss.hasPermi('tourism:news:remove')")
     @DeleteMapping("/{ids}")
     @Operation(summary = "删除新闻")
     /**

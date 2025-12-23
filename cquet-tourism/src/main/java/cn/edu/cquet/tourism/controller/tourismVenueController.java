@@ -139,14 +139,14 @@ public class tourismVenueController extends BaseController {
         return toAjax(tourismVenueService.removeVenueByIds(ids));
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:venue:activity:list')")
+    @PreAuthorize("@ss.hasPermi('tourism:venueActivity:list')")
     @GetMapping("/{id}/activities")
     @Operation(summary = "查看当前场馆的特色活动列表")
     /**
      * 查询场馆下的特色活动列表
      *
      * 路径：`GET /tourism/venue/{id}/activities`
-     * 权限：`tourism:venue:activity:list`
+     * 权限：`tourism:venueActivity:list`
      * 入参：路径参数 `id`
      * 返回：`Result` 包装的活动列表（含审批派生字段）
      */
