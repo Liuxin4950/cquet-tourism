@@ -157,14 +157,19 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
-            <el-form-item label="经度" prop="longitude">
-              <el-input-number v-model="form.longitude" :precision="7" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="纬度" prop="latitude">
-              <el-input-number v-model="form.latitude" :precision="7" style="width: 100%" />
+          <el-col :span="24">
+            <el-form-item label="地图定位">
+              <div class="location-picker-row">
+                <el-tag v-if="form.longitude && form.latitude" type="success" effect="plain" closable @close="onLocationClear" style="margin-right: 10px;">
+                  <i class="el-icon-check"></i> 已定位
+                </el-tag>
+                <el-button type="primary" size="small" @click="openMapPicker">
+                  <i class="el-icon-location"></i> {{ form.longitude && form.latitude ? '重新选择位置' : '在地图上选择位置' }}
+                </el-button>
+                <span v-if="form.longitude && form.latitude" class="coord-display">
+                  ({{ form.longitude }}, {{ form.latitude }})
+                </span>
+              </div>
             </el-form-item>
           </el-col>
         </el-row>
@@ -211,6 +216,24 @@
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 地图位置选择对话框 -->
+    <el-dialog title="在地图上选择位置" :visible.sync="mapPickerVisible" width="1000px" top="5vh" append-to-body :close-on-click-modal="false">
+      <map-location-picker
+        v-if="mapPickerVisible"
+        :longitude="form.longitude"
+        :latitude="form.latitude"
+        @update:longitude="form.longitude = $event"
+        @update:latitude="form.latitude = $event"
+        @select="onLocationSelect"
+        @clear="onLocationClear"
+      />
+      <div v-else class="map-loading">正在加载地图...</div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="mapPickerVisible = false">确 定</el-button>
+        <el-button @click="mapPickerVisible = false">取 消</el-button>
       </div>
     </el-dialog>
 
@@ -293,10 +316,11 @@
 import { listScenicVenue, getScenicVenue, addScenicVenue, updateScenicVenue, delScenicVenue, listScenicVenueActivity, listVenueImages } from '@/api/tourism/scenicVenue'
 import Pagination from '@/components/Pagination'
 import ImageUpload from '@/components/ImageUpload'
+import MapLocationPicker from '@/components/MapLocationPicker'
 
 export default {
   name: 'TourismVenue',
-  components: { Pagination, ImageUpload },
+  components: { Pagination, ImageUpload, MapLocationPicker },
   data() {
     return {
       venueList: [],
@@ -338,6 +362,7 @@ export default {
       venueDetailImagesPreview: [],
       areaOptions: [],
       areaValue: [],
+      mapPickerVisible: false,
       openingHoursOptions: ['全天','6:00-18:30','7:30-17:30','9:00-17:00','9:00-21:00','10:00-18:00'],
       categoryOptions: ['体育场馆类','文化艺术类场馆','会议展览类场馆','教育科研类场馆','娱乐休闲类场馆','商业服务类场馆','医疗健康类场馆']
     }
@@ -563,6 +588,50 @@ export default {
       this.form.city = (province || '') + (city || '')
       this.form.district = district
     },
+    // 打开地图选点对话框
+    openMapPicker() {
+      this.mapPickerVisible = true
+    },
+    // 位置选择完成 - 自动填充表单
+    onLocationSelect(location) {
+      if (location.address) this.form.address = location.address
+      if (location.district) {
+        this.form.district = location.district
+        this.setAreaByDistrict(location.district)
+      }
+      if (location.city) this.form.city = location.city
+      this.$message.success('已选择位置: ' + location.address)
+    },
+    // 根据区县名称设置级联选择器的值
+    setAreaByDistrict(districtName) {
+      try {
+        const provinces = this.areaOptions || []
+        for (const p of provinces) {
+          const pLabel = p.label || ''
+          if (!pLabel || !districtName) continue
+          if (pLabel.indexOf('重庆') === -1 && p.value !== '50') continue
+
+          const children = p.children || []
+          // 首先尝试直接匹配区县名
+          for (const c of children) {
+            const cLabel = c.label || ''
+            if (cLabel === districtName) {
+              this.areaValue = [p.value, c.value]
+              return
+            }
+            if (c.children && c.children.length) {
+              const d = c.children.find(x => x.label === districtName)
+              if (d) { this.areaValue = [p.value, c.value, d.value]; return }
+            }
+          }
+        }
+      } catch (e) { console.warn('设置区县失败:', e) }
+    },
+    // 清除位置选择
+    onLocationClear() {
+      this.form.longitude = null
+      this.form.latitude = null
+    },
     auditText(s) {
       if (s === '1') return '通过'
       if (s === '2') return '拒绝'
@@ -583,42 +652,44 @@ export default {
     },
     setAreaValueFromForm(cityStr, districtLabel) {
       try {
-        const target = cityStr || ''
         const provinces = this.areaOptions || []
         for (const p of provinces) {
           const pLabel = p.label || ''
+          if (!pLabel || !cityStr) continue
+          const provinceMatch = cityStr.indexOf(pLabel) !== -1
+          if (!provinceMatch) continue
+
           const children = p.children || []
-          for (const c of children) {
-            const cLabel = c.label || ''
-            if (target && ((pLabel + cLabel) === target || cLabel === target)) {
-              const path = [p.value, c.value]
-              if (districtLabel && c.children && c.children.length) {
-                const d = c.children.find(x => x.label === districtLabel)
-                if (d) path.push(d.value)
+          // 首先尝试直接匹配区县名（对于直辖市的永川区等）
+          if (districtLabel) {
+            for (const c of children) {
+              const cLabel = c.label || ''
+              if (cLabel === districtLabel) {
+                this.areaValue = [p.value, c.value]
+                return
               }
-              this.areaValue = path
-              return
-            }
-          }
-          if (!target || pLabel === target) {
-            if (districtLabel && children && children.length) {
-              for (const c of children) {
-                const d = (c.children || []).find(x => x.label === districtLabel)
+              if (c.children && c.children.length) {
+                const d = c.children.find(x => x.label === districtLabel)
                 if (d) { this.areaValue = [p.value, c.value, d.value]; return }
               }
             }
-            if (pLabel === target) { this.areaValue = [p.value]; return }
           }
-        }
-        if (districtLabel) {
-          for (const p of provinces) {
-            for (const c of (p.children || [])) {
-              const d = (c.children || []).find(x => x.label === districtLabel)
-              if (d) { this.areaValue = [p.value, c.value, d.value]; return }
+
+          // 然后尝试传统匹配
+          for (const c of children) {
+            const cLabel = c.label || ''
+            const cityMatch = (pLabel + cLabel) === cityStr || (cityStr.indexOf(cLabel) !== -1 && cLabel.length > 0)
+            if (!cityMatch) continue
+            const path = [p.value, c.value]
+            if (districtLabel && c.children && c.children.length) {
+              const d = c.children.find(x => x.label === districtLabel)
+              if (d) path.push(d.value)
             }
+            this.areaValue = path
+            return
           }
         }
-      } catch (e) {}
+      } catch (e) { console.warn('设置所在地区失败:', e) }
     }
   }
 }
@@ -646,4 +717,7 @@ export default {
 .empty-tip { text-align: center; color: #909399; font-size: 12px; }
 .detail-close-btn { display: inline-block; margin: 0 auto; }
 .detail-close-btn:hover { color: #409eff; border-color: #409eff; }
+.location-picker-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.coord-display { font-size: 12px; color: #909399; margin-left: 5px; }
+.map-loading { text-align: center; padding: 50px; color: #909399; }
 </style>

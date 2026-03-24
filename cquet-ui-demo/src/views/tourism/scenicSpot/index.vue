@@ -224,147 +224,171 @@
     />
 
     <!-- 添加或修改景区配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="景区名称" prop="name">
-              <el-input v-model="form.name" placeholder="请输入景区名称" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="景区等级" prop="level">
-              <el-select
-                v-model="form.level"
-                placeholder="请选择景区等级"
-                style="width: 100%"
-              >
-                <el-option label="A级" value="A" />
-                <el-option label="AA级" value="AA" />
-                <el-option label="AAA级" value="AAA" />
-                <el-option label="AAAA级" value="AAAA" />
-                <el-option label="AAAAA级" value="AAAAA" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="票务" prop="feeType">
-              <el-radio-group v-model="form.feeType" @change="onFeeTypeChange">
-                <el-radio label="free">免费</el-radio>
-                <el-radio label="paid">收费</el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="form.feeType === 'paid'" label="门票价格" prop="ticketPrice">
-              <el-input-number v-model="form.ticketPrice" :min="0" :precision="2" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="联系电话" prop="contactPhone">
-              <el-input
-                v-model="form.contactPhone"
-                placeholder="请输入联系电话"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="所在地区">
-              <el-cascader
-                :options="areaOptions"
-                v-model="areaValue"
-                :props="{ checkStrictly: true }"
-                clearable
-                style="width: 100%"
-                @change="onAreaChange"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="开放时间" prop="openingHours">
-              <el-select v-model="form.openingHours" placeholder="请选择开放时间" clearable style="width: 100%">
-                <el-option v-for="opt in openingHoursOptions" :key="opt" :label="opt" :value="opt" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="官方网站" prop="website">
-              <el-input v-model="form.website" placeholder="请输入官方网站" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="详细地址" prop="address">
-              <el-input v-model="form.address" placeholder="请输入详细地址" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="景区介绍" prop="description">
-              <el-input
-                v-model="form.description"
-                type="textarea"
-                :rows="4"
-                placeholder="请输入景区介绍"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="封面图片" prop="coverImage">
-              <image-upload v-model="form.coverImage" :limit="1" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="内容图片">
-              <image-upload v-model="form.imageUrls" :limit="9" />
+        <!-- 基本信息区块 -->
+        <div class="form-section">
+          <div class="section-title"><i class="el-icon-info"></i> 基本信息</div>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="景区名称" prop="name">
+                <el-input v-model="form.name" placeholder="请输入景区名称" clearable />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="景区等级" prop="level">
+                <el-select v-model="form.level" placeholder="请选择景区等级" style="width: 100%" clearable>
+                  <el-option label="A级" value="A" />
+                  <el-option label="AA级" value="AA" />
+                  <el-option label="AAA级" value="AAA" />
+                  <el-option label="AAAA级" value="AAAA" />
+                  <el-option label="AAAAA级" value="AAAAA" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <el-form-item label="票务">
+                <el-radio-group v-model="form.feeType" @change="onFeeTypeChange" size="small">
+                  <el-radio-button label="free">免费</el-radio-button>
+                  <el-radio-button label="paid">收费</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8" v-if="form.feeType === 'paid'">
+              <el-form-item label="门票价格">
+                <el-input-number v-model="form.ticketPrice" :min="0" :precision="2" controls-position="right" style="width: 100%" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="联系电话">
+                <el-input v-model="form.contactPhone" placeholder="请输入联系电话" clearable />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
 
-              
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="经度" prop="longitude">
-              <el-input-number
-                v-model="form.longitude"
-                :precision="7"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="纬度" prop="latitude">
-              <el-input-number
-                v-model="form.latitude"
-                :precision="7"
-                style="width: 100%"
-              />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="备注">
-              <el-input
-                v-model="form.remark"
-                type="textarea"
-                placeholder="请输入内容"
-              ></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <!-- 位置信息区块 -->
+        <div class="form-section">
+          <div class="section-title"><i class="el-icon-location"></i> 位置信息</div>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="所在地区">
+                <el-cascader
+                  :options="areaOptions"
+                  v-model="areaValue"
+                  :props="{ checkStrictly: true }"
+                  clearable
+                  style="width: 100%"
+                  @change="onAreaChange"
+                  placeholder="请选择省市区"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="详细地址">
+                <el-input v-model="form.address" placeholder="详细地址（地图选点后自动填充）" clearable />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item label="地图定位">
+                <div class="location-picker-row">
+                  <el-tag v-if="form.longitude && form.latitude" type="success" effect="plain" closable @close="onLocationClear" style="margin-right: 10px;">
+                    <i class="el-icon-check"></i> 已定位
+                  </el-tag>
+                  <el-button type="primary" size="small" @click="openMapPicker">
+                    <i class="el-icon-location"></i> {{ form.longitude && form.latitude ? '重新选择位置' : '在地图上选择位置' }}
+                  </el-button>
+                  <span v-if="form.longitude && form.latitude" class="coord-display">
+                    ({{ form.longitude }}, {{ form.latitude }})
+                  </span>
+                </div>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+
+        <!-- 其他信息区块 -->
+        <div class="form-section">
+          <div class="section-title"><i class="el-icon-more"></i> 其他信息</div>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="开放时间">
+                <el-select v-model="form.openingHours" placeholder="请选择开放时间" clearable style="width: 100%">
+                  <el-option v-for="opt in openingHoursOptions" :key="opt" :label="opt" :value="opt" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="官方网站">
+                <el-input v-model="form.website" placeholder="请输入官方网站" clearable />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item label="景区介绍">
+                <el-input v-model="form.description" type="textarea" :rows="3" placeholder="请输入景区介绍" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+
+        <!-- 图片区块 -->
+        <div class="form-section">
+          <div class="section-title"><i class="el-icon-picture"></i> 图片资料</div>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="封面图片">
+                <image-upload v-model="form.coverImage" :limit="1" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="内容图片">
+                <image-upload v-model="form.imageUrls" :limit="9" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+
+        <!-- 备注区块 -->
+        <div class="form-section">
+          <el-form-item label="备注">
+            <el-input v-model="form.remark" type="textarea" :rows="2" placeholder="请输入备注信息" />
+          </el-form-item>
+        </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 地图位置选择对话框 -->
+    <el-dialog
+      title="在地图上选择位置"
+      :visible.sync="mapPickerVisible"
+      width="1000px"
+      top="5vh"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <map-location-picker
+        v-if="mapPickerVisible"
+        :longitude="form.longitude"
+        :latitude="form.latitude"
+        @update:longitude="form.longitude = $event"
+        @update:latitude="form.latitude = $event"
+        @select="onLocationSelect"
+        @clear="onLocationClear"
+      />
+      <div v-else class="map-loading">正在加载地图...</div>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="mapPickerVisible = false">确 定</el-button>
+        <el-button @click="mapPickerVisible = false">取 消</el-button>
       </div>
     </el-dialog>
 
@@ -467,12 +491,16 @@ import ImageUpload from "@/components/ImageUpload";
 // 引入分页组件
 import Pagination from "@/components/Pagination";
 
+// 引入地图位置选择组件
+import MapLocationPicker from "@/components/MapLocationPicker";
+
 export default {
   name: "TourismScenicSpot",
   // 注册分页组件
   components: {
     Pagination,
     ImageUpload,
+    MapLocationPicker,
   },
   data() {
     return {
@@ -519,6 +547,8 @@ export default {
       scenicDetail: {},
       scenicDetailImagesPreview: [],
       openingHoursOptions: ['全天','6:00-18:30','7:30-17:30','9:00-17:00','9:00-21:00','10:00-18:00'],
+      // 地图选点对话框
+      mapPickerVisible: false,
       // 新增或修改表单的数据校验规则
       rules: {
         name: [
@@ -557,6 +587,73 @@ export default {
   methods: {
     formatText(row, column, cellValue) {
       return cellValue || '暂无';
+    },
+    // 打开地图选点对话框
+    openMapPicker() {
+      this.mapPickerVisible = true
+    },
+    // 位置选择完成 - 自动填充表单
+    onLocationSelect(location) {
+      // 自动填充详细地址
+      if (location.address) {
+        this.form.address = location.address
+      }
+
+      // 如果返回了区县信息，尝试设置级联选择器
+      if (location.district) {
+        this.form.district = location.district
+
+        // 根据区县名称查找对应的级联选项
+        // 由于级联选择器的值是完整的路径数组，这里需要特殊处理
+        this.setAreaByDistrict(location.district)
+      }
+
+      // 如果返回了城市信息
+      if (location.city) {
+        this.form.city = location.city
+      }
+
+      this.$message.success('已选择位置: ' + location.address)
+    },
+    // 根据区县名称设置级联选择器的值
+    setAreaByDistrict(districtName) {
+      try {
+        const provinces = this.areaOptions || []
+        for (const p of provinces) {
+          const pLabel = p.label || ''
+          // 匹配重庆市（直辖市）
+          if (pLabel.indexOf('重庆') !== -1 || p.value === '50') {
+            const children = p.children || []
+            for (const c of children) {
+              const cChildren = c.children || []
+              for (const d of cChildren) {
+                const dLabel = d.label || ''
+                // 匹配区县名称（去掉"区"或"县"后缀比较）
+                if (dLabel === districtName ||
+                    dLabel.replace('区', '').replace('县', '') === districtName.replace('区', '').replace('县', '')) {
+                  // 设置完整的路径值 [省份码, 城市码, 区县码]
+                  this.areaValue = [p.value, c.value, d.value]
+                  return
+                }
+              }
+              // 如果城市直接匹配（比如万州区等）
+              const cityLabel = c.label || ''
+              if (cityLabel === districtName ||
+                  cityLabel.replace('区', '').replace('县', '') === districtName.replace('区', '').replace('县', '')) {
+                this.areaValue = [p.value, c.value]
+                return
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('设置区县失败:', e)
+      }
+    },
+    // 清除位置选择
+    onLocationClear() {
+      this.form.longitude = null
+      this.form.latitude = null
     },
     // 处理查询
     handleQuery() {
@@ -781,21 +878,52 @@ export default {
         const provinces = this.areaOptions || []
         for (const p of provinces) {
           const pLabel = p.label || ''
+          // 匹配省份（直辖市或市）
+          if (!pLabel || !cityStr) continue
+          const provinceMatch = cityStr.indexOf(pLabel) !== -1
+          if (!provinceMatch) continue
+
           const children = p.children || []
-          for (const c of children) {
-            const cLabel = c.label || ''
-            if ((pLabel + cLabel) === (cityStr || '')) {
-              const path = [p.value, c.value]
-              if (districtLabel && c.children && c.children.length) {
-                const d = c.children.find(x => x.label === districtLabel)
-                if (d) path.push(d.value)
+          // 首先尝试直接匹配区县名（对于直辖市的永川区、合川区等直接区县）
+          if (districtLabel) {
+            for (const c of children) {
+              const cLabel = c.label || ''
+              if (cLabel === districtLabel) {
+                // 区县直接作为市的下一级
+                this.areaValue = [p.value, c.value]
+                return
               }
-              this.areaValue = path
-              return
+              // 检查区县是否在"市辖区"或"县"下
+              if (c.children && c.children.length) {
+                const d = c.children.find(x => x.label === districtLabel)
+                if (d) {
+                  this.areaValue = [p.value, c.value, d.value]
+                  return
+                }
+              }
             }
           }
+
+          // 然后尝试传统匹配：省份+城市
+          for (const c of children) {
+            const cLabel = c.label || ''
+            const cityMatch = (pLabel + cLabel) === cityStr ||
+                            (cityStr.indexOf(cLabel) !== -1 && cLabel.length > 0)
+            if (!cityMatch) continue
+
+            const path = [p.value, c.value]
+            // 如果有区县标签，查找并添加
+            if (districtLabel && c.children && c.children.length) {
+              const d = c.children.find(x => x.label === districtLabel)
+              if (d) path.push(d.value)
+            }
+            this.areaValue = path
+            return
+          }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('设置所在地区失败:', e)
+      }
     },
     imageUrl(u) {
       const base = process.env.VUE_APP_BASE_API || '';
@@ -897,4 +1025,29 @@ export default {
 .empty-tip { text-align: center; color: #909399; font-size: 12px; }
 .detail-close-btn { display: inline-block; margin: 0 auto; }
 .detail-close-btn:hover { color: #409eff; border-color: #409eff; }
+.map-loading { text-align: center; padding: 50px; color: #909399; }
+.form-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f5f7fa;
+  border-radius: 4px;
+  border: 1px solid #ebeef5;
+}
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #dcdfe6;
+}
+.section-title i {
+  margin-right: 6px;
+  color: #409eff;
+}
+.coord-display {
+  font-size: 12px;
+  color: #909399;
+  margin-left: 5px;
+}
 </style>
