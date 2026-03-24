@@ -296,7 +296,7 @@
             <el-col :span="24">
               <el-form-item label="地图定位">
                 <div class="location-picker-row">
-                  <el-tag v-if="form.longitude && form.latitude" type="success" effect="plain" closable @close="onLocationClear" style="margin-right: 10px;">
+                  <el-tag v-if="form.longitude && form.latitude" type="success" effect="plain" closable @close="onLocationClear" style="margin-right: 10px;" class="location-tag">
                     <i class="el-icon-check"></i> 已定位
                   </el-tag>
                   <el-button type="primary" size="small" @click="openMapPicker">
@@ -385,7 +385,7 @@
         @select="onLocationSelect"
         @clear="onLocationClear"
       />
-      <div v-else class="map-loading">正在加载地图...</div>
+      <div v-else class="map-loading"><i class="el-icon-loading"></i>正在加载地图...</div>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="mapPickerVisible = false">确 定</el-button>
         <el-button @click="mapPickerVisible = false">取 消</el-button>
@@ -1025,7 +1025,6 @@ export default {
 .empty-tip { text-align: center; color: #909399; font-size: 12px; }
 .detail-close-btn { display: inline-block; margin: 0 auto; }
 .detail-close-btn:hover { color: #409eff; border-color: #409eff; }
-.map-loading { text-align: center; padding: 50px; color: #909399; }
 .form-section {
   margin-bottom: 20px;
   padding: 15px;
@@ -1049,5 +1048,19 @@ export default {
   font-size: 12px;
   color: #909399;
   margin-left: 5px;
+}
+.location-tag.is-closable:hover .el-tag__close {
+  color: #fff;
+  background-color: #f56c6c;
+}
+.map-loading {
+  text-align: center;
+  padding: 50px;
+  color: #909399;
+}
+.map-loading i {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 10px;
 }
 </style>

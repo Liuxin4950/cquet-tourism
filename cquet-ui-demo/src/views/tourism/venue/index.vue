@@ -230,7 +230,7 @@
         @select="onLocationSelect"
         @clear="onLocationClear"
       />
-      <div v-else class="map-loading">正在加载地图...</div>
+      <div v-else class="map-loading"><i class="el-icon-loading"></i>正在加载地图...</div>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="mapPickerVisible = false">确 定</el-button>
         <el-button @click="mapPickerVisible = false">取 消</el-button>
@@ -719,5 +719,14 @@ export default {
 .detail-close-btn:hover { color: #409eff; border-color: #409eff; }
 .location-picker-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .coord-display { font-size: 12px; color: #909399; margin-left: 5px; }
-.map-loading { text-align: center; padding: 50px; color: #909399; }
+.map-loading {
+  text-align: center;
+  padding: 50px;
+  color: #909399;
+}
+.map-loading i {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 10px;
+}
 </style>
