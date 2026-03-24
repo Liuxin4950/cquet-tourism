@@ -5,17 +5,17 @@
 .DS_Store
 .AppleDouble
 .LSOverride
-._*
+._
 .Spotlight-V100
 .Trashes
-*.swp
-*.swo
 
 # Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+*.swp
+*.swo
 
 # Linux
 .*.swp
@@ -35,6 +35,9 @@ $RECYCLE.BIN/
 *.vcxproj
 *.sln
 *.suo
+
+# MarsCode
+.marscode/
 
 # 编辑器备份文件
 *~
@@ -121,6 +124,16 @@ stop.*
 
 # 调试文件
 *.debug
+
+# ==============================================
+# 4. 前端工程
+# ==============================================
+# Node.js
+cquet-ui-demo/node_modules/
+cquet-ui-demo/dist/
+cquet-ui-demo/build/
+cquet-ui-demo/.vite/
+cquet-ui-demo/.cache/
 
 # ==============================================
 # 4. 前端工程
