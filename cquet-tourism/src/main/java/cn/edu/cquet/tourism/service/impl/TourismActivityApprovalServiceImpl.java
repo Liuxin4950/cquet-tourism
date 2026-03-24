@@ -52,10 +52,10 @@ public class TourismActivityApprovalServiceImpl implements TourismActivityApprov
         // 写审批记录
         recordApproval(id, "1", opinion, cn.edu.cquet.common.utils.SecurityUtils.getUsername());
         // 可选：通过后将运行状态置为正常
-        com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<cn.edu.cquet.tourism.domain.TourismActivity> uw = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>();
-        uw.set(cn.edu.cquet.tourism.domain.TourismActivity::getStatus, "0")
-          .set(cn.edu.cquet.tourism.domain.TourismActivity::getUpdateTime, new java.util.Date())
-          .eq(cn.edu.cquet.tourism.domain.TourismActivity::getId, id);
+        com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<cn.edu.cquet.tourism.domain.TourismActivity> uw = new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<>();
+        uw.set("status", "0")
+          .set("update_time", new java.util.Date())
+          .eq("id", id);
         activityMapper.update(null, uw);
         return true;
     }
@@ -69,9 +69,9 @@ public class TourismActivityApprovalServiceImpl implements TourismActivityApprov
         // 写审批记录
         recordApproval(id, "2", reason, cn.edu.cquet.common.utils.SecurityUtils.getUsername());
         // 可选：更新活动更新时间
-        com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<cn.edu.cquet.tourism.domain.TourismActivity> uw = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>();
-        uw.set(cn.edu.cquet.tourism.domain.TourismActivity::getUpdateTime, new java.util.Date())
-          .eq(cn.edu.cquet.tourism.domain.TourismActivity::getId, id);
+        com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<cn.edu.cquet.tourism.domain.TourismActivity> uw = new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<>();
+        uw.set("update_time", new java.util.Date())
+          .eq("id", id);
         activityMapper.update(null, uw);
         return true;
     }

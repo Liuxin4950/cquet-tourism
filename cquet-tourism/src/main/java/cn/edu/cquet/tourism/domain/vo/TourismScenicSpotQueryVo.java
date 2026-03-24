@@ -1,5 +1,7 @@
 package cn.edu.cquet.tourism.domain.vo;
 
+import java.math.BigDecimal;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -20,10 +22,10 @@ public class TourismScenicSpotQueryVo {
     private String level;
 
     @Schema(description = "最低门票价格")
-    private Double minTicketPrice;
+    private BigDecimal minTicketPrice;
 
     @Schema(description = "最高门票价格")
-    private Double maxTicketPrice;
+    private BigDecimal maxTicketPrice;
 
     @Schema(description = "景区状态(0:关闭, 1:开放)")
     private String status;
