@@ -1,0 +1,16 @@
+{
+  "mysql-mcp": {
+    "command": "npx",
+    "args": [
+      "-y",
+      "mysql-mcp"
+    ],
+    "env": {
+      "MYSQL_HOST": "localhost",
+      "MYSQL_PORT": "3306",
+      "MYSQL_DATABASE": "ruoyi",
+      "MYSQL_USER": "root",
+      "MYSQL_PASSWORD": "123456"
+    }
+  }
+}
