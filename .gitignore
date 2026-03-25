@@ -301,3 +301,4 @@ Makefile
 !Dockerfile.example
 !docker-compose.example.yml
 !.env.example
+.gstack/

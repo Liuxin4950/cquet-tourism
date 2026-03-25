@@ -19,14 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import cn.edu.cquet.common.utils.bean.BeanUtils;
 import cn.edu.cquet.tourism.domain.TourismActivity;
 import cn.edu.cquet.tourism.mapper.TourismActivityMapper;
-// duplicate imports removed
 
 @Slf4j
 @Service
@@ -252,7 +248,8 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
     @Transactional(rollbackFor = Exception.class)
     /**
      * 批量删除场馆
-     * 步骤：删除图片与设施的关联；批量逻辑删除主表
+     * 步骤：删除图片与设施的关联；将关联活动的 venue_id 置为 NULL；批量逻辑删除主表
+     * 注意：不删除关联的活动记录，仅解除关联（与数据库 ON DELETE SET NULL 约束一致）
      */
     public boolean removeVenueByIds(List<Integer> ids) {
         if (ids == null || ids.isEmpty()) return false; // 校验：至少一个 id
@@ -264,10 +261,10 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
         del2.in(TourismVenueFacilities::getVenueId, ids);
         venueFacilitiesMapper.delete(del2);
         
-        // 删除当前场馆下的特色活动（以确保联动清理申报与评论等）
-        LambdaQueryWrapper<TourismActivity> delAct = new LambdaQueryWrapper<>();
-        delAct.in(TourismActivity::getVenueId, ids);
-        activityMapper.delete(delAct);
+        // 将该场馆关联的所有活动的 venue_id 置为 NULL（不删除活动，保持与数据库 ON DELETE SET NULL 约束一致）
+        com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<TourismActivity> clearVenue = new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<>();
+        clearVenue.in("venue_id", ids).set("venue_id", null);
+        activityMapper.update(null, clearVenue);
 
         return tourismVenueMapper.deleteBatchIds(ids) > 0; // 删除主表并返回结果
     }
