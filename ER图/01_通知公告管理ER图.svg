@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .entity { fill: #e8f4fd; stroke: #1976d2; stroke-width: 2; }
+      .attribute { fill: #fff3e0; stroke: #f57c00; stroke-width: 1.5; }
+      .key-attribute { fill: #e8f5e8; stroke: #388e3c; stroke-width: 2; }
+      .relationship { fill: #fce4ec; stroke: #c2185b; stroke-width: 2; }
+      .text { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 12px; text-anchor: middle; dominant-baseline: middle; }
+      .title { font-family: 'Microsoft YaHei', Arial, sans-serif; font-size: 16px; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+      .line { stroke: #333; stroke-width: 1.5; fill: none; }
+    </style>
+  </defs>
+  
+  <!-- 标题 -->
+  <text x="400" y="30" class="title">通知公告管理模块 ER图</text>
+  
+  <!-- 管理员实体 -->
+  <rect x="50" y="100" width="120" height="60" class="entity" rx="5"/>
+  <text x="110" y="130" class="text">管理员</text>
+  
+  <!-- 管理员属性 -->
+  <ellipse cx="30" cy="80" rx="25" ry="15" class="key-attribute"/>
+  <text x="30" y="80" class="text" font-size="10">user_id</text>
+  
+  <ellipse cx="110" cy="60" rx="30" ry="15" class="attribute"/>
+  <text x="110" y="60" class="text" font-size="10">用户名</text>
+  
+  <ellipse cx="190" cy="80" rx="25" ry="15" class="attribute"/>
+  <text x="190" y="80" class="text" font-size="10">姓名</text>
+  
+  <!-- 通知公告实体 -->
+  <rect x="320" y="250" width="160" height="80" class="entity" rx="5"/>
+  <text x="400" y="290" class="text">通知公告</text>
+  <text x="400" y="305" class="text" font-size="10">(tourism_notice)</text>
+  
+  <!-- 通知公告属性 -->
+  <ellipse cx="250" cy="200" rx="20" ry="15" class="key-attribute"/>
+  <text x="250" y="200" class="text" font-size="10">id</text>
+  
+  <ellipse cx="320" cy="180" rx="40" ry="15" class="attribute"/>
+  <text x="320" y="180" class="text" font-size="10">notice_title</text>
+  
+  <ellipse cx="420" cy="180" rx="45" ry="15" class="attribute"/>
+  <text x="420" y="180" class="text" font-size="10">notice_content</text>
+  
+  <ellipse cx="520" cy="200" rx="40" ry="15" class="attribute"/>
+  <text x="520" y="200" class="text" font-size="10">notice_type</text>
+  
+  <ellipse cx="200" cy="250" rx="30" ry="15" class="attribute"/>
+  <text x="200" y="250" class="text" font-size="10">priority</text>
+  
+  <ellipse cx="200" cy="290" rx="35" ry="15" class="attribute"/>
+  <text x="200" y="290" class="text" font-size="10">view_count</text>
+  
+  <ellipse cx="200" cy="330" rx="25" ry="15" class="attribute"/>
+  <text x="200" y="330" class="text" font-size="10">status</text>
+  
+  <ellipse cx="550" cy="250" rx="35" ry="15" class="attribute"/>
+  <text x="550" y="250" class="text" font-size="10">create_time</text>
+  
+  <ellipse cx="550" cy="290" rx="35" ry="15" class="attribute"/>
+  <text x="550" y="290" class="text" font-size="10">update_time</text>
+  
+  <ellipse cx="550" cy="330" rx="25" ry="15" class="attribute"/>
+  <text x="550" y="330" class="text" font-size="10">remark</text>
+  
+  <ellipse cx="320" cy="380" rx="30" ry="15" class="attribute"/>
+  <text x="320" y="380" class="text" font-size="10">create_by</text>
+  
+  <ellipse cx="420" cy="380" rx="30" ry="15" class="attribute"/>
+  <text x="420" y="380" class="text" font-size="10">update_by</text>
+  
+  <ellipse cx="480" cy="380" rx="25" ry="15" class="attribute"/>
+  <text x="480" y="380" class="text" font-size="10">del_flag</text>
+  
+  <!-- 用户实体 -->
+  <rect x="600" y="450" width="120" height="60" class="entity" rx="5"/>
+  <text x="660" y="480" class="text">用户</text>
+  
+  <!-- 用户属性 -->
+  <ellipse cx="580" cy="430" rx="25" ry="15" class="key-attribute"/>
+  <text x="580" y="430" class="text" font-size="10">user_id</text>
+  
+  <ellipse cx="660" cy="410" rx="30" ry="15" class="attribute"/>
+  <text x="660" y="410" class="text" font-size="10">用户名</text>
+  
+  <ellipse cx="740" cy="430" rx="25" ry="15" class="attribute"/>
+  <text x="740" y="430" class="text" font-size="10">昵称</text>
+  
+  <!-- 管理关系 -->
+  <polygon points="170,130 250,200 230,190 250,210" class="relationship"/>
+  <text x="210" y="165" class="text">管理</text>
+  
+  <!-- 浏览关系 -->
+  <polygon points="480,290 600,450 580,440 600,460" class="relationship"/>
+  <text x="540" y="370" class="text">浏览</text>
+  
+  <!-- 连接线 -->
+  <!-- 管理员到管理关系 -->
+  <line x1="170" y1="130" x2="210" y2="165" class="line"/>
+  
+  <!-- 管理关系到通知公告 -->
+  <line x1="210" y1="165" x2="320" y2="250" class="line"/>
+  
+  <!-- 用户到浏览关系 -->
+  <line x1="600" y1="480" x2="540" y2="370" class="line"/>
+  
+  <!-- 浏览关系到通知公告 -->
+  <line x1="540" y1="370" x2="480" y2="290" class="line"/>
+  
+  <!-- 属性连接线 -->
+  <!-- 管理员属性 -->
+  <line x1="55" y1="80" x2="80" y2="110" class="line"/>
+  <line x1="110" y1="75" x2="110" y2="100" class="line"/>
+  <line x1="165" y1="80" x2="140" y2="110" class="line"/>
+  
+  <!-- 通知公告属性 -->
+  <line x1="270" y1="200" x2="320" y2="250" class="line"/>
+  <line x1="320" y1="195" x2="350" y2="250" class="line"/>
+  <line x1="420" y1="195" x2="400" y2="250" class="line"/>
+  <line x1="500" y1="200" x2="450" y2="250" class="line"/>
+  <line x1="230" y1="250" x2="320" y2="270" class="line"/>
+  <line x1="235" y1="290" x2="320" y2="290" class="line"/>
+  <line x1="225" y1="330" x2="320" y2="310" class="line"/>
+  <line x1="515" y1="250" x2="480" y2="270" class="line"/>
+  <line x1="515" y1="290" x2="480" y2="290" class="line"/>
+  <line x1="525" y1="330" x2="480" y2="310" class="line"/>
+  <line x1="320" y1="365" x2="350" y2="330" class="line"/>
+  <line x1="420" y1="365" x2="420" y2="330" class="line"/>
+  <line x1="480" y1="365" x2="450" y2="330" class="line"/>
+  
+  <!-- 用户属性 -->
+  <line x1="605" y1="430" x2="630" y2="460" class="line"/>
+  <line x1="660" y1="425" x2="660" y2="450" class="line"/>
+  <line x1="715" y1="430" x2="690" y2="460" class="line"/>
+  
+  <!-- 基数标注 -->
+  <text x="180" y="140" class="text" font-size="10">1</text>
+  <text x="300" y="240" class="text" font-size="10">N</text>
+  <text x="590" y="460" class="text" font-size="10">N</text>
+  <text x="490" y="300" class="text" font-size="10">1</text>
+  
+  <!-- 图例 -->
+  <rect x="50" y="520" width="700" height="60" fill="none" stroke="#ccc" stroke-width="1"/>
+  <text x="60" y="535" class="text" font-weight="bold">图例：</text>
+  
+  <rect x="70" y="545" width="40" height="20" class="entity" rx="2"/>
+  <text x="90" y="555" class="text" font-size="10">实体</text>
+  
+  <ellipse cx="150" cy="555" rx="20" ry="10" class="key-attribute"/>
+  <text x="150" y="555" class="text" font-size="9">主键属性</text>
+  
+  <ellipse cx="230" cy="555" rx="20" ry="10" class="attribute"/>
+  <text x="230" y="555" class="text" font-size="9">普通属性</text>
+  
+  <polygon points="300,545 320,555 300,565 280,555" class="relationship"/>
+  <text x="300" y="555" class="text" font-size="9">关系</text>
+  
+  <text x="400" y="555" class="text" font-size="10">1:N 表示一对多关系，N:1 表示多对一关系</text>
+</svg>
