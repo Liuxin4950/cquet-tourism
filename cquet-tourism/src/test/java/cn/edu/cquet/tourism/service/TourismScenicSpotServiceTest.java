@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import cn.edu.cquet.common.exception.ServiceException;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -84,17 +86,16 @@ class TourismScenicSpotServiceTest {
         }
 
         @Test
-        @DisplayName("名称重复时新增失败")
-        void addScenicSpot_Fails_WhenNameExists() {
+        @DisplayName("名称重复时抛出异常")
+        void addScenicSpot_ThrowsServiceException_WhenNameExists() {
             // given
             when(tourismScenicSpotMapper.selectList(any(LambdaQueryWrapper.class)))
                     .thenReturn(List.of(testSpot));
 
-            // when
-            boolean result = scenicSpotService.addScenicSpot(testSpot);
-
-            // then
-            assertFalse(result);
+            // when & then
+            ServiceException e = assertThrows(ServiceException.class,
+                    () -> scenicSpotService.addScenicSpot(testSpot));
+            assertEquals("景区名称已存在", e.getMessage());
             verify(tourismScenicSpotMapper, never()).insert(any());
         }
 

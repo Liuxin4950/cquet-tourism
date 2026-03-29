@@ -1,5 +1,6 @@
 package cn.edu.cquet.tourism.service.impl;
 
+import cn.edu.cquet.common.exception.ServiceException;
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
 import cn.edu.cquet.tourism.mapper.TourismScenicSpotMapper;
@@ -78,8 +79,7 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         queryWrapper.eq(TourismScenicSpot::getName, scenicSpot.getName()); // 以名称为唯一约束
         List<TourismScenicSpot> list = tourismScenicSpotMapper.selectList(queryWrapper); // 执行查询
         if (!list.isEmpty()) { // 若存在同名记录
-            log.error("该景区已存在"); // 记录错误日志
-            return false; // 返回失败
+            throw new ServiceException("景区名称已存在");
         }
         int inserted = tourismScenicSpotMapper.insert(scenicSpot); // 插入主表数据
         if (inserted <= 0) return false; // 插入失败直接返回

@@ -1,5 +1,6 @@
 package cn.edu.cquet.tourism.service.impl;
 
+import cn.edu.cquet.common.exception.ServiceException;
 import cn.edu.cquet.tourism.domain.TourismActivity;
 import cn.edu.cquet.tourism.mapper.TourismActivityMapper;
 import cn.edu.cquet.tourism.service.TourismActivityService;
@@ -85,6 +86,7 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
     /**
      * 新增活动
      * 默认审核状态：`0`（待审核）
+     * 校验：名称唯一、同场馆同时间段无冲突
      */
     public boolean create(TourismActivity activity) {
         if (activity == null) return false; // 基本校验
@@ -92,7 +94,9 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
         if (StringUtils.hasText(activity.getName())) {
             LambdaQueryWrapper<TourismActivity> qwName = new LambdaQueryWrapper<>();
             qwName.eq(TourismActivity::getDelFlag, "0").eq(TourismActivity::getName, activity.getName());
-            if (activityMapper.selectCount(qwName) > 0) return false;
+            if (activityMapper.selectCount(qwName) > 0) {
+                throw new ServiceException("活动名称已存在");
+            }
         }
         // 同场馆同时间段占用校验（有交集视为冲突，忽略已删除）
         if (activity.getVenueId() != null && activity.getStartTime() != null && activity.getEndTime() != null) {
@@ -101,7 +105,9 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
                  .eq(TourismActivity::getVenueId, activity.getVenueId())
                  .lt(TourismActivity::getStartTime, activity.getEndTime())
                  .gt(TourismActivity::getEndTime, activity.getStartTime());
-            if (activityMapper.selectCount(qwTime) > 0) return false;
+            if (activityMapper.selectCount(qwTime) > 0) {
+                throw new ServiceException("该场馆在所选时间段已有其他活动安排");
+            }
         }
         // 申报信息补全
         activity.setApplicantUserId(cn.edu.cquet.common.utils.SecurityUtils.getUserId());

@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import cn.edu.cquet.common.exception.ServiceException;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -104,33 +106,135 @@ class TourismActivityServiceTest {
         }
 
         @Test
-        @DisplayName("同名活动已存在时创建失败")
-        void create_Fails_WhenNameExists() {
-            // given
+        @DisplayName("同名活动已存在时抛出异常")
+        void create_ThrowsServiceException_WhenNameExists() {
+            // given: 名称检查返回 1（有重复）
             when(activityMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
 
-            // when
-            boolean result = activityService.create(testActivity);
-
-            // then
-            assertFalse(result);
+            // when & then: 应抛出 ServiceException
+            ServiceException e = assertThrows(ServiceException.class,
+                    () -> activityService.create(testActivity));
+            assertEquals("活动名称已存在", e.getMessage());
             verify(activityMapper, never()).insert(any());
         }
 
         @Test
-        @DisplayName("同场馆同时间段冲突时创建失败")
-        void create_Fails_WhenTimeSlotConflicts() {
+        @DisplayName("同场馆同时间段冲突时抛出异常")
+        void create_ThrowsServiceException_WhenTimeSlotConflicts() {
             // given
             when(activityMapper.selectCount(any(LambdaQueryWrapper.class)))
                     .thenReturn(0L)  // 名称检查通过
                     .thenReturn(1L); // 时间冲突检查
 
+            // when & then: 应抛出 ServiceException
+            ServiceException e = assertThrows(ServiceException.class,
+                    () -> activityService.create(testActivity));
+            assertEquals("该场馆在所选时间段已有其他活动安排", e.getMessage());
+            verify(activityMapper, never()).insert(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("时间冲突边界测试")
+    class TimeConflictBoundaryTests {
+
+        /**
+         * 冲突判定规则：
+         * - 冲突：existing.startTime < new.endTime AND existing.endTime > new.startTime
+         * - 不冲突：existing.endTime <= new.startTime OR existing.startTime >= new.endTime
+         *
+         * 边界用例：
+         * 1. 相邻时间段（09:00-10:00 vs 10:00-11:00）→ 不冲突（endTime = startTime，首尾相接）
+         * 2. 部分重叠（09:00-11:00 vs 10:00-12:00）→ 冲突
+         * 3. 完全包含（09:00-12:00 vs 10:00-11:00）→ 冲突
+         * 4. 不同场馆（10:00-12:00，venueId=2）→ 不冲突
+         */
+
+        @Test
+        @DisplayName("相邻时间段不冲突：09:00-10:00 与 10:00-11:00 首尾相接")
+        void create_Success_WhenTimeSlotsAreAdjacent() {
+            // given: 已有 10:00-11:00 的活动(testActivity 是 10:00-12:00)
+            // 条件：existing.startTime(10) < new.endTime(11) → 10 < 11 ✓
+            //       existing.endTime(11) > new.startTime(10) → 11 > 10 ✓ → 冲突！
+            // 但我们要测试"不冲突"场景，需要换个数据：
+            // 新活动: 10:00-11:00，已有: 09:00-10:00
+            // 条件：existing.startTime(9) < new.endTime(11) → 9 < 11 ✓
+            //       existing.endTime(10) > new.startTime(10) → 10 > 10 ✗ → 不冲突 ✓
+            testActivity.setStartTime(LocalDateTime.of(2026, 4, 1, 10, 0));
+            testActivity.setEndTime(LocalDateTime.of(2026, 4, 1, 11, 0));
+
+            // 第一次 selectCount：名称检查返回 0
+            // 第二次 selectCount：时间冲突检查也返回 0（无冲突）
+            when(activityMapper.selectCount(any(LambdaQueryWrapper.class)))
+                    .thenReturn(0L)
+                    .thenReturn(0L);
+            when(activityMapper.insert(any(TourismActivity.class))).thenReturn(1);
+
             // when
             boolean result = activityService.create(testActivity);
 
             // then
-            assertFalse(result);
-            verify(activityMapper, never()).insert(any());
+            assertTrue(result);
+            verify(activityMapper).insert(any(TourismActivity.class));
+        }
+
+        @Test
+        @DisplayName("不同场馆时间段重叠不冲突：venueId=1 vs venueId=2")
+        void create_Success_WhenDifferentVenue() {
+            // given: 场馆 2，10:00-12:00（与 testActivity 相同时间段）
+            testActivity.setVenueId(2);
+
+            when(activityMapper.selectCount(any(LambdaQueryWrapper.class)))
+                    .thenReturn(0L)   // 名称检查
+                    .thenReturn(0L); // venueId=2 与 venueId=1 不匹配，时间冲突检查返回 0
+            when(activityMapper.insert(any(TourismActivity.class))).thenReturn(1);
+
+            // when
+            boolean result = activityService.create(testActivity);
+
+            // then
+            assertTrue(result);
+            verify(activityMapper).insert(any(TourismActivity.class));
+        }
+
+        @Test
+        @DisplayName("部分重叠时冲突：09:00-11:00 与 10:00-12:00 有交集")
+        void create_Fails_WhenPartiallyOverlapping() {
+            // given: 已有 10:00-12:00 的活动
+            // 新活动: 09:00-11:00
+            // existing.startTime(10) < new.endTime(11) → 10 < 11 ✓
+            // existing.endTime(12) > new.startTime(9)  → 12 > 9  ✓ → 冲突
+            testActivity.setStartTime(LocalDateTime.of(2026, 4, 1, 9, 0));
+            testActivity.setEndTime(LocalDateTime.of(2026, 4, 1, 11, 0));
+
+            when(activityMapper.selectCount(any(LambdaQueryWrapper.class)))
+                    .thenReturn(0L)   // 名称检查
+                    .thenReturn(1L); // 时间冲突
+
+            // when & then
+            ServiceException e = assertThrows(ServiceException.class,
+                    () -> activityService.create(testActivity));
+            assertEquals("该场馆在所选时间段已有其他活动安排", e.getMessage());
+        }
+
+        @Test
+        @DisplayName("完全包含时冲突：大时间段包含小时间段")
+        void create_Fails_WhenContained() {
+            // given: 已有 09:00-12:00 的活动
+            // 新活动: 10:00-11:00（被包含）
+            // existing.startTime(9) < new.endTime(11)  → 9 < 11  ✓
+            // existing.endTime(12) > new.startTime(10) → 12 > 10 ✓ → 冲突
+            testActivity.setStartTime(LocalDateTime.of(2026, 4, 1, 10, 0));
+            testActivity.setEndTime(LocalDateTime.of(2026, 4, 1, 11, 0));
+
+            when(activityMapper.selectCount(any(LambdaQueryWrapper.class)))
+                    .thenReturn(0L)   // 名称检查
+                    .thenReturn(1L); // 时间冲突
+
+            // when & then
+            ServiceException e = assertThrows(ServiceException.class,
+                    () -> activityService.create(testActivity));
+            assertEquals("该场馆在所选时间段已有其他活动安排", e.getMessage());
         }
     }
 

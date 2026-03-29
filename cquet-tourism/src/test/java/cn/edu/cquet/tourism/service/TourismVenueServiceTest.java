@@ -11,6 +11,7 @@ import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
 import cn.edu.cquet.tourism.mapper.*;
 import cn.edu.cquet.tourism.service.impl.TourismVenueServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -222,7 +224,7 @@ class TourismVenueServiceTest {
             assertTrue(result);
             verify(venueImageMapper).delete(any(LambdaQueryWrapper.class));
             verify(venueFacilitiesMapper).delete(any(LambdaQueryWrapper.class));
-            verify(activityMapper).delete(any(LambdaQueryWrapper.class));
+            verify(activityMapper).update(eq(null), any(UpdateWrapper.class));
         }
     }
 
