@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:)",
+      "Bash(mkdir -p \"F:/04-课程学习/cquet-user\")",
+      "Read(//f/04-课程学习/**)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npm run:*)",
+      "WebFetch(domain:www.rangedevelopmentsgroup.com)",
+      "Skill(browse)"
+    ]
+  }
+}

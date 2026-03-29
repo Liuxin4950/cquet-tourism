@@ -302,3 +302,4 @@ Makefile
 !docker-compose.example.yml
 !.env.example
 .gstack/
+*/application-druid.yml
