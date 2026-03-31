@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import NavBar from '@/components/layout/NavBar.vue'
 import SpotCard from '@/components/cards/SpotCard.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
+import ErrorState from '@/components/ui/ErrorState.vue'
 import { useScenicSpotStore } from '@/stores/scenicSpot'
 
 const store = useScenicSpotStore()
@@ -23,25 +25,31 @@ const handlePageChange = (p: number) => {
   page.value = p
   store.fetchSpots({ pageNum: p, pageSize: pageSize.value, name: searchName.value || undefined })
 }
+
+const handleRetry = () => {
+  store.fetchSpots({ pageNum: page.value, pageSize: pageSize.value, name: searchName.value || undefined })
+}
 </script>
 
 <template>
-  <div class="min-h-screen bg-primary-dark pt-[72px]">
-    <div class="px-[5vw] py-8">
-      <h1 class="font-montserrat font-bold text-3xl text-text-primary mb-8">A级景区</h1>
+  <NavBar />
+  <div class="min-h-screen bg-dark pt-[72px]">
+    <div class="px-6 lg:px-8 py-8">
+      <h1 class="font-montserrat font-bold text-3xl text-brand mb-8">A级景区</h1>
       <div class="flex gap-3 mb-8">
         <input
           v-model="searchName"
           @keyup.enter="handleSearch"
           placeholder="搜索景区名称..."
-          class="bg-primary-dark border border-border-color text-text-primary px-4 py-2 rounded text-sm flex-1 focus:border-primary outline-none"
+          class="bg-dark border border-border text-brand px-4 py-2 rounded text-sm flex-1 focus:border-brand outline-none"
         />
-        <button @click="handleSearch" class="bg-primary text-text-primary px-6 py-2 text-xs font-montserrat tracking-wider rounded hover:bg-primary-light transition-colors">
+        <button @click="handleSearch" class="bg-brand text-brand px-6 py-2 text-xs font-montserrat tracking-wider rounded hover:bg-brand-light transition-colors">
           搜索
         </button>
       </div>
 
       <LoadingState :isLoading="store.isLoading" />
+      <ErrorState v-else-if="store.error" message="加载失败，请检查网络连接" @retry="handleRetry" />
       <EmptyState v-else-if="store.spots.length === 0" message="暂无景区数据" />
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         <SpotCard v-for="spot in store.spots" :key="spot.id" :spot="spot" />
@@ -53,7 +61,7 @@ const handlePageChange = (p: number) => {
           :key="p"
           @click="handlePageChange(p)"
           class="w-10 h-10 rounded text-sm font-montserrat transition-colors"
-          :class="p === page ? 'bg-primary text-text-primary' : 'border border-border-color text-text-secondary hover:border-primary'"
+          :class="p === page ? 'bg-brand text-brand' : 'border border-border text-muted hover:border-brand'"
         >
           {{ p }}
         </button>

@@ -9,7 +9,12 @@
       "Bash(npx tailwindcss:*)",
       "Bash(npm run:*)",
       "WebFetch(domain:www.rangedevelopmentsgroup.com)",
-      "Skill(browse)"
+      "Skill(browse)",
+      "Bash(~/.claude/skills/gstack/browse/dist/browse screenshot:*)",
+      "Bash(~/.claude/skills/gstack/browse/dist/browse css:*)",
+      "Bash(~/.claude/skills/gstack/browse/dist/browse snapshot:*)",
+      "Bash(npx vite:*)",
+      "Bash(mvn compile:*)"
     ]
   }
 }

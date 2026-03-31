@@ -33,9 +33,9 @@ const onError = () => {
     />
     <div
       v-else
-      class="w-full h-full bg-primary-light/20 flex items-center justify-center"
+      class="w-full h-full bg-light/20 flex items-center justify-center"
     >
-      <span v-if="error" class="text-text-secondary text-xs">图片加载失败</span>
+      <span v-if="error" class="text-muted text-xs">图片加载失败</span>
     </div>
   </div>
 </template>

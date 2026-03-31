@@ -1,5 +1,7 @@
 import request from './request'
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
+
 export interface LoginParams {
   username: string
   password: string
@@ -17,9 +19,9 @@ export interface LoginResult {
 }
 
 export const login = (data: LoginParams) => {
-  return request.post<any, any>('/login', data)
+  return request.post<any, any>(`${API_BASE}/login`, data)
 }
 
 export const getInfo = () => {
-  return request.get<any, any>('/getInfo')
+  return request.get<any, any>(`${API_BASE}/getInfo`)
 }

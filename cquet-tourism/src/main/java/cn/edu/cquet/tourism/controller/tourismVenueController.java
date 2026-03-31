@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import cn.edu.cquet.common.annotation.Anonymous;
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
@@ -42,7 +43,7 @@ public class tourismVenueController extends BaseController {
     @Autowired
     private cn.edu.cquet.tourism.service.TourismActivityApprovalService approvalService;
 
-    @PreAuthorize("@ss.hasPermi('tourism:venue:list')")
+    @Anonymous
     @GetMapping("/list")
     @Operation(summary = "获取场馆列表")
     /**
@@ -62,7 +63,7 @@ public class tourismVenueController extends BaseController {
         return getDataTable(list);
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:venue:query')")
+    @Anonymous
     @GetMapping("/{id}")
     @Operation(summary = "获取场馆信息")
     /**
@@ -71,7 +72,7 @@ public class tourismVenueController extends BaseController {
      * 路径：`GET /tourism/venue/{id}`
      * 权限：`tourism:venue:query`
      * 入参：路径参数 `id`
-     * 返回：`Result` 包装的 `VenueDetailVo`，为空则返回警告“场馆不存在”
+     * 返回：`Result` 包装的 `VenueDetailVo`，为空则返回警告"场馆不存在"
      */
     public Result getInfo(@PathVariable Long id) {
         VenueDetailVo venue = tourismVenueService.getDetail(id);
@@ -139,7 +140,7 @@ public class tourismVenueController extends BaseController {
         return toAjax(tourismVenueService.removeVenueByIds(ids));
     }
 
-    @PreAuthorize("@ss.hasPermi('tourism:venueActivity:list')")
+    @Anonymous
     @GetMapping("/{id}/activities")
     @Operation(summary = "查看当前场馆的特色活动列表")
     /**
@@ -170,7 +171,7 @@ public class tourismVenueController extends BaseController {
     }
 
 
-    @PreAuthorize("@ss.hasPermi('tourism:venue:image:list')")
+    @Anonymous
     @GetMapping("/{id}/images")
     @Operation(summary = "查看当前场馆的关联图片列表")
     public Result venueImages(@PathVariable Long id) {

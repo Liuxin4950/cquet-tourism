@@ -23,14 +23,17 @@ request.interceptors.request.use(
   }
 )
 
-// 响应拦截器：处理 401 过期
+// 响应拦截器：处理 401 过期（仅在需要登录的页面才跳转）
 request.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('userInfo')
-      router.push('/login')
+      // 只有不在登录/注册页时才跳转
+      if (!['/login', '/register'].includes(window.location.pathname)) {
+        router.push('/login')
+      }
     }
     return Promise.reject(error)
   }

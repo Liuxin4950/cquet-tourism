@@ -29,5 +29,5 @@ export const getActivity = (id: number) => {
 }
 
 export const applyActivity = (data: { activityId: number; userId?: number; remark?: string }) => {
-  return request.post<any, any>('/tourism/activityApplication', data)
+  return request.post<any, any>('/tourism/activity-approval', data)
 }

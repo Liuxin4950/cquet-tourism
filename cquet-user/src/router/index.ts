@@ -42,6 +42,33 @@ const routes: RouteRecordRaw[] = [
     props: true,
   },
   {
+    path: '/about',
+    name: 'About',
+    component: () => import('@/views/AboutView.vue'),
+  },
+  {
+    path: '/news',
+    name: 'NewsList',
+    component: () => import('@/views/NewsListView.vue'),
+  },
+  {
+    path: '/news/:id',
+    name: 'NewsDetail',
+    component: () => import('@/views/NewsDetailView.vue'),
+    props: true,
+  },
+  {
+    path: '/notices',
+    name: 'NoticeList',
+    component: () => import('@/views/NoticeListView.vue'),
+  },
+  {
+    path: '/notices/:id',
+    name: 'NoticeDetail',
+    component: () => import('@/views/NoticeDetailView.vue'),
+    props: true,
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/LoginView.vue'),
