@@ -15,7 +15,13 @@ export const useVenueStore = defineStore('venue', () => {
     error.value = false
     try {
       const res: any = await listVenue(query)
-      venues.value = res.rows || res.data?.rows || []
+      const list: any[] = res.rows || res.data?.rows || []
+      // 统一 coverImage → images[]；category → type（兼容前端类型）
+      venues.value = list.map(v => ({
+        ...v,
+        type: v.category,
+        images: v.coverImage ? [v.coverImage] : [],
+      }))
       total.value = res.total || res.data?.total || 0
     } catch {
       error.value = true

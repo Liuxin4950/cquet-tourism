@@ -52,28 +52,29 @@ const handleRetry = () => {
           <span v-if="store.currentSpot.level" class="bg-brand text-white text-xs font-montserrat px-3 py-1 rounded mb-3 inline-block">
             {{ store.currentSpot.level }}
           </span>
-          <h1 class="font-montserrat font-bold text-4xl text-white">{{ store.currentSpot.name }}</h1>
+          <span v-else class="bg-brand/50 text-white text-xs font-montserrat px-3 py-1 rounded mb-3 inline-block">暂无等级</span>
+          <h1 class="font-montserrat font-bold text-4xl text-white">{{ store.currentSpot.name || '暂无名称' }}</h1>
         </div>
       </div>
       <div class="grid md:grid-cols-3 gap-8">
         <div class="md:col-span-2">
           <h2 class="font-montserrat font-bold text-xl text-brand mb-4">景区介绍</h2>
-          <p class="text-muted leading-relaxed">{{ store.currentSpot.description }}</p>
+          <p class="text-muted leading-relaxed">{{ store.currentSpot.description || '暂无内容...' }}</p>
         </div>
         <div class="bg-accent/20 border border-border rounded-lg p-6">
           <h3 class="font-montserrat font-bold text-brand mb-4">游览信息</h3>
           <div class="space-y-3 text-sm">
             <div class="flex justify-between">
               <span class="text-muted">地址</span>
-              <span class="text-brand">{{ store.currentSpot.address }}</span>
+              <span class="text-brand">{{ store.currentSpot.address || '暂无内容...' }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-muted">开放时间</span>
-              <span class="text-brand">{{ store.currentSpot.openHours }}</span>
+              <span class="text-brand">{{ store.currentSpot.openHours || '暂无内容...' }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-muted">票务信息</span>
-              <span class="text-brand">{{ store.currentSpot.ticketInfo || '免费' }}</span>
+              <span class="text-brand">{{ store.currentSpot.ticketInfo || '暂无内容...' }}</span>
             </div>
           </div>
         </div>

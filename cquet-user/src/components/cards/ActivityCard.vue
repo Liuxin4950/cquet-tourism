@@ -38,7 +38,7 @@ const goDetail = () => {
   >
     <div class="flex justify-between items-start mb-3">
       <h3 class="font-heading font-light text-card-title text-brand line-clamp-1 flex-1 group-hover:text-muted transition-colors">
-        {{ activity.name }}
+        {{ activity.name || '暂无名称' }}
       </h3>
       <span
         class="text-[10px] font-body px-3 py-0.5 rounded-pill ml-2 shrink-0"
@@ -48,13 +48,13 @@ const goDetail = () => {
           'bg-gray-100 text-gray-500': !activity.status || activity.status === '已结束',
         }"
       >
-        {{ activity.status || '报名中' }}
+        {{ activity.status || '暂无状态' }}
       </span>
     </div>
-    <p class="font-body text-card-desc text-muted line-clamp-2 mb-4">{{ activity.description || '' }}</p>
+    <p class="font-body text-card-desc text-muted line-clamp-2 mb-4">{{ activity.description || '暂无内容...' }}</p>
     <div class="flex justify-between text-card-meta text-muted/70 mb-4">
-      <span>{{ activity.venueName || '' }}</span>
-      <span>{{ activity.startTime ? activity.startTime.slice(0, 10) : '' }}</span>
+      <span>{{ activity.venueName || '暂无场馆信息' }}</span>
+      <span>{{ activity.startTime ? activity.startTime.slice(0, 10) : '暂无时间' }}</span>
     </div>
     <div v-if="activity.capacity" class="mt-auto">
       <div class="h-0.5 bg-border rounded-full overflow-hidden">

@@ -15,7 +15,12 @@ export const useScenicSpotStore = defineStore('scenicSpot', () => {
     error.value = false
     try {
       const res: any = await listScenicSpot(query)
-      spots.value = res.rows || res.data?.rows || []
+      const list: any[] = res.rows || res.data?.rows || []
+      // 统一 coverImage → images[] 格式，兼容卡片组件
+      spots.value = list.map(s => ({
+        ...s,
+        images: s.coverImage ? [s.coverImage] : [],
+      }))
       total.value = res.total || res.data?.total || 0
     } catch {
       error.value = true

@@ -55,10 +55,11 @@ const goDetail = () => {
     >
       {{ venue.type }}
     </span>
+    <span v-else class="inline-block font-body text-card-meta tracking-[0.15em] text-muted uppercase mb-2">暂无类型</span>
     <h3 class="font-heading font-light text-card-title text-brand mb-1 line-clamp-1 group-hover:text-muted transition-colors">
-      {{ venue.name }}
+      {{ venue.name || '暂无名称' }}
     </h3>
-    <p class="font-body text-card-desc text-muted line-clamp-2 mb-1">{{ venue.description || '' }}</p>
-    <p class="font-body text-card-meta text-muted/70">{{ venue.city || '' }}</p>
+    <p class="font-body text-card-desc text-muted line-clamp-2 mb-1">{{ venue.description || '暂无内容...' }}</p>
+    <p class="font-body text-card-meta text-muted/70">{{ venue.city || '暂无地区信息' }}</p>
   </div>
 </template>

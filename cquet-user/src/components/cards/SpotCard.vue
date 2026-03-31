@@ -58,13 +58,14 @@ const goDetail = () => {
     >
       {{ spot.level }}
     </span>
+    <span v-else class="inline-block font-body text-card-meta tracking-[0.15em] text-muted uppercase mb-2">暂无等级</span>
     <!-- 标题 -->
     <h3 class="font-heading font-light text-card-title text-brand mb-1 line-clamp-1 group-hover:text-muted transition-colors">
-      {{ spot.name }}
+      {{ spot.name || '暂无名称' }}
     </h3>
     <!-- 描述 -->
-    <p class="font-body text-card-desc text-muted line-clamp-2 mb-1">{{ spot.description || '' }}</p>
+    <p class="font-body text-card-desc text-muted line-clamp-2 mb-1">{{ spot.description || '暂无内容...' }}</p>
     <!-- 底部信息 -->
-    <p class="font-body text-card-meta text-muted/70">{{ spot.city || '' }}</p>
+    <p class="font-body text-card-meta text-muted/70">{{ spot.city || '暂无地区信息' }}</p>
   </div>
 </template>

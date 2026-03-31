@@ -62,28 +62,28 @@ const handleApply = async () => {
                 'bg-gray-600/20 text-gray-400': store.currentActivity.status === '已结束',
               }"
             >
-              {{ store.currentActivity.status || '报名中' }}
+              {{ store.currentActivity.status || '暂无状态' }}
             </span>
-            <h1 class="font-montserrat font-bold text-4xl text-brand">{{ store.currentActivity.name }}</h1>
+            <h1 class="font-montserrat font-bold text-4xl text-brand">{{ store.currentActivity.name || '暂无名称' }}</h1>
           </div>
         </div>
-        <p class="text-muted leading-relaxed mb-6">{{ store.currentActivity.description }}</p>
+        <p class="text-muted leading-relaxed mb-6">{{ store.currentActivity.description || '暂无内容...' }}</p>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
           <div>
             <span class="text-muted block mb-1">活动时间</span>
-            <span class="text-brand">{{ store.currentActivity.startTime?.slice(0, 16) || '' }} ~ {{ store.currentActivity.endTime?.slice(0, 16) || '' }}</span>
+            <span class="text-brand">{{ store.currentActivity.startTime?.slice(0, 16) || '暂无时间' }} ~ {{ store.currentActivity.endTime?.slice(0, 16) || '暂无时间' }}</span>
           </div>
           <div>
             <span class="text-muted block mb-1">活动地点</span>
-            <span class="text-brand">{{ store.currentActivity.venueName }}</span>
+            <span class="text-brand">{{ store.currentActivity.venueName || '暂无场馆信息' }}</span>
           </div>
           <div>
             <span class="text-muted block mb-1">活动类型</span>
-            <span class="text-brand">{{ store.currentActivity.type }}</span>
+            <span class="text-brand">{{ store.currentActivity.type || '暂无类型' }}</span>
           </div>
           <div>
             <span class="text-muted block mb-1">报名人数</span>
-            <span class="text-brand">{{ store.currentActivity.currentParticipants || 0 }} / {{ store.currentActivity.capacity }}</span>
+            <span class="text-brand">{{ store.currentActivity.currentParticipants || 0 }} / {{ store.currentActivity.capacity || '暂无' }}</span>
           </div>
         </div>
       </div>
