@@ -28,7 +28,7 @@ const handleRetry = () => {
   store.fetchSpots({ pageNum: page.value, pageSize: pageSize.value })
 }
 
-const totalPages = computed(() => Math.ceil(store.total / pageSize))
+const totalPages = computed(() => Math.ceil(store.total / pageSize.value))
 
 // 将一维数组转为二维数组，每行3个
 const rows = computed(() => {

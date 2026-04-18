@@ -61,26 +61,27 @@ watch(() => props.show, (val) => {
 }
 
 .modal-content {
-  background: #fff;
-  border-radius: 12px;
+  background: var(--white);
+  border-radius: 16px;
   padding: 32px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 48px rgba(9, 44, 56, 0.18);
 }
 
 .modal-title {
   font-family: 'Manrope', sans-serif;
   font-size: 20px;
   font-weight: 600;
-  color: #222a2c;
+  color: var(--brand);
   margin-bottom: 8px;
 }
 
 .modal-message {
   font-family: 'Manrope', sans-serif;
   font-size: 14px;
-  color: #666;
+  color: var(--muted);
   margin-bottom: 32px;
   line-height: 1.5;
 }
@@ -97,32 +98,32 @@ watch(() => props.show, (val) => {
   font-weight: 500;
   letter-spacing: 0.02em;
   padding: 12px 28px;
-  border-radius: 8px;
+  border-radius: 100vw;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .modal-btn-cancel {
   background: transparent;
-  border: 1px solid #ddd;
-  color: #666;
+  border: 1px solid var(--border);
+  color: var(--muted);
 }
 
 .modal-btn-cancel:hover {
-  border-color: #999;
-  color: #333;
-  background: #f5f5f5;
+  border-color: var(--muted);
+  color: var(--brand);
+  background: var(--light);
 }
 
 .modal-btn-confirm {
-  background: #222a2c;
-  border: 1px solid #222a2c;
-  color: #fff;
+  background: var(--brand);
+  border: 1px solid var(--brand);
+  color: var(--white);
 }
 
 .modal-btn-confirm:hover {
-  background: #333;
-  border-color: #333;
+  background: var(--dark);
+  border-color: var(--dark);
 }
 
 /* Modal transitions */

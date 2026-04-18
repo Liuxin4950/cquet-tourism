@@ -1,72 +1,129 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import NavBar from '@/components/layout/NavBar.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
+import ConfirmModal from '@/components/ui/ConfirmModal.vue'
+import ProfileApplicationsPanel from '@/components/profile/ProfileApplicationsPanel.vue'
+import ProfileCollectionsPanel from '@/components/profile/ProfileCollectionsPanel.vue'
+import ProfileCommentsPanel from '@/components/profile/ProfileCommentsPanel.vue'
+import ProfileInfoPanel from '@/components/profile/ProfileInfoPanel.vue'
+import ProfileSkeleton from '@/components/profile/ProfileSkeleton.vue'
+import ProfileTabs from '@/components/profile/ProfileTabs.vue'
+import ProfileUserCard from '@/components/profile/ProfileUserCard.vue'
+import { mockApplications, mockCollections, mockComments } from '@/components/profile/profileMock'
+import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
+import type { ProfileTab, ProfileTabItem } from '@/types/profile'
 
 const router = useRouter()
+const route = useRoute()
+const toast = useToast()
 const authStore = useAuthStore()
 
-onMounted(() => {
-  if (authStore.isAuthenticated()) {
-    authStore.fetchUserInfo()
+const isLoading = ref(!authStore.userInfo)
+const applicationsLoading = ref(false)
+const applicationsError = ref(false)
+const showLogoutModal = ref(false)
+
+const tabItems: ProfileTabItem[] = [
+  { key: 'info', label: '我的资料' },
+  { key: 'applications', label: '我的报名' },
+  { key: 'collections', label: '我的收藏' },
+  { key: 'comments', label: '我的评论' },
+]
+
+const isProfileTab = (value: unknown): value is ProfileTab => {
+  return typeof value === 'string' && tabItems.some(item => item.key === value)
+}
+
+const activeTab = computed<ProfileTab>(() => {
+  return isProfileTab(route.query.tab) ? route.query.tab : 'info'
+})
+
+onMounted(async () => {
+  if (!authStore.isAuthenticated()) {
+    isLoading.value = false
+    return
+  }
+
+  try {
+    await authStore.fetchUserInfo()
+  } finally {
+    isLoading.value = false
   }
 })
 
+const handleTabChange = (tab: ProfileTab) => {
+  router.replace({
+    query: {
+      ...route.query,
+      tab,
+    },
+  })
+}
+
 const handleLogout = () => {
   authStore.logout()
+  showLogoutModal.value = false
+  toast.success('已退出登录')
   router.push('/')
 }
 </script>
 
 <template>
   <NavBar />
-  <div class="min-h-screen bg-dark pt-[72px]">
-    <div class="px-6 lg:px-8 py-8 max-w-2xl mx-auto">
-      <h1 class="font-montserrat font-bold text-3xl text-brand mb-8">用户中心</h1>
+  <main class="min-h-screen bg-light pt-[72px]">
+    <div class="mx-auto max-w-[1280px] px-6 py-10 lg:px-10 lg:py-12">
+      <header class="mb-6">
+        <h1 class="font-heading text-[28px] font-bold text-brand">个人中心</h1>
+        <p class="mt-3 font-body text-sm leading-6 text-muted md:text-base">
+          管理你的个人资料、活动报名与互动记录
+        </p>
+      </header>
 
-      <div v-if="authStore.isAuthenticated()" class="space-y-6">
-        <!-- 用户信息卡片 -->
-        <div class="bg-dark border border-border rounded-lg p-6">
-          <div class="flex items-center gap-4 mb-6">
-            <div class="w-16 h-16 rounded-full bg-brand flex items-center justify-center text-2xl font-montserrat font-bold text-brand">
-              {{ (authStore.userInfo?.nickName || authStore.userInfo?.username || 'U').charAt(0).toUpperCase() }}
-            </div>
-            <div>
-              <h2 class="font-montserrat font-bold text-xl text-brand">{{ authStore.userInfo?.nickName || authStore.userInfo?.username }}</h2>
-              <p class="text-muted text-sm">{{ authStore.userInfo?.phone || '' }}</p>
-            </div>
+      <ProfileSkeleton v-if="isLoading" />
+
+      <div v-else-if="authStore.isAuthenticated()" class="grid grid-cols-1 gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <ProfileUserCard :user="authStore.userInfo" @logout="showLogoutModal = true" />
+
+        <section class="rounded-[24px] border border-border bg-white p-5 shadow-sm md:p-6">
+          <ProfileTabs :items="tabItems" :active="activeTab" @change="handleTabChange" />
+
+          <div class="mt-8">
+            <ProfileInfoPanel v-if="activeTab === 'info'" :user="authStore.userInfo" />
+            <ProfileApplicationsPanel
+              v-else-if="activeTab === 'applications'"
+              :applications="mockApplications"
+              :loading="applicationsLoading"
+              :error="applicationsError"
+            />
+            <ProfileCollectionsPanel
+              v-else-if="activeTab === 'collections'"
+              :collections="mockCollections"
+            />
+            <ProfileCommentsPanel
+              v-else-if="activeTab === 'comments'"
+              :comments="mockComments"
+            />
           </div>
-          <button
-            @click="handleLogout"
-            class="w-full border border-border text-muted py-2 text-sm font-montserrat tracking-wider rounded hover:border-red-500 hover:text-red-400 transition-colors"
-          >
-            退出登录
-          </button>
-        </div>
-
-        <!-- 暂无数据提示（后续对接真实 API） -->
-        <div class="bg-dark border border-border rounded-lg p-8 text-center">
-          <p class="text-muted text-sm mb-2">我的收藏</p>
-          <EmptyState message="暂无收藏内容，浏览景区后发现感兴趣的内容吧" />
-        </div>
-        <div class="bg-dark border border-border rounded-lg p-8 text-center">
-          <p class="text-muted text-sm mb-2">我的报名</p>
-          <EmptyState message="暂未报名任何活动，快去探索精彩活动吧" />
-        </div>
-        <div class="bg-dark border border-border rounded-lg p-8 text-center">
-          <p class="text-muted text-sm mb-2">我的留言</p>
-          <EmptyState message="暂无留言记录，参与活动后可发表感想" />
-        </div>
+        </section>
       </div>
 
-      <div v-else class="text-center py-20">
-        <p class="text-muted mb-6">请先登录</p>
-        <router-link to="/login" class="bg-brand text-brand px-8 py-3 text-xs font-montserrat tracking-wider rounded hover:bg-brand-light transition-colors">
-          登录
+      <div v-else class="rounded-[24px] border border-border bg-white p-10 text-center">
+        <p class="font-body text-sm text-muted">请先登录后查看个人中心。</p>
+        <router-link to="/login" class="btn-pill dark mt-6">
+          去登录
         </router-link>
       </div>
     </div>
-  </div>
+  </main>
+
+  <ConfirmModal
+    :show="showLogoutModal"
+    title="确认退出登录？"
+    message="退出后你仍可浏览公开内容，但无法继续进行报名、收藏与评论操作。"
+    confirm-text="确认退出"
+    @confirm="handleLogout"
+    @cancel="showLogoutModal = false"
+  />
 </template>

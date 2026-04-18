@@ -1,29 +1,20 @@
 import request from './request'
+import type { AxiosResponse } from 'axios'
+import type { LoginPayload, UserInfoPayload } from '@/types/auth'
 
 export interface LoginParams {
   username: string
   password: string
 }
 
-export interface LoginResult {
-  token: string
-  userInfo: {
-    userId: number
-    username: string
-    nickName: string
-    phone: string
-    avatar?: string
-  }
-}
-
 export const login = (data: LoginParams) => {
-  return request.post<any, any>('/login', data)
+  return request.post<LoginPayload, AxiosResponse<LoginPayload>>('/login', data)
 }
 
 export const getInfo = () => {
-  return request.get<any, any>('/getInfo')
+  return request.get<UserInfoPayload, AxiosResponse<UserInfoPayload>>('/getInfo')
 }
 
 export const register = (data: LoginParams) => {
-  return request.post<any, any>('/register', data)
+  return request.post('/register', data)
 }

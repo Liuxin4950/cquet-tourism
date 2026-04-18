@@ -24,6 +24,7 @@ const navLinks = [
 ]
 
 const isLoggedIn = computed(() => authStore.isAuthenticated())
+const isAuthReady = computed(() => authStore.isAuthReady)
 const userNickName = computed(() => authStore.userInfo?.nickName || authStore.userInfo?.username || '用户')
 
 const toggleMobileMenu = () => {
@@ -69,9 +70,16 @@ const handleLogout = () => {
       </div>
 
       <!-- CTA Button -->
-      <div class="nav-actions">
+      <div v-if="isAuthReady" class="nav-actions">
         <template v-if="isLoggedIn">
-          <span class="nav-user-name">{{ userNickName }}</span>
+          <RouterLink
+            to="/profile"
+            class="nav-profile-link"
+            :class="{ 'nav-profile-link-active': route.path === '/profile' }"
+          >
+            <span class="nav-profile-label">个人中心</span>
+            <span class="nav-user-name">{{ userNickName }}</span>
+          </RouterLink>
           <button @click="confirmLogout" class="nav-btn nav-btn-logout">
             退出登录
           </button>
@@ -110,13 +118,21 @@ const handleLogout = () => {
           >
             {{ link.name }}
           </RouterLink>
-          <template v-if="isLoggedIn">
+          <template v-if="isAuthReady && isLoggedIn">
             <span class="mobile-nav-user">{{ userNickName }}</span>
-            <button @click="confirmLogout; closeMobileMenu()" class="mobile-nav-btn">
+            <RouterLink
+              to="/profile"
+              class="mobile-nav-link"
+              :class="{ 'mobile-nav-link-active': route.path === '/profile' }"
+              @click="closeMobileMenu"
+            >
+              个人中心
+            </RouterLink>
+            <button @click="confirmLogout(); closeMobileMenu()" class="mobile-nav-btn">
               退出登录
             </button>
           </template>
-          <template v-else>
+          <template v-else-if="isAuthReady">
             <RouterLink to="/login" class="nav-btn mt-6" @click="closeMobileMenu">
               登录 / 注册
             </RouterLink>
@@ -128,8 +144,8 @@ const handleLogout = () => {
     <!-- 退出登录确认弹窗 -->
     <ConfirmModal
       :show="showLogoutModal"
-      title="确认退出"
-      message="确定要退出登录吗？"
+      title="确认退出登录？"
+      message="退出后你仍可浏览公开内容，但无法继续进行报名、收藏与评论操作。"
       confirm-text="确认退出"
       @confirm="handleLogout"
       @cancel="showLogoutModal = false"
@@ -232,11 +248,36 @@ const handleLogout = () => {
   gap: 12px;
 }
 
-.nav-user-name {
+.nav-profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: 'Manrope', sans-serif;
   font-size: 13px;
   color: #f5f4f2;
   letter-spacing: 0.02em;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-profile-link:hover,
+.nav-profile-link-active {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+.nav-profile-label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.nav-user-name {
+  max-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
 }
 
 .nav-btn {

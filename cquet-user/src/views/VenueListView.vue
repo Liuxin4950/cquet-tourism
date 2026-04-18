@@ -26,7 +26,7 @@ const handleRetry = () => {
   store.fetchVenues({ pageNum: page.value, pageSize: pageSize.value })
 }
 
-const totalPages = computed(() => Math.ceil(store.total / pageSize))
+const totalPages = computed(() => Math.ceil(store.total / pageSize.value))
 
 const rows = computed(() => {
   const result: any[][] = []

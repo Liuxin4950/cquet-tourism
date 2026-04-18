@@ -1,7 +1,9 @@
 <script setup lang="ts">
-defineProps<{
-  isLoading: boolean
-}>()
+withDefaults(defineProps<{
+  isLoading?: boolean
+}>(), {
+  isLoading: true,
+})
 </script>
 
 <template>

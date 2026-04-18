@@ -25,7 +25,9 @@
       "Bash($B restart:*)",
       "Bash($B status:*)",
       "Bash(curl -s http://localhost:5175/spots)",
-      "Bash($B text:*)"
+      "Bash($B text:*)",
+      "Bash(npm ls *)",
+      "Bash(npx tailwindcss *)"
     ]
   }
 }
