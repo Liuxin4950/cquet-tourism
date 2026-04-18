@@ -17,6 +17,8 @@ export interface ScenicSpotQuery {
   pageNum: number
   pageSize: number
   name?: string
+  city?: string
+  level?: string
 }
 
 export const listScenicSpot = (query: ScenicSpotQuery) => {

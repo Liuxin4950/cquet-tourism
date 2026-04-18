@@ -27,7 +27,7 @@ const handleRetry = () => {
 <template>
   <NavBar />
   <div class="min-h-screen bg-dark pt-[72px]">
-    <LoadingState :isLoading="store.isLoading" />
+    <LoadingState v-if="store.isLoading" :isLoading="store.isLoading" />
     <ErrorState v-else-if="store.error" message="加载失败，请检查网络连接" @retry="handleRetry" />
     <EmptyState v-else-if="!store.currentVenue" message="未找到该场馆" />
     <div v-else-if="store.currentVenue" class="px-6 lg:px-8 py-8">
@@ -63,15 +63,15 @@ const handleRetry = () => {
         <div class="bg-accent/20 border border-border rounded-lg p-6">
           <h3 class="font-montserrat font-bold text-brand mb-4">场馆信息</h3>
           <div class="space-y-3 text-sm">
-            <div class="flex justify-between">
+            <div class="flex justify-between items-center min-h-[24px]">
               <span class="text-muted">地址</span>
               <span class="text-brand">{{ store.currentVenue.address || '暂无内容...' }}</span>
             </div>
-            <div class="flex justify-between">
+            <div class="flex justify-between items-center min-h-[24px]">
               <span class="text-muted">开放时间</span>
               <span class="text-brand">{{ store.currentVenue.openHours || '暂无内容...' }}</span>
             </div>
-            <div class="flex justify-between">
+            <div class="flex justify-between items-center min-h-[24px]">
               <span class="text-muted">容量</span>
               <span class="text-brand">{{ store.currentVenue.capacity ? `${store.currentVenue.capacity} 人` : '暂无内容...' }}</span>
             </div>

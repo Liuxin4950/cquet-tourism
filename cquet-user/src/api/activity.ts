@@ -18,6 +18,8 @@ export interface ActivityQuery {
   pageNum: number
   pageSize: number
   name?: string
+  venueId?: number
+  status?: string
 }
 
 export const listActivity = (query: ActivityQuery) => {

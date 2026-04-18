@@ -2,7 +2,30 @@
   "permissions": {
     "allow": [
       "Skill(plan-design-review)",
-      "Skill(plan-eng-review)"
+      "Skill(plan-eng-review)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://images.unsplash.com/photo-1547989453-11a6f9b88d2f?w=600&q=80\")",
+      "WebFetch(domain:21st.dev)",
+      "WebSearch",
+      "Bash(npm run:*)",
+      "Bash(npx vite:*)",
+      "Bash(~/.claude/skills/gstack/browse/dist/browse goto:*)",
+      "Bash(~/.claude/skills/gstack/browse/dist/browse screenshot:*)",
+      "Bash(~/.claude/skills/gstack/browse/dist/browse console:*)",
+      "Bash(curl -s \"http://localhost:8080/tourism/news/list?pageNum=1&pageSize=3\")",
+      "Skill(browse)",
+      "WebFetch(domain:minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse)",
+      "Bash($B goto:*)",
+      "Bash($B console:*)",
+      "Bash($B screenshot:*)",
+      "Bash($B responsive:*)",
+      "Bash($B scroll:*)",
+      "Bash($B snapshot:*)",
+      "Bash($B html:*)",
+      "Bash($B restart:*)",
+      "Bash($B status:*)",
+      "Bash(curl -s http://localhost:5175/spots)",
+      "Bash($B text:*)"
     ]
   }
 }

@@ -14,7 +14,11 @@ export const useNoticeStore = defineStore('notice', () => {
     error.value = false
     try {
       const res: any = await listNotice(query)
-      noticeList.value = res.rows || res.data?.rows || []
+      noticeList.value = (res.rows || res.data?.rows || []).map((n: any) => ({
+        ...n,
+        // 兼容不同字段名
+        publishTime: n.publishTime || n.createTime || ''
+      }))
       total.value = res.total || res.data?.total || 0
     } catch {
       error.value = true

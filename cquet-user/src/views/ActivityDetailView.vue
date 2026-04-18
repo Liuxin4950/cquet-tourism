@@ -47,7 +47,7 @@ const handleApply = async () => {
 <template>
   <NavBar />
   <div class="min-h-screen bg-dark pt-[72px]">
-    <LoadingState :isLoading="store.isLoading" />
+    <LoadingState v-if="store.isLoading" :isLoading="store.isLoading" />
     <ErrorState v-else-if="store.error" message="加载失败，请检查网络连接" @retry="handleRetry" />
     <EmptyState v-else-if="!store.currentActivity" message="未找到该活动" />
     <div v-else-if="store.currentActivity" class="px-6 lg:px-8 py-8">
@@ -69,19 +69,19 @@ const handleApply = async () => {
         </div>
         <p class="text-muted leading-relaxed mb-6">{{ store.currentActivity.description || '暂无内容...' }}</p>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
-          <div>
+          <div class="min-h-[48px]">
             <span class="text-muted block mb-1">活动时间</span>
             <span class="text-brand">{{ store.currentActivity.startTime?.slice(0, 16) || '暂无时间' }} ~ {{ store.currentActivity.endTime?.slice(0, 16) || '暂无时间' }}</span>
           </div>
-          <div>
+          <div class="min-h-[48px]">
             <span class="text-muted block mb-1">活动地点</span>
             <span class="text-brand">{{ store.currentActivity.venueName || '暂无场馆信息' }}</span>
           </div>
-          <div>
+          <div class="min-h-[48px]">
             <span class="text-muted block mb-1">活动类型</span>
             <span class="text-brand">{{ store.currentActivity.type || '暂无类型' }}</span>
           </div>
-          <div>
+          <div class="min-h-[48px]">
             <span class="text-muted block mb-1">报名人数</span>
             <span class="text-brand">{{ store.currentActivity.currentParticipants || 0 }} / {{ store.currentActivity.capacity || '暂无' }}</span>
           </div>

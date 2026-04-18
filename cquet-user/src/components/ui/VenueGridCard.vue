@@ -1,0 +1,65 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const props = defineProps<{
+  venue: {
+    id: number
+    name: string
+    type?: string
+    city?: string
+    description?: string
+    openHours?: string
+    images?: string[]
+  }
+}>()
+
+const router = useRouter()
+
+const coverImage = computed(() => props.venue.images?.[0] || '')
+const hasImage = computed(() => !!coverImage.value)
+
+const goDetail = () => {
+  router.push(`/venues/${props.venue.id}`)
+}
+</script>
+
+<template>
+  <article
+    class="grid-card cursor-pointer"
+    @click="goDetail"
+    :aria-label="`查看 ${venue.name} 详情`"
+  >
+    <!-- 图片 -->
+    <div class="aspect-[4/3] bg-[#e8e6e3] overflow-hidden">
+      <img
+        v-if="hasImage"
+        :src="coverImage"
+        :alt="venue.name"
+        loading="lazy"
+        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+      />
+      <div v-else class="w-full h-full flex flex-col items-center justify-center text-[#648992]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+        <span class="text-[11px] font-body opacity-60">暂无图片</span>
+      </div>
+    </div>
+    <!-- 内容 -->
+    <div class="p-4 lg:p-5">
+      <span
+        v-if="venue.type"
+        class="inline-block font-body text-[10px] tracking-[0.15em] text-muted uppercase mb-2"
+      >
+        {{ venue.type }}
+      </span>
+      <span v-else class="inline-block font-body text-[10px] tracking-[0.15em] text-muted uppercase mb-2">暂无类型</span>
+      <h3 class="font-heading font-light text-[15px] text-brand mb-1.5 line-clamp-1 hover:text-muted transition-colors">
+        {{ venue.name || '暂无名称' }}
+      </h3>
+      <p class="font-body text-[12px] text-muted line-clamp-2 mb-2">{{ venue.description || '暂无内容...' }}</p>
+      <p class="font-body text-[11px] text-muted/70">{{ venue.city || '暂无地区信息' }}</p>
+    </div>
+  </article>
+</template>

@@ -18,6 +18,7 @@ export interface VenueQuery {
   pageNum: number
   pageSize: number
   name?: string
+  city?: string
 }
 
 export const listVenue = (query: VenueQuery) => {

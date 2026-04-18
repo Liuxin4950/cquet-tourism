@@ -13,6 +13,7 @@ export interface Activity {
   capacity?: number
   currentParticipants?: number
   status?: string
+  images?: string[]
 }
 
 const props = defineProps<{
@@ -20,6 +21,9 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
+
+const coverImage = computed(() => props.activity.images?.[0] || '')
+const hasImage = computed(() => !!coverImage.value)
 
 const progress = computed(() => {
   if (!props.activity.capacity || !props.activity.currentParticipants) return 0
@@ -33,9 +37,27 @@ const goDetail = () => {
 
 <template>
   <div
-    class="group cursor-pointer border border-border rounded p-6 hover:border-brand transition-colors"
+    class="group cursor-pointer border border-border rounded overflow-hidden hover:border-brand transition-colors"
     @click="goDetail"
   >
+    <!-- 图片 -->
+    <div class="aspect-[4/3] bg-[#e8e6e3] flex items-center justify-center">
+      <img
+        v-if="hasImage"
+        :src="coverImage"
+        :alt="activity.name"
+        loading="lazy"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+      <div v-else class="flex flex-col items-center justify-center text-[#648992]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+        </svg>
+        <span class="text-[11px] font-body opacity-60">暂无图片</span>
+      </div>
+    </div>
+    <!-- 内容 -->
+    <div class="p-6">
     <div class="flex justify-between items-start mb-3">
       <h3 class="font-heading font-light text-card-title text-brand line-clamp-1 flex-1 group-hover:text-muted transition-colors">
         {{ activity.name || '暂无名称' }}
@@ -61,6 +83,7 @@ const goDetail = () => {
         <div class="h-full bg-brand rounded-full transition-all" :style="{ width: progress + '%' }"></div>
       </div>
       <p class="font-body text-card-meta text-muted/60 mt-1">{{ activity.currentParticipants || 0 }}/{{ activity.capacity }} 人</p>
+    </div>
     </div>
   </div>
 </template>

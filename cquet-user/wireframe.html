@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>景区列表 UI 线框</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    overflow-x: hidden; /* 防止横向滚动 */
+    background: #fff;
+  }
+
+  /* ── NavBar (fixed, exact replica) ── */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 72px;
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    background-color: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .nav-container {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 72px; padding: 0 48px;
+    max-width: 1440px; margin: 0 auto;
+  }
+  .nav-logo { font-weight: 700; font-size: 18px; color: #fff; text-decoration: none; flex-shrink: 0; }
+  .nav-links { display: flex; align-items: center; gap: 40px; }
+  .nav-links a {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px; font-weight: 400; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #f5f4f2; text-decoration: none;
+    position: relative; padding: 4px 0; transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 1px; background-color: #fff; transition: width 0.3s;
+  }
+  .nav-links a:hover { color: #fff; }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: #fff; }
+  .nav-links a.active::after { width: 100%; }
+  .nav-cta {
+    font-family: 'Montserrat', sans-serif; font-size: 12px;
+    padding: 10px 20px; border: 1px solid #f5f4f2;
+    border-radius: 100vw; color: #f5f4f2; background: transparent;
+    text-decoration: none; transition: all 0.3s; cursor: pointer;
+  }
+  .nav-cta:hover { background-color: #f5f4f2; color: #222a2c; }
+
+  /* ── Hero Banner: 100vh + 纯黑渐变 ── */
+  .hero {
+    position: relative;
+    /* 精确100%宽度，不超出 */
+    width: 100%;
+    height: 100vh;
+    background: url('https://images.unsplash.com/photo-1609609697762-87d2c2c944b4?w=1920&q=80') center/cover no-repeat;
+    /* NavBar 72px fixed在上方，hero 从72px下方开始 */
+    padding-top: 72px;
+  }
+  /* 纯黑渐变：底部纯黑向上渐变淡 */
+  .hero::after {
+    content: '';
+    position: absolute; top: 72px; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 70%);
+    pointer-events: none;
+  }
+  .hero-text {
+    position: absolute; bottom: 48px; left: 48px; z-index: 1;
+  }
+  .hero-text h1 { font-size: 42px; font-weight: 700; color: #fff; letter-spacing: -1px; line-height: 1.1; }
+  .hero-text p { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 8px; letter-spacing: 0.08em; }
+
+  /* ── Page Content ── */
+  .page-wrap { background: #fff; }
+  .page-content { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+
+  /* ── Section Title ── */
+  .section-title {
+    font-size: 22px; font-weight: 600; color: #222;
+    padding: 40px 0 24px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  /* ── 3列网格，border分隔 ── */
+  .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .cell {
+    border-right: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .cell:nth-child(3n) { border-right: none; }
+
+  .grid-card { cursor: pointer; }
+  .card-img { aspect-ratio: 4/3; background: #e8e6e3; overflow: hidden; }
+  .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card-img .placeholder {
+    width: 100%; height: 100%; display: flex; align-items: center;
+    justify-content: center; color: #aaa; font-size: 12px;
+  }
+  .card-body { padding: 16px 20px 20px; }
+  .card-level { font-size: 10px; letter-spacing: 0.15em; color: #648992; text-transform: uppercase; margin-bottom: 6px; }
+  .card-title { font-size: 15px; font-weight: 400; color: #222; margin-bottom: 6px; line-height: 1.3; }
+  .card-desc {
+    font-size: 12px; color: #648992; line-height: 1.5; margin-bottom: 8px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card-meta { font-size: 11px; color: #648992; opacity: 0.7; }
+
+  /* ── Back to Top Button ── */
+  .back-to-top {
+    position: fixed; bottom: 40px; right: 40px;
+    width: 44px; height: 44px; background: #222; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 50;
+  }
+  .back-to-top svg { width: 18px; height: 18px; color: #fff; }
+
+  /* ── Responsive ── */
+  @media (max-width: 1023px) {
+    .nav-container { padding: 0 24px; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 768px) {
+    .grid-container { grid-template-columns: repeat(2, 1fr); }
+    .cell:nth-child(3n) { border-right: 1px solid #e0e0e0; }
+    .cell:nth-child(2n) { border-right: none; }
+    .hero-text { bottom: 32px; left: 24px; }
+    .hero-text h1 { font-size: 28px; }
+    .page-content { padding: 0 16px; }
+    .back-to-top { bottom: 24px; right: 24px; }
+  }
+  @media (max-width: 480px) {
+    .grid-container { grid-template-columns: 1fr; }
+    .cell { border-right: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NavBar (fixed, 72px) -->
+<div class="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">山城文旅</a>
+    <div class="nav-links">
+      <a href="/" class="active">首页</a>
+      <a href="/spots">景区</a>
+      <a href="/venues">场馆</a>
+      <a href="/activities">活动</a>
+      <a href="/news">资讯</a>
+    </div>
+    <a href="/login" class="nav-cta">登录 / 注册</a>
+  </div>
+</div>
+
+<!-- Hero Banner: 100vh -->
+<div class="hero">
+  <div class="hero-text">
+    <h1>景区列表</h1>
+    <p>EXPLORE CHONGQING</p>
+  </div>
+</div>
+
+<!-- Page Content -->
+<div class="page-wrap">
+<div class="page-content">
+  <div class="section-title">A级景区</div>
+
+  <div class="grid-container">
+    <div class="cell">
+      <div class="grid-card">
+        <div class="card-img"><img src="https://images.unsplash.com/photo-1537531383496-f4749b8032cf?w=600&q=80" alt="洪崖洞" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-level">AAAAA</div>
+          <div class="card-title">洪崖洞民俗风貌区</div>
+          <div class="card-desc">国家AAAAA级旅游景区，位于重庆市渝中区，是重庆市重点景观工程。</div>
+          <div class="card-meta">重庆市渝中区 · 08:00-22:00</div>
+        </div>
+      </div>
+    </div>
+    <div class="cell">
+      <div class="grid-card">
+        <div class="card-img"><img src="https://images.unsplash.com/photo-1523901839036-a3030662f220?w=600&q=80" alt="大足石刻" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-level">AAAAA</div>
+          <div class="card-title">大足石刻景区</div>
+          <div class="card-desc">世界文化遗产，代表了唐宋时期中国石窟艺术的最高水平。</div>
+          <div class="card-meta">重庆市大足区 · 09:00-18:00</div>
+        </div>
+      </div>
+    </div>
+    <div class="cell">
+      <div class="grid-card">
+        <div class="card-img"><img src="https://images.unsplash.com/photo-1585031521070-1ff3e5ee3d62?w=600&q=80" alt="武隆" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-level">AAAAA</div>
+          <div class="card-title">武隆天生三桥</div>
+          <div class="card-desc">世界上最大的天生桥群，集雄、奇、险、秀、幽、绝于一体。</div>
+          <div class="card-meta">重庆市武隆区 · 08:30-17:00</div>
+        </div>
+      </div>
+    </div>
+    <div class="cell">
+      <div class="grid-card">
+        <div class="card-img"><div class="placeholder">暂无图片</div></div>
+        <div class="card-body">
+          <div class="card-level">AAAA</div>
+          <div class="card-title">四面山景区</div>
+          <div class="card-desc">国家级风景名胜区，国家AAAA级旅游景区。</div>
+          <div class="card-meta">重庆市江津区</div>
+        </div>
+      </div>
+    </div>
+    <div class="cell">
+      <div class="grid-card">
+        <div class="card-img"><img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80" alt="解放碑" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-level">AAAAA</div>
+          <div class="card-title">解放碑步行街</div>
+          <div class="card-desc">重庆最繁华的商业中心，集购物、美食、娱乐于一体。</div>
+          <div class="card-meta">重庆市渝中区 · 全天开放</div>
+        </div>
+      </div>
+    </div>
+    <div class="cell">
+      <div class="grid-card">
+        <div class="card-img"><img src="https://images.unsplash.com/photo-1569310133095-8e2a72a8a83d?w=600&q=80" alt="黑山谷" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-level">AAAA</div>
+          <div class="card-title">万盛黑山谷</div>
+          <div class="card-desc">国家级森林公园，夏季避暑圣地。</div>
+          <div class="card-meta">重庆市万盛经开区 · 09:00-17:00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Back to Top Button -->
+<div class="back-to-top">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+  </svg>
+</div>
+
+</body>
+</html>

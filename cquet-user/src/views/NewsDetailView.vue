@@ -34,15 +34,6 @@ const goBack = () => {
         ← 返回
       </button>
 
-      <!-- Banner -->
-      <div v-if="store.currentNews.coverImage" class="w-full h-[40vh] rounded-lg overflow-hidden mb-10">
-        <img
-          :src="store.currentNews.coverImage"
-          :alt="store.currentNews.title"
-          class="w-full h-full object-cover"
-        />
-      </div>
-
       <!-- 标题 -->
       <h1 class="font-heading font-light text-[32px] text-brand leading-tight mb-4">
         {{ store.currentNews.title }}

@@ -31,11 +31,11 @@ const goDetail = () => {
 
 <template>
   <div
-    class="group cursor-pointer"
+    class="group cursor-pointer border border-border rounded overflow-hidden hover:border-brand transition-colors"
     @click="goDetail"
   >
     <!-- 图片 -->
-    <div class="aspect-[4/3] bg-[#e8e6e3] rounded overflow-hidden mb-4 flex items-center justify-center">
+    <div class="aspect-[4/3] bg-[#e8e6e3] flex items-center justify-center">
       <img
         v-if="hasImage"
         :src="coverImage"
@@ -51,6 +51,8 @@ const goDetail = () => {
         <span class="text-[11px] font-body opacity-60">暂无图片</span>
       </div>
     </div>
+    <!-- 内容 -->
+    <div class="p-6">
     <!-- 标签 -->
     <span
       v-if="spot.level"
@@ -67,5 +69,6 @@ const goDetail = () => {
     <p class="font-body text-card-desc text-muted line-clamp-2 mb-1">{{ spot.description || '暂无内容...' }}</p>
     <!-- 底部信息 -->
     <p class="font-body text-card-meta text-muted/70">{{ spot.city || '暂无地区信息' }}</p>
+    </div>
   </div>
 </template>

@@ -55,35 +55,25 @@ const goToDetail = (id: number) => {
 
       <LoadingState v-if="store.isLoading" />
       <EmptyState v-else-if="store.newsList.length === 0" message="暂无新闻资讯" />
-      <div v-else class="space-y-6">
+      <div v-else class="space-y-4">
         <article
           v-for="item in store.newsList"
           :key="item.id"
           @click="goToDetail(item.id)"
-          class="flex gap-6 cursor-pointer group"
+          class="border border-border rounded p-6 cursor-pointer group hover:border-accent hover:shadow-md transition-all"
         >
-          <div class="w-48 h-32 flex-shrink-0 bg-light rounded overflow-hidden">
-            <img
-              v-if="item.coverImage"
-              :src="item.coverImage"
-              :alt="item.title"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-            />
-            <div v-else class="w-full h-full bg-light flex items-center justify-center">
-              <span class="text-muted text-xs">无封面</span>
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <h2 class="font-heading text-[15px] text-brand mb-2 group-hover:text-accent transition-colors line-clamp-2">
+                {{ item.title }}
+              </h2>
+              <p class="text-sm text-muted line-clamp-2 leading-relaxed">
+                {{ item.content?.replace(/<[^>]+>/g, '').slice(0, 120) }}...
+              </p>
             </div>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h2 class="font-heading text-[15px] text-brand mb-2 group-hover:text-accent transition-colors line-clamp-2">
-              {{ item.title }}
-            </h2>
-            <p class="text-xs text-muted mb-2">
+            <span class="text-xs text-muted whitespace-nowrap flex-shrink-0 mt-1">
               {{ item.publishTime }}
-            </p>
-            <p class="text-sm text-muted line-clamp-2 leading-relaxed">
-              {{ item.content?.replace(/<[^>]+>/g, '').slice(0, 100) }}...
-            </p>
+            </span>
           </div>
         </article>
       </div>

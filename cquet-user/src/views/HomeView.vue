@@ -81,7 +81,6 @@ onMounted(async () => {
   gsap.fromTo('.hero-subtitle', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.7 })
   gsap.fromTo('.hero-actions', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.9 })
   gsap.fromTo('.section-title', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.2 })
-  animateCountUp()
 })
 
 // Tab 切换后更新 Swiper
@@ -120,15 +119,9 @@ const scrollToAbout = () => {
   document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' })
 }
 
-const countSpots = ref(0)
-const countVenues = ref(0)
-const countActivities = ref(0)
-
-const animateCountUp = () => {
-  gsap.to(countSpots, { value: 294, duration: 1.5, ease: 'power2.out' })
-  gsap.to(countVenues, { value: 38, duration: 1.5, ease: 'power2.out', delay: 0.1 })
-  gsap.to(countActivities, { value: 126, duration: 1.5, ease: 'power2.out', delay: 0.2 })
-}
+const countSpots = computed(() => scenicSpotStore.total)
+const countVenues = computed(() => venueStore.total)
+const countActivities = computed(() => activityStore.total)
 </script>
 
 <template>
@@ -259,15 +252,15 @@ const animateCountUp = () => {
           </p>
           <div class="flex gap-12">
             <div class="border-l-2 border-brand pl-6">
-              <div class="font-heading font-light text-[40px] text-brand leading-none">{{ Math.round(countSpots) }}</div>
+              <div class="font-heading font-light text-[40px] text-brand leading-none">{{ countSpots }}</div>
               <div class="font-body text-nav text-muted mt-1">A级景区</div>
             </div>
             <div class="border-l-2 border-brand pl-6">
-              <div class="font-heading font-light text-[40px] text-brand leading-none">{{ Math.round(countVenues) }}</div>
+              <div class="font-heading font-light text-[40px] text-brand leading-none">{{ countVenues }}</div>
               <div class="font-body text-nav text-muted mt-1">文化场馆</div>
             </div>
             <div class="border-l-2 border-brand pl-6">
-              <div class="font-heading font-light text-[40px] text-brand leading-none">{{ Math.round(countActivities) }}</div>
+              <div class="font-heading font-light text-[40px] text-brand leading-none">{{ countActivities }}</div>
               <div class="font-body text-nav text-muted mt-1">特色活动</div>
             </div>
           </div>
@@ -293,39 +286,39 @@ const animateCountUp = () => {
         <div class="group cursor-pointer" @click="goToList('spots')">
           <div class="aspect-[16/10] bg-border rounded overflow-hidden mb-6">
             <img
-              src="https://images.unsplash.com/photo-1545584429-6642a302c35c?w=600&q=80"
+              src="https://images.unsplash.com/photo-1537531383496-f4749b8032cf?w=600&q=80"
               alt="A级景区"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           </div>
           <h3 class="font-heading text-card-title font-light text-brand mb-3">A级景区</h3>
-          <p class="font-body text-card-desc text-muted leading-[1.6]">从5A到1A，重庆294个A级景区覆盖自然景观、历史遗迹、主题乐园等多种类型。</p>
+          <p class="font-body text-card-desc text-muted leading-[1.6]">从5A到1A，重庆{{ scenicSpotStore.total || '—' }}个A级景区覆盖自然景观、历史遗迹、主题乐园等多种类型。</p>
           <span class="inline-block mt-4 font-body text-nav text-brand border-b border-brand pb-0.5 group-hover:text-muted group-hover:border-muted transition-all">浏览景区 →</span>
         </div>
         <!-- 文化场馆 -->
         <div class="group cursor-pointer" @click="goToList('venues')">
           <div class="aspect-[16/10] bg-border rounded overflow-hidden mb-6">
             <img
-              src="https://images.unsplash.com/photo-1565803974275-dccd2f933cbb?w=600&q=80"
+              src="https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&q=80"
               alt="文化场馆"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           </div>
           <h3 class="font-heading text-card-title font-light text-brand mb-3">文化场馆</h3>
-          <p class="font-body text-card-desc text-muted leading-[1.6]">博物馆、图书馆、体育馆、剧院——38个文化体育设施，满足你的不同需求。</p>
+          <p class="font-body text-card-desc text-muted leading-[1.6]">博物馆、图书馆、体育馆、剧院——{{ venueStore.total || '—' }}个文化体育设施，满足你的不同需求。</p>
           <span class="inline-block mt-4 font-body text-nav text-brand border-b border-brand pb-0.5 group-hover:text-muted group-hover:border-muted transition-all">浏览场馆 →</span>
         </div>
         <!-- 特色活动 -->
         <div class="group cursor-pointer" @click="goToList('activities')">
           <div class="aspect-[16/10] bg-border rounded overflow-hidden mb-6">
             <img
-              src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&q=80"
+              src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80"
               alt="特色活动"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           </div>
           <h3 class="font-heading text-card-title font-light text-brand mb-3">特色活动</h3>
-          <p class="font-body text-card-desc text-muted leading-[1.6]">川剧变脸、书法课堂、马拉松、文化节——126个特色活动等你参与。</p>
+          <p class="font-body text-card-desc text-muted leading-[1.6]">川剧变脸、书法课堂、马拉松、文化节——{{ activityStore.total || '—' }}个特色活动等你参与。</p>
           <span class="inline-block mt-4 font-body text-nav text-brand border-b border-brand pb-0.5 group-hover:text-muted group-hover:border-muted transition-all">浏览活动 →</span>
         </div>
       </div>
@@ -350,23 +343,12 @@ const animateCountUp = () => {
               v-for="item in newsStore.newsList"
               :key="item.id"
               @click="router.push(`/news/${item.id}`)"
-              class="flex gap-4 cursor-pointer group"
+              class="border-l-2 border-border pl-4 cursor-pointer group hover:border-accent transition-colors"
             >
-              <div class="w-20 h-16 flex-shrink-0 bg-border rounded overflow-hidden">
-                <img
-                  v-if="item.coverImage"
-                  :src="item.coverImage"
-                  :alt="item.title"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="font-heading text-[13px] text-brand group-hover:text-accent transition-colors line-clamp-2 leading-snug">
-                  {{ item.title }}
-                </h3>
-                <p class="text-xs text-muted mt-1">{{ item.publishTime }}</p>
-              </div>
+              <h3 class="font-heading text-[13px] text-brand group-hover:text-accent transition-colors line-clamp-2 leading-snug">
+                {{ item.title }}
+              </h3>
+              <p class="text-xs text-muted mt-1">{{ item.publishTime }}</p>
             </article>
           </div>
           <EmptyState v-else-if="newsStore.isLoading === false" message="暂无资讯" />

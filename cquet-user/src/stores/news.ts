@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { listNews, getNews } from '@/api/news'
+import { imgUrl } from '@/utils/imgUrl'
 
 export const useNewsStore = defineStore('news', () => {
   const newsList = ref<any[]>([])
@@ -14,7 +15,13 @@ export const useNewsStore = defineStore('news', () => {
     error.value = false
     try {
       const res: any = await listNews(query)
-      newsList.value = res.rows || res.data?.rows || []
+      const list: any[] = res.rows || res.data?.rows || []
+      newsList.value = list.map(n => ({
+        ...n,
+        coverImage: n.coverImage ? imgUrl(n.coverImage) : '',
+        // 兼容不同字段名
+        publishTime: n.publishTime || n.createTime || ''
+      }))
       total.value = res.total || res.data?.total || 0
     } catch {
       error.value = true
@@ -28,7 +35,8 @@ export const useNewsStore = defineStore('news', () => {
     error.value = false
     try {
       const res: any = await getNews(id)
-      currentNews.value = res.data || res
+      const data = res.data || res
+      currentNews.value = data ? { ...data, coverImage: data.coverImage ? imgUrl(data.coverImage) : '' } : null
     } catch {
       error.value = true
     } finally {

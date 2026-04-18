@@ -5,6 +5,7 @@ import { login as loginApi, getInfo as getInfoApi } from '@/api/auth'
 import type { LoginParams } from '@/api/auth'
 
 export const useAuthStore = defineStore('auth', () => {
+  const router = useRouter()
   const token = ref<string | null>(localStorage.getItem('token'))
   const userInfo = ref<any>(null)
 
@@ -38,8 +39,6 @@ export const useAuthStore = defineStore('auth', () => {
     userInfo.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('userInfo')
-    // 在 store 内部调用 useRouter 会拿到正确的 router 实例
-    const router = useRouter()
     router.push('/')
   }
 
@@ -54,7 +53,6 @@ export const useAuthStore = defineStore('auth', () => {
       }
     } catch {
       // token invalid — logout and redirect to login
-      const router = useRouter()
       token.value = null
       userInfo.value = null
       localStorage.removeItem('token')
