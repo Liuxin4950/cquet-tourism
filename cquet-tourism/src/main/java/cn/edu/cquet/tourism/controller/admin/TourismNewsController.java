@@ -1,6 +1,5 @@
-package cn.edu.cquet.tourism.controller;
+package cn.edu.cquet.tourism.controller.admin;
 
-import cn.edu.cquet.common.annotation.Anonymous;
 import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
 import cn.edu.cquet.common.core.page.TableDataInfo;
@@ -32,7 +31,6 @@ public class TourismNewsController extends BaseController {
     @Autowired
     private TourismNewsService tourismNewsService;
 
-    @Anonymous
     @GetMapping("/list")
     @Operation(summary = "获取新闻列表")
     /**
@@ -48,7 +46,6 @@ public class TourismNewsController extends BaseController {
         return getDataTable(list);
     }
 
-    @Anonymous
     @GetMapping("/{id}")
     @Operation(summary = "获取新闻信息")
     /**

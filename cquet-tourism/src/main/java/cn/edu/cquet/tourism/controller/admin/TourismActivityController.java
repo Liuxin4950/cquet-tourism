@@ -1,6 +1,5 @@
-package cn.edu.cquet.tourism.controller;
+package cn.edu.cquet.tourism.controller.admin;
 
-import cn.edu.cquet.common.annotation.Anonymous;
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
@@ -34,7 +33,6 @@ public class TourismActivityController extends BaseController {
     @Autowired
     private TourismActivityApprovalService approvalService;
 
-    @Anonymous
     @GetMapping("/list")
     @Operation(summary = "活动列表（含审核状态筛选）")
     /**
@@ -54,7 +52,6 @@ public class TourismActivityController extends BaseController {
         return getDataTable(vos);
     }
 
-    @Anonymous
     @GetMapping("/{id}")
     @Operation(summary = "活动详情")
     /**

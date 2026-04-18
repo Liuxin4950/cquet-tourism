@@ -22,13 +22,13 @@ export interface VenueQuery {
 }
 
 export const listVenue = (query: VenueQuery) => {
-  return request.get<any, any>('/tourism/venue/list', { params: query })
+  return request.get<any, any>('/web/tourism/venue/list', { params: query })
 }
 
 export const getVenue = (id: number) => {
-  return request.get<any, any>(`/tourism/venue/${id}`)
+  return request.get<any, any>(`/web/tourism/venue/${id}`)
 }
 
 export const listVenueImages = (id: number) => {
-  return request.get<any, any>(`/tourism/venue/${id}/images`)
+  return request.get<any, any>(`/web/tourism/venue/${id}/images`)
 }

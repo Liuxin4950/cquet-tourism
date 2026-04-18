@@ -19,17 +19,13 @@ export interface ActivityQuery {
   pageSize: number
   name?: string
   venueId?: number
-  status?: string
+  auditStatus?: string
 }
 
 export const listActivity = (query: ActivityQuery) => {
-  return request.get<any, any>('/tourism/activity/list', { params: query })
+  return request.get<any, any>('/web/tourism/activity/list', { params: query })
 }
 
 export const getActivity = (id: number) => {
-  return request.get<any, any>(`/tourism/activity/${id}`)
-}
-
-export const applyActivity = (data: { activityId: number; userId?: number; remark?: string }) => {
-  return request.post<any, any>('/tourism/activity-approval', data)
+  return request.get<any, any>(`/web/tourism/activity/${id}`)
 }

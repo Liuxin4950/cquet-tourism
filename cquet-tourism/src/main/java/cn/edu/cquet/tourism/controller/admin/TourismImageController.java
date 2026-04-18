@@ -1,4 +1,4 @@
-package cn.edu.cquet.tourism.controller;
+package cn.edu.cquet.tourism.controller.admin;
 
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.core.controller.BaseController;

@@ -1,20 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import NavBar from '@/components/layout/NavBar.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import { useActivityStore } from '@/stores/activity'
-import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{ id: string }>()
 const store = useActivityStore()
-const authStore = useAuthStore()
 const route = useRoute()
-const remark = ref('')
-const applyStatus = ref<'idle' | 'submitting' | 'submitted' | 'error'>('idle')
-const applyErrorMsg = ref('')
 
 onMounted(() => {
   const activityId = Number(props.id || route.params.id)
@@ -24,23 +19,6 @@ onMounted(() => {
 const handleRetry = () => {
   const activityId = Number(props.id || route.params.id)
   store.fetchActivityDetail(activityId)
-}
-
-const handleApply = async () => {
-  if (!authStore.isAuthenticated()) {
-    applyErrorMsg.value = '请先登录'
-    return
-  }
-  const activityId = Number(props.id || route.params.id)
-  applyStatus.value = 'submitting'
-  applyErrorMsg.value = ''
-  const result = await store.apply({ activityId, remark: remark.value })
-  if (result.ok) {
-    applyStatus.value = 'submitted'
-  } else {
-    applyStatus.value = 'error'
-    applyErrorMsg.value = result.msg || '报名失败，请稍后重试'
-  }
 }
 </script>
 
@@ -79,61 +57,20 @@ const handleApply = async () => {
           </div>
           <div class="min-h-[48px]">
             <span class="text-muted block mb-1">活动类型</span>
-            <span class="text-brand">{{ store.currentActivity.type || '暂无类型' }}</span>
+            <span class="text-brand">{{ store.currentActivity.type || store.currentActivity.category || '暂无类型' }}</span>
           </div>
           <div class="min-h-[48px]">
-            <span class="text-muted block mb-1">报名人数</span>
+            <span class="text-muted block mb-1">参与人数</span>
             <span class="text-brand">{{ store.currentActivity.currentParticipants || 0 }} / {{ store.currentActivity.capacity || '暂无' }}</span>
           </div>
         </div>
       </div>
 
-      <!-- 报名区 -->
       <div class="bg-dark border border-border rounded-lg p-6 max-w-lg">
-        <h3 class="font-montserrat font-bold text-brand mb-4">立即报名</h3>
-
-        <!-- 已提交待审核状态 -->
-        <div v-if="applyStatus === 'submitted'" class="text-center py-4">
-          <div class="w-12 h-12 bg-[#105670]/20 rounded-full flex items-center justify-center mx-auto mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#105670]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <p class="font-heading text-[16px] text-brand mb-1">报名已提交</p>
-          <p class="text-xs text-muted">请等待管理员审核，审核结果将通过站内消息通知</p>
-        </div>
-
-        <!-- 提交中状态 -->
-        <div v-else-if="applyStatus === 'submitting'" class="text-center py-4">
-          <p class="text-sm text-muted">提交中...</p>
-        </div>
-
-        <!-- 错误状态 -->
-        <div v-else-if="applyStatus === 'error'">
-          <p class="text-red-400 text-xs mb-3">{{ applyErrorMsg }}</p>
-          <button
-            @click="handleApply"
-            class="w-full bg-brand text-brand py-3 text-xs font-montserrat tracking-wider rounded hover:bg-brand-light transition-colors"
-          >
-            重新提交
-          </button>
-        </div>
-
-        <!-- 报名表单 -->
-        <div v-else>
-          <textarea
-            v-model="remark"
-            placeholder="备注信息（选填）"
-            class="w-full bg-dark border border-border text-brand px-4 py-3 rounded text-sm mb-4 focus:border-brand outline-none resize-none"
-            rows="3"
-          ></textarea>
-          <button
-            @click="handleApply"
-            class="w-full bg-brand text-white py-3 text-xs font-montserrat tracking-wider rounded hover:bg-brand-light transition-colors"
-          >
-            提交报名
-          </button>
-        </div>
+        <h3 class="font-montserrat font-bold text-brand mb-4">功能规划</h3>
+        <p class="text-sm text-muted leading-7">
+          当前用户端仅提供活动展示与信息查询。后续接入 Python 智能体后，登录用户可基于站内数据获得路线规划与个性化推荐，并按使用次数进行控制。
+        </p>
       </div>
     </div>
   </div>

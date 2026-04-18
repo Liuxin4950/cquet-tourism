@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { listActivity, getActivity, applyActivity } from '@/api/activity'
+import { listActivity, getActivity } from '@/api/activity'
 import { imgUrl } from '@/utils/imgUrl'
 
 export const useActivityStore = defineStore('activity', () => {
@@ -48,17 +48,5 @@ export const useActivityStore = defineStore('activity', () => {
     }
   }
 
-  const apply = async (data: { activityId: number; userId?: number; remark?: string }) => {
-    try {
-      const res: any = await applyActivity(data)
-      if (res.code === 200 || res.code === 0) {
-        return { ok: true }
-      }
-      return { ok: false, code: res.code, msg: res.msg }
-    } catch (e: any) {
-      return { ok: false, code: e.response?.status, msg: e.response?.data?.msg }
-    }
-  }
-
-  return { activities, currentActivity, total, isLoading, error, fetchActivities, fetchActivityDetail, apply }
+  return { activities, currentActivity, total, isLoading, error, fetchActivities, fetchActivityDetail }
 })

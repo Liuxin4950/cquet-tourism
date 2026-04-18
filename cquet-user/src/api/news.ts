@@ -18,9 +18,9 @@ export interface NewsQuery {
 }
 
 export const listNews = (query: NewsQuery) => {
-  return request.get<any, any>('/tourism/news/list', { params: query })
+  return request.get<any, any>('/web/tourism/news/list', { params: query })
 }
 
 export const getNews = (id: number) => {
-  return request.get<any, any>(`/tourism/news/${id}`)
+  return request.get<any, any>(`/web/tourism/news/${id}`)
 }

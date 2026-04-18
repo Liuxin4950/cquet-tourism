@@ -22,13 +22,13 @@ export interface ScenicSpotQuery {
 }
 
 export const listScenicSpot = (query: ScenicSpotQuery) => {
-  return request.get<any, any>('/tourism/scenic-spot/list', { params: query })
+  return request.get<any, any>('/web/tourism/scenic-spot/list', { params: query })
 }
 
 export const getScenicSpot = (id: number) => {
-  return request.get<any, any>(`/tourism/scenic-spot/${id}`)
+  return request.get<any, any>(`/web/tourism/scenic-spot/${id}`)
 }
 
 export const listScenicSpotImages = (id: number) => {
-  return request.get<any, any>(`/tourism/scenic-spot/${id}/images`)
+  return request.get<any, any>(`/web/tourism/scenic-spot/${id}/images`)
 }

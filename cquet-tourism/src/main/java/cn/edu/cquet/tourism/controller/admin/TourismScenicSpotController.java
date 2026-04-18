@@ -1,4 +1,4 @@
-package cn.edu.cquet.tourism.controller;
+package cn.edu.cquet.tourism.controller.admin;
 
 import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
@@ -6,14 +6,12 @@ import cn.edu.cquet.common.core.page.TableDataInfo;
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import cn.edu.cquet.tourism.domain.vo.TourismScenicSpotQueryVo;
 import cn.edu.cquet.tourism.service.TourismScenicSpotService;
-import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import cn.edu.cquet.common.annotation.Anonymous;
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.vo.ScenicSpotDetailVo;
@@ -40,7 +38,6 @@ public class TourismScenicSpotController extends BaseController {
     @Autowired
     private TourismScenicSpotService tourismScenicSpotService;
 
-    @Anonymous
     @GetMapping("/list")
     @Operation(summary = "获取景区列表")
     /**
@@ -59,7 +56,6 @@ public class TourismScenicSpotController extends BaseController {
         return getDataTable(list);
     }
 
-    @Anonymous
     @GetMapping("/{id}")
     @Operation(summary = "获取景区信息")
     /**
@@ -79,7 +75,6 @@ public class TourismScenicSpotController extends BaseController {
     }
 
 
-    @Anonymous
     @GetMapping("/{id}/images")
     @Operation(summary = "查看当前景区的关联图片列表")
     public Result spotImages(@PathVariable Long id) {

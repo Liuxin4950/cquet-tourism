@@ -16,9 +16,9 @@ export interface NoticeQuery {
 }
 
 export const listNotice = (query: NoticeQuery) => {
-  return request.get<any, any>('/tourism/notice/list', { params: query })
+  return request.get<any, any>('/web/tourism/notice/list', { params: query })
 }
 
 export const getNotice = (id: number) => {
-  return request.get<any, any>(`/tourism/notice/${id}`)
+  return request.get<any, any>(`/web/tourism/notice/${id}`)
 }

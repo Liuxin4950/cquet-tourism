@@ -1,4 +1,4 @@
-package cn.edu.cquet.tourism.controller;
+package cn.edu.cquet.tourism.controller.admin;
 
 import cn.edu.cquet.common.core.controller.BaseController;
 import cn.edu.cquet.common.core.domain.Result;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import cn.edu.cquet.common.annotation.Anonymous;
 import cn.edu.cquet.common.annotation.Log;
 import cn.edu.cquet.common.enums.BusinessType;
 import cn.edu.cquet.tourism.domain.vo.VenueDetailVo;
@@ -43,7 +42,6 @@ public class tourismVenueController extends BaseController {
     @Autowired
     private cn.edu.cquet.tourism.service.TourismActivityApprovalService approvalService;
 
-    @Anonymous
     @GetMapping("/list")
     @Operation(summary = "获取场馆列表")
     /**
@@ -63,7 +61,6 @@ public class tourismVenueController extends BaseController {
         return getDataTable(list);
     }
 
-    @Anonymous
     @GetMapping("/{id}")
     @Operation(summary = "获取场馆信息")
     /**
@@ -140,7 +137,6 @@ public class tourismVenueController extends BaseController {
         return toAjax(tourismVenueService.removeVenueByIds(ids));
     }
 
-    @Anonymous
     @GetMapping("/{id}/activities")
     @Operation(summary = "查看当前场馆的特色活动列表")
     /**
@@ -171,7 +167,6 @@ public class tourismVenueController extends BaseController {
     }
 
 
-    @Anonymous
     @GetMapping("/{id}/images")
     @Operation(summary = "查看当前场馆的关联图片列表")
     public Result venueImages(@PathVariable Long id) {

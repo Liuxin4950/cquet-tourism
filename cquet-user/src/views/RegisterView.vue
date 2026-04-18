@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import request from '@/api/request'
+import { register as registerApi } from '@/api/auth'
 import { useToast } from '@/composables/useToast'
 import AnimatedCharacters from '@/components/ui/AnimatedCharacters.vue'
 import InteractiveHoverButton from '@/components/ui/InteractiveHoverButton.vue'
@@ -53,7 +53,7 @@ const handleRegister = async () => {
   }, 2000)
   isLoading.value = true
   try {
-    const res: any = await request.post('/register', {
+    const res: any = await registerApi({
       username: username.value,
       password: password.value,
     })
