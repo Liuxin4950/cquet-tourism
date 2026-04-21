@@ -18,9 +18,9 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "旅游新闻") // 描述
 public class TourismNews extends AbsEntity {
 
-    @Schema(description = "主键，整型")
+    @Schema(description = "主键")
     @TableId(type = IdType.AUTO) // 主键自增
-    private Integer id;
+    private Long id;
 
     @TableField("title")
     @Schema(description = "新闻标题")
@@ -37,5 +37,9 @@ public class TourismNews extends AbsEntity {
     @Schema(description = "作者")
     @Xss(message = "作者不能包含脚本")
     private String author;
+
+    @TableField("cover_image_id")
+    @Schema(description = "封面图片ID")
+    private Long coverImageId;
 
 }

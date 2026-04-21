@@ -59,7 +59,7 @@ class TourismActivityServiceTest {
         testActivity.setId(1L);
         testActivity.setName("川剧变脸表演");
         testActivity.setCategory("文艺演出");
-        testActivity.setVenueId(1);
+        testActivity.setVenueId(Long.valueOf(1L));
         testActivity.setStartTime(LocalDateTime.of(2026, 4, 1, 10, 0));
         testActivity.setEndTime(LocalDateTime.of(2026, 4, 1, 12, 0));
         testActivity.setStatus("0");
@@ -182,7 +182,7 @@ class TourismActivityServiceTest {
         @DisplayName("不同场馆时间段重叠不冲突：venueId=1 vs venueId=2")
         void create_Success_WhenDifferentVenue() {
             // given: 场馆 2，10:00-12:00（与 testActivity 相同时间段）
-            testActivity.setVenueId(2);
+            testActivity.setVenueId(Long.valueOf(2L));
 
             when(activityMapper.selectCount(any(LambdaQueryWrapper.class)))
                     .thenReturn(0L)   // 名称检查

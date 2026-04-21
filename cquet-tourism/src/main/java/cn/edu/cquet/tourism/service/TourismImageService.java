@@ -8,6 +8,8 @@ import java.util.List;
 public interface TourismImageService extends IService<TourismImage> {
     TourismImage create(TourismImage image);
     List<TourismImage> createBatch(List<String> urls);
-    TourismImage getById(Integer id);
-    boolean removeByIds(List<Integer> ids);
+    TourismImage getById(Long id);
+    boolean removeByIds(List<Long> ids);
+    TourismImage ensureByUrl(String url);
+    java.util.Map<Long, TourismImage> getImageMap(java.util.Collection<Long> ids);
 }

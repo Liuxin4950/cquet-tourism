@@ -18,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("tourism/activity-approval")
@@ -34,13 +35,16 @@ public class TourismActivityApprovalController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "待审核活动列表")
     public TableDataInfo list(@RequestParam(required = false) String name,
-                              @RequestParam(required = false) Integer venueId,
+                              @RequestParam(required = false) Long venueId,
                               @RequestParam(required = false) String auditStatus) {
         startPage();
         java.util.List<TourismActivity> list = activityService.list(name, venueId, auditStatus);
+        Map<Long, TourismActivityApproval> latestMap = approvalService.latestByActivityIds(
+                list.stream().map(TourismActivity::getId).toList()
+        );
         java.util.List<TourismActivityVo> vos = new java.util.ArrayList<>(list.size());
         for (TourismActivity a : list) {
-            vos.add(toVo(a));
+            vos.add(toVo(a, latestMap.get(a.getId())));
         }
         return getDataTable(vos);
     }
@@ -78,13 +82,16 @@ public class TourismActivityApprovalController extends BaseController {
         return toAjax(approvalService.reject(id, r));
     }
 
-    private TourismActivityVo toVo(TourismActivity a) {
+    private TourismActivityVo toVo(TourismActivity a, TourismActivityApproval latest) {
         TourismActivityVo vo = new TourismActivityVo();
         BeanUtils.copyProperties(a, vo);
-        java.util.List<TourismActivityApproval> h = approvalService.history(a.getId());
-        TourismActivityApproval latest = (h == null || h.isEmpty()) ? null : h.get(0);
-        if (latest == null) { vo.setAuditStatus("0"); }
-        else { vo.setAuditStatus(latest.getAuditStatus()); vo.setAuditReason(latest.getReason()); vo.setAuditor(latest.getAuditor()); vo.setAuditTime(latest.getAuditTime()); }
+        vo.setAuditStatus(a.getAuditStatus() != null ? a.getAuditStatus() : "0");
+        if (latest != null) {
+            vo.setAuditStatus(latest.getAuditStatus());
+            vo.setAuditReason(latest.getReason());
+            vo.setAuditor(latest.getAuditor());
+            vo.setAuditTime(latest.getAuditTime());
+        }
         return vo;
     }
 }

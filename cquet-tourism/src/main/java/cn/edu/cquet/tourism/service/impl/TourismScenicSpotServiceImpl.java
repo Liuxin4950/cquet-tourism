@@ -18,7 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -40,6 +44,9 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
 
     @Autowired
     private TourismImageMapper imageMapper; // 图片表
+
+    @Autowired
+    private cn.edu.cquet.tourism.service.TourismImageService imageService; // 图片服务
 
 
     @Override
@@ -65,7 +72,9 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
                 .eq(TourismScenicSpot::getDelFlag, "0")
                 // 创建时间倒序，保证最新记录优先
                 .orderByDesc(TourismScenicSpot::getCreateTime);
-        return tourismScenicSpotMapper.selectList(queryWrapper); // 执行查询并返回列表
+        List<TourismScenicSpot> spots = tourismScenicSpotMapper.selectList(queryWrapper); // 执行查询并返回列表
+        hydrateCoverImages(spots);
+        return spots;
     }
 
     @Override
@@ -81,15 +90,20 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         if (!list.isEmpty()) { // 若存在同名记录
             throw new ServiceException("景区名称已存在");
         }
+        resolveCoverImageReference(scenicSpot);
         int inserted = tourismScenicSpotMapper.insert(scenicSpot); // 插入主表数据
         if (inserted <= 0) return false; // 插入失败直接返回
         // 处理图片关联：若前端传递 imageIds，则建立关联关系
         if (scenicSpot.getImageIds() != null && !scenicSpot.getImageIds().isEmpty()) {
-            for (Integer imageId : scenicSpot.getImageIds()) { // 遍历图片ID列表
+            int sortOrder = 0;
+            for (Long imageId : scenicSpot.getImageIds()) { // 遍历图片ID列表
                 TourismScenicSpotImage rel = new TourismScenicSpotImage(); // 创建关联实体
-                rel.setScenicSpotId(scenicSpot.getId().intValue()); // 绑定景区ID
+                rel.setScenicSpotId(scenicSpot.getId()); // 绑定景区ID
                 rel.setImageId(imageId); // 绑定图片ID
+                rel.setSortOrder(sortOrder);
+                rel.setIsCover(sortOrder == 0 ? "1" : "0");
                 scenicSpotImageMapper.insert(rel); // 插入关联记录
+                sortOrder++;
             }
         }
         return true; // 成功
@@ -115,18 +129,23 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
             log.error("该景区已存在");
             return false;
         }
+        resolveCoverImageReference(scenicSpot);
         int updated = tourismScenicSpotMapper.updateById(scenicSpot); // 更新主表
         if (updated <= 0) return false; // 更新失败
         // 处理图片关联：若提供 imageIds，则重建关联（先删后插）
         if (scenicSpot.getImageIds() != null) {
             LambdaQueryWrapper<TourismScenicSpotImage> del = new LambdaQueryWrapper<>(); // 删除条件
-            del.eq(TourismScenicSpotImage::getScenicSpotId, scenicSpot.getId().intValue()); // 关联景区ID
+            del.eq(TourismScenicSpotImage::getScenicSpotId, scenicSpot.getId()); // 关联景区ID
             scenicSpotImageMapper.delete(del); // 删除旧关联
-            for (Integer imageId : scenicSpot.getImageIds()) { // 重建关联
+            int sortOrder = 0;
+            for (Long imageId : scenicSpot.getImageIds()) { // 重建关联
                 TourismScenicSpotImage rel = new TourismScenicSpotImage();
-                rel.setScenicSpotId(scenicSpot.getId().intValue());
+                rel.setScenicSpotId(scenicSpot.getId());
                 rel.setImageId(imageId);
+                rel.setSortOrder(sortOrder);
+                rel.setIsCover(sortOrder == 0 ? "1" : "0");
                 scenicSpotImageMapper.insert(rel);
+                sortOrder++;
             }
         }
         return true; // 成功
@@ -145,7 +164,7 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         }
         // 删除图片关联（中间表）
         LambdaQueryWrapper<TourismScenicSpotImage> del = new LambdaQueryWrapper<>();
-        del.in(TourismScenicSpotImage::getScenicSpotId, ids.stream().map(Long::intValue).collect(java.util.stream.Collectors.toList())); // scenic_spot_id IN (ids)
+        del.in(TourismScenicSpotImage::getScenicSpotId, ids); // scenic_spot_id IN (ids)
         scenicSpotImageMapper.delete(del); // 执行删除
         // 删除主表（批量按主键）
         boolean ok = tourismScenicSpotMapper.deleteBatchIds(ids) > 0; // 返回是否删除成功
@@ -162,7 +181,9 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
             log.error("查询时，id不能为空");
             return null;
         }
-        return tourismScenicSpotMapper.selectById(id); // 主键查询
+        TourismScenicSpot spot = tourismScenicSpotMapper.selectById(id); // 主键查询
+        hydrateCoverImages(spot == null ? java.util.Collections.emptyList() : java.util.Collections.singletonList(spot));
+        return spot;
     }
 
     @Override
@@ -179,12 +200,15 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         // TourismScenicSpotImage：图片关联表
         LambdaQueryWrapper<TourismScenicSpotImage> q = new LambdaQueryWrapper<>(); // 查询关联关系
         // intValue() 强转成 int
-        q.eq(TourismScenicSpotImage::getScenicSpotId, spot.getId().intValue()); // scenic_spot_id=当前ID
+        q.eq(TourismScenicSpotImage::getScenicSpotId, spot.getId()) // scenic_spot_id=当前ID
+         .orderByDesc(TourismScenicSpotImage::getIsCover)
+         .orderByAsc(TourismScenicSpotImage::getSortOrder)
+         .orderByAsc(TourismScenicSpotImage::getId);
         List<TourismScenicSpotImage> rels = scenicSpotImageMapper.selectList(q); // 取出所有关联记录
         if (!rels.isEmpty()) { // 若存在关联
-            // 将获取的rels数组转换为流，映射为图片ID存储到imageIds中
-            List<Integer> imageIds = rels.stream().map(TourismScenicSpotImage::getImageId).collect(java.util.stream.Collectors.toList()); // 提取图片ID列表
-            List<TourismImage> images = imageMapper.selectBatchIds(imageIds); // 批量查询图片
+            List<Long> imageIds = rels.stream().map(TourismScenicSpotImage::getImageId).collect(Collectors.toList()); // 提取图片ID列表
+            Map<Long, TourismImage> imageMap = imageService.getImageMap(imageIds);
+            List<TourismImage> images = imageIds.stream().map(imageMap::get).filter(Objects::nonNull).collect(Collectors.toList());
             vo.setImages(images); // 设置到 VO
         }
         return vo; // 返回详情
@@ -196,35 +220,77 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
     @Override
     public List<TourismImage> getImagesByScenicSpot(Long scenicSpotId) {
         LambdaQueryWrapper<TourismScenicSpotImage> qw = new LambdaQueryWrapper<>();
-        qw.eq(TourismScenicSpotImage::getScenicSpotId, scenicSpotId.intValue());
+        qw.eq(TourismScenicSpotImage::getScenicSpotId, scenicSpotId)
+          .orderByDesc(TourismScenicSpotImage::getIsCover)
+          .orderByAsc(TourismScenicSpotImage::getSortOrder)
+          .orderByAsc(TourismScenicSpotImage::getId);
         List<TourismScenicSpotImage> rels = scenicSpotImageMapper.selectList(qw);
         if (rels.isEmpty()) return java.util.Collections.emptyList();
-        java.util.List<Integer> imageIds = rels.stream().map(TourismScenicSpotImage::getImageId).collect(java.util.stream.Collectors.toList());
-        return imageMapper.selectBatchIds(imageIds);
+        java.util.List<Long> imageIds = rels.stream().map(TourismScenicSpotImage::getImageId).collect(Collectors.toList());
+        Map<Long, TourismImage> imageMap = imageService.getImageMap(imageIds);
+        return imageIds.stream().map(imageMap::get).filter(Objects::nonNull).collect(Collectors.toList());
     }
     // 说明：
     // - 按景区ID查询关联图片，返回图片列表。
     // - 若不存在关联记录，返回空列表。
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean setImagesForScenicSpot(Long scenicSpotId, java.util.List<Integer> imageIds) {
-        if (scenicSpotId == null || imageIds == null) { // 基本校验
-            log.error("设置关联图片时，景区ID或图片ID不能为空");
+    public boolean setImagesForScenicSpot(Long scenicSpotId, java.util.List<Long> imageIds) {
+        if (scenicSpotId == null) { // 基本校验
+            log.error("设置关联图片时，景区ID不能为空");
             return false;
         }
         LambdaQueryWrapper<TourismScenicSpotImage> del = new LambdaQueryWrapper<>();
-        del.eq(TourismScenicSpotImage::getScenicSpotId, scenicSpotId.intValue());
+        del.eq(TourismScenicSpotImage::getScenicSpotId, scenicSpotId);
         scenicSpotImageMapper.delete(del);
         if (imageIds != null) {
             int sort = 0;
-            for (Integer imgId : imageIds) {
+            for (Long imgId : imageIds) {
                 TourismScenicSpotImage rel = new TourismScenicSpotImage();
-                rel.setScenicSpotId(scenicSpotId.intValue());
+                rel.setScenicSpotId(scenicSpotId);
                 rel.setImageId(imgId);
-                rel.setSort(sort++);
+                rel.setSortOrder(sort);
+                rel.setIsCover(sort == 0 ? "1" : "0");
                 scenicSpotImageMapper.insert(rel);
+                sort++;
             }
         }
         return true;
+    }
+
+    private void resolveCoverImageReference(TourismScenicSpot scenicSpot) {
+        if (scenicSpot == null) {
+            return;
+        }
+        if (org.springframework.util.StringUtils.hasText(scenicSpot.getCoverImage())) {
+            TourismImage image = imageService.ensureByUrl(scenicSpot.getCoverImage());
+            scenicSpot.setCoverImageId(image != null ? image.getId() : null);
+        } else if (scenicSpot.getCoverImageId() == null) {
+            scenicSpot.setCoverImageId(null);
+        }
+    }
+
+    private void hydrateCoverImages(Collection<TourismScenicSpot> scenicSpots) {
+        if (scenicSpots == null || scenicSpots.isEmpty()) {
+            return;
+        }
+        List<Long> coverImageIds = scenicSpots.stream()
+                .map(TourismScenicSpot::getCoverImageId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        if (coverImageIds.isEmpty()) {
+            return;
+        }
+        Map<Long, TourismImage> imageMap = imageService.getImageMap(coverImageIds);
+        for (TourismScenicSpot scenicSpot : scenicSpots) {
+            if (scenicSpot.getCoverImageId() == null) {
+                continue;
+            }
+            TourismImage image = imageMap.get(scenicSpot.getCoverImageId());
+            if (image != null && org.springframework.util.StringUtils.hasText(image.getUrl())) {
+                scenicSpot.setCoverImage(image.getUrl());
+            }
+        }
     }
 }

@@ -38,7 +38,7 @@ class TourismImageServiceTest {
     @BeforeEach
     void setUp() {
         testImage = new TourismImage();
-        testImage.setId(1);
+        testImage.setId(Long.valueOf(1L));
         testImage.setUrl("https://example.com/image.jpg");
     }
 

@@ -1,17 +1,14 @@
 package cn.edu.cquet.tourism.domain;
 
-import cn.edu.cquet.common.annotation.Excel;
 import cn.edu.cquet.common.core.domain.abs.AbsEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.apache.poi.hpsf.Decimal;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,9 +27,9 @@ import java.util.List;
  * - 业务层通过 `imageIds`、`facilitiesIds` 辅助批量绑定关联。
  */
 public class TourismVenue extends AbsEntity {
-    @Schema(description = "主键，整型")
+    @Schema(description = "主键")
     @TableId(type = IdType.AUTO) // 主键自增
-    private Integer id;
+    private Long id;
 
     @Schema(description = "场馆名称")
     @Size(min = 2, max = 20, message = "场馆名称长度不能小于2位或大于20位")
@@ -44,6 +41,10 @@ public class TourismVenue extends AbsEntity {
     @Schema(description = "场馆封面图片")
     @TableField("cover_image")
     private String coverImage;
+
+    @Schema(description = "场馆封面图片ID")
+    @TableField("cover_image_id")
+    private Long coverImageId;
 
     @Schema(description = "门票价格")
     // Decimal: BigDecimal，常用于金融，高精度计算
@@ -99,10 +100,10 @@ public class TourismVenue extends AbsEntity {
     private String status;
 
     @TableField(exist = false)
-    private List<Integer> imageIds;
+    private List<Long> imageIds;
 
     // 说明：
     // - 场馆设施ID列表，用于批量绑定关联。暂未开发
     @TableField(exist = false)
-    private List<Integer> facilitiesIds;
+    private List<Long> facilitiesIds;
 }

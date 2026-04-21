@@ -1,133 +1,294 @@
 <template>
-  <div class="dashboard-container">
-    <!-- 统计卡片区域 -->
-    <el-row :gutter="20" class="stat-cards">
-      <el-col :xs="12" :sm="8" :md="6">
-        <div class="stat-card scenic">
-          <div class="stat-icon">
-            <i class="el-icon-location-outline"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ statistics.scenicCount || 0 }}</div>
-            <div class="stat-label">景区数量</div>
-          </div>
+  <div class="app-container tourism-dashboard">
+    <section class="hero">
+      <div class="hero__content">
+        <div class="hero__eyebrow">Tourism Operations Dashboard</div>
+        <h1 class="hero__title">重庆文旅运营大屏</h1>
+        <p class="hero__desc">
+          这一版不再展示示例数据，景区、场馆、活动趋势和热度排行都直接来自当前管理端真实业务数据。
+        </p>
+        <div class="hero__meta">
+          <span>{{ currentDateText }}</span>
+          <span>{{ dashboardSummary }}</span>
+          <span>{{ mapSummary }}</span>
         </div>
-      </el-col>
-      <el-col :xs="12" :sm="8" :md="6">
-        <div class="stat-card venue">
-          <div class="stat-icon">
-            <i class="el-icon-office-building"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ statistics.venueCount || 0 }}</div>
-            <div class="stat-label">场馆数量</div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="12" :sm="8" :md="6">
-        <div class="stat-card activity">
-          <div class="stat-icon">
-            <i class="el-icon-tickets"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ statistics.activityCount || 0 }}</div>
-            <div class="stat-label">活动数量</div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="12" :sm="8" :md="6">
-        <div class="stat-card pending">
-          <div class="stat-icon">
-            <i class="el-icon-refresh"></i>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ statistics.pendingCount || 0 }}</div>
-            <div class="stat-label">待审核活动</div>
-          </div>
-        </div>
-      </el-col>
-    </el-row>
+      </div>
 
-    <!-- 图表区域 -->
-    <el-row :gutter="20" class="chart-row">
-      <!-- 左侧：重庆地图 -->
-      <el-col :xs="24" :md="12">
-        <div class="chart-container map-container">
-          <div class="chart-header">
-            <span class="chart-title">重庆景区分布</span>
+      <div class="hero__panel">
+        <div class="hero__panel-label">运营焦点</div>
+        <div class="hero__panel-number">{{ statistics.pendingCount || 0 }}</div>
+        <div class="hero__panel-title">待审核活动</div>
+        <p class="hero__panel-tip">{{ pendingTip }}</p>
+        <div class="hero__panel-metrics">
+          <div>
+            <span>热点景区</span>
+            <strong>{{ topHotSpotText }}</strong>
           </div>
-          <div id="mapChart" class="map-chart" v-loading="mapLoading"></div>
+          <div>
+            <span>资源最集中的区县</span>
+            <strong>{{ topDistrictText }}</strong>
+          </div>
         </div>
-      </el-col>
+      </div>
+    </section>
 
-      <!-- 右侧：区县分布柱状图 -->
-      <el-col :xs="24" :md="12">
-        <div class="chart-container">
-          <div class="chart-header">
-            <span class="chart-title">各区县景区数量</span>
-          </div>
-          <div id="districtChart" class="bar-chart" v-loading="chartLoading"></div>
+    <section class="stats-grid">
+      <article
+        v-for="card in metricCards"
+        :key="card.key"
+        class="metric-card"
+        :class="card.theme"
+      >
+        <div class="metric-card__head">
+          <span class="metric-card__label">{{ card.label }}</span>
+          <i :class="card.icon" class="metric-card__icon" />
         </div>
-      </el-col>
-    </el-row>
+        <div class="metric-card__value">{{ card.value }}</div>
+        <div class="metric-card__foot">{{ card.note }}</div>
+      </article>
+    </section>
 
-    <!-- 底部图表区域 -->
-    <el-row :gutter="20" class="chart-row">
-      <!-- 景区热度排行 -->
-      <el-col :xs="24" :md="12">
-        <div class="chart-container">
-          <div class="chart-header">
-            <span class="chart-title">景区热度排行 TOP10</span>
+    <section class="main-grid">
+      <article class="panel panel--wide">
+        <div class="panel__header">
+          <div>
+            <div class="panel__eyebrow">Map View</div>
+            <h3 class="panel__title">资源地图与坐标覆盖</h3>
           </div>
-          <div id="hotSpotChart" class="hot-chart" v-loading="chartLoading"></div>
+          <span class="panel__hint">{{ mapHint }}</span>
         </div>
-      </el-col>
+        <div v-loading="mapLoading" class="panel__body panel__body--chart">
+          <div ref="mapChart" class="chart-surface" :class="{ 'chart-surface--hidden': !hasMapContent }" />
+          <div v-if="!hasMapContent" class="chart-empty">
+            <el-empty :image-size="92" description="暂无可展示的地图数据" />
+          </div>
+        </div>
+      </article>
 
-      <!-- 活动趋势 -->
-      <el-col :xs="24" :md="12">
-        <div class="chart-container">
-          <div class="chart-header">
-            <span class="chart-title">月度活动数量趋势</span>
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <div class="panel__eyebrow">District Distribution</div>
+            <h3 class="panel__title">区县资源分布</h3>
           </div>
-          <div id="trendChart" class="trend-chart" v-loading="chartLoading"></div>
+          <span class="panel__hint">{{ districtDistribution.length }} 个区县有数据</span>
         </div>
-      </el-col>
-    </el-row>
+        <div v-loading="chartLoading" class="panel__body panel__body--chart">
+          <div ref="districtChart" class="chart-surface" :class="{ 'chart-surface--hidden': !hasDistrictData }" />
+          <div v-if="!hasDistrictData" class="chart-empty">
+            <el-empty :image-size="84" description="暂无区县分布数据" />
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <div class="panel__eyebrow">Hot Ranking</div>
+            <h3 class="panel__title">景区热度排行</h3>
+          </div>
+          <span class="panel__hint">按浏览量排序的真实数据</span>
+        </div>
+        <div v-loading="chartLoading" class="panel__body panel__body--chart">
+          <div ref="hotSpotChart" class="chart-surface" :class="{ 'chart-surface--hidden': !hasHotSpotData }" />
+          <div v-if="!hasHotSpotData" class="chart-empty">
+            <el-empty :image-size="84" description="暂无热度排行数据" />
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <div class="panel__eyebrow">Activity Trend</div>
+            <h3 class="panel__title">近 12 个月活动趋势</h3>
+          </div>
+          <span class="panel__hint">{{ trendHint }}</span>
+        </div>
+        <div v-loading="chartLoading" class="panel__body panel__body--chart">
+          <div ref="trendChart" class="chart-surface" :class="{ 'chart-surface--hidden': !hasTrendData }" />
+          <div v-if="!hasTrendData" class="chart-empty">
+            <el-empty :image-size="84" description="暂无活动趋势数据" />
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <div class="panel__eyebrow">Operations Notes</div>
+            <h3 class="panel__title">运营提示</h3>
+          </div>
+        </div>
+        <div class="insight-list">
+          <div class="insight-item">
+            <span>当前资源总量</span>
+            <strong>{{ resourceTotal }}</strong>
+          </div>
+          <div class="insight-item">
+            <span>热点景区</span>
+            <strong>{{ topHotSpotText }}</strong>
+          </div>
+          <div class="insight-item">
+            <span>重点区县</span>
+            <strong>{{ topDistrictText }}</strong>
+          </div>
+          <div class="insight-item">
+            <span>坐标标注覆盖</span>
+            <strong>{{ mapPoints.length }} 个点位</strong>
+          </div>
+        </div>
+        <div class="notice-box">
+          <div class="notice-box__title">建议动作</div>
+          <p>{{ operationTip }}</p>
+        </div>
+      </article>
+    </section>
   </div>
 </template>
 
 <script>
 import * as echarts from 'echarts'
-import { getDashboardStatistics } from '@/api/tourism/dashboard'
+import {
+  getActivityTrend,
+  getDashboardStatistics,
+  getDistrictDistribution,
+  getHotSpotRanking,
+  getMapDistribution
+} from '@/api/tourism/dashboard'
 
 export default {
   name: 'TourismDashboard',
   data() {
     return {
-      // 统计数据
       statistics: {
         scenicCount: 0,
         venueCount: 0,
         activityCount: 0,
         pendingCount: 0
       },
-      // 加载状态
-      mapLoading: true,
+      districtDistribution: [],
+      hotSpotRanking: [],
+      activityTrend: [],
+      mapPoints: [],
+      mapGeoJson: null,
       chartLoading: true,
-      // 图表实例
+      mapLoading: true,
       mapChart: null,
       districtChart: null,
       hotSpotChart: null,
-      trendChart: null,
-      // GeoJSON 数据
-      mapData: null
+      trendChart: null
     }
   },
-  created() {
-    this.loadStatistics()
+  computed: {
+    currentDateText() {
+      const now = new Date()
+      const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+      return `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${weekMap[now.getDay()]}`
+    },
+    metricCards() {
+      return [
+        {
+          key: 'scenic',
+          label: '景区总量',
+          value: Number(this.statistics.scenicCount || 0),
+          note: '当前后台已录入的景区资源数量',
+          icon: 'el-icon-location',
+          theme: 'metric-card--blue'
+        },
+        {
+          key: 'venue',
+          label: '场馆总量',
+          value: Number(this.statistics.venueCount || 0),
+          note: '包含博物馆、文化馆和综合场地',
+          icon: 'el-icon-office-building',
+          theme: 'metric-card--green'
+        },
+        {
+          key: 'activity',
+          label: '活动总量',
+          value: Number(this.statistics.activityCount || 0),
+          note: '统计后台已维护的活动数据',
+          icon: 'el-icon-date',
+          theme: 'metric-card--amber'
+        },
+        {
+          key: 'coordinate',
+          label: '坐标点位',
+          value: this.mapPoints.length,
+          note: '已具备地图标注能力的资源数量',
+          icon: 'el-icon-map-location',
+          theme: 'metric-card--rose'
+        }
+      ]
+    },
+    hasMapContent() {
+      return this.districtDistribution.length > 0 || this.mapPoints.length > 0
+    },
+    hasDistrictData() {
+      return this.districtDistribution.length > 0
+    },
+    hasHotSpotData() {
+      return this.hotSpotRanking.length > 0
+    },
+    hasTrendData() {
+      return this.activityTrend.length > 0
+    },
+    dashboardSummary() {
+      return `资源总量 ${this.resourceTotal}，待审核活动 ${this.statistics.pendingCount || 0} 条`
+    },
+    resourceTotal() {
+      return Number(this.statistics.scenicCount || 0) + Number(this.statistics.venueCount || 0)
+    },
+    topHotSpotText() {
+      if (!this.hotSpotRanking.length) {
+        return '暂无'
+      }
+      return this.hotSpotRanking[0].name || '暂无'
+    },
+    topDistrictText() {
+      if (!this.districtDistribution.length) {
+        return '暂无'
+      }
+      return this.districtDistribution[0].district || '暂无'
+    },
+    mapSummary() {
+      const scenicPointCount = this.mapPoints.filter(item => item.type === 'scenic').length
+      const venuePointCount = this.mapPoints.filter(item => item.type === 'venue').length
+      return `地图已标注 ${scenicPointCount} 个景区、${venuePointCount} 个场馆`
+    },
+    mapHint() {
+      return this.mapPoints.length ? `${this.mapPoints.length} 个资源点位已完成坐标标注` : '坐标数据不足时会自动展示空态'
+    },
+    pendingTip() {
+      const pending = Number(this.statistics.pendingCount || 0)
+      if (!pending) {
+        return '当前没有积压审核，适合继续完善基础资料和图片内容。'
+      }
+      if (pending >= 5) {
+        return '待审核活动偏多，建议先清理审批队列，避免运营内容积压。'
+      }
+      return '待审核数量可控，处理后可继续补充热门资源内容。'
+    },
+    trendHint() {
+      if (!this.activityTrend.length) {
+        return '按活动开始时间或创建时间统计'
+      }
+      const latest = this.activityTrend[this.activityTrend.length - 1]
+      return `最新月份 ${this.formatMonthLabel(latest.month)}：${latest.count || 0} 条`
+    },
+    operationTip() {
+      if (Number(this.statistics.pendingCount || 0) > 0) {
+        return `当前有 ${this.statistics.pendingCount} 条活动待审核，建议优先清理审批，再检查 ${this.topHotSpotText} 的内容是否需要更新。`
+      }
+      if (this.districtDistribution.length) {
+        return `${this.topDistrictText} 当前资源相对集中，适合继续补充活动与资讯内容，形成更完整的运营闭环。`
+      }
+      return '目前真实数据还比较少，建议先补齐景区、场馆坐标和内容信息，让大屏能更完整反映业务状态。'
+    }
   },
   mounted() {
-    this.initMapChart()
+    this.initDashboard()
     window.addEventListener('resize', this.handleResize)
   },
   beforeDestroy() {
@@ -135,352 +296,458 @@ export default {
     this.disposeCharts()
   },
   methods: {
-    // 加载统计数据
-    loadStatistics() {
-      getDashboardStatistics().then(res => {
-        if (res.code === 200 && res.data) {
-          this.statistics = res.data
-        }
-        this.loadDistrictData()
-        this.loadHotSpotData()
-        this.loadTrendData()
-      }).catch(() => {
-        this.chartLoading = false
-        this.mapLoading = false
+    async initDashboard() {
+      this.chartLoading = true
+      this.mapLoading = true
+
+      const [
+        geoJson,
+        statisticsRes,
+        districtRes,
+        hotSpotRes,
+        trendRes,
+        mapRes
+      ] = await Promise.all([
+        this.fetchMapJson().catch(() => null),
+        getDashboardStatistics().catch(() => null),
+        getDistrictDistribution().catch(() => null),
+        getHotSpotRanking().catch(() => null),
+        getActivityTrend().catch(() => null),
+        getMapDistribution().catch(() => null)
+      ])
+
+      this.mapGeoJson = geoJson
+      this.statistics = statisticsRes && statisticsRes.code === 200 && statisticsRes.data
+        ? statisticsRes.data
+        : this.statistics
+      this.districtDistribution = this.normalizeArrayData(districtRes)
+      this.hotSpotRanking = this.normalizeArrayData(hotSpotRes)
+      this.activityTrend = this.normalizeArrayData(trendRes)
+      this.mapPoints = this.normalizeArrayData(mapRes)
+
+      this.chartLoading = false
+      this.mapLoading = false
+
+      this.$nextTick(() => {
+        this.initCharts()
+        this.renderAllCharts()
       })
     },
-
-    // 初始化地图
-    initMapChart() {
-      this.mapLoading = true
-      // 加载重庆GeoJSON
-      fetch('/chongqing.json')
-        .then(response => response.json())
-        .then(data => {
-          this.mapData = data
-          this.mapChart = echarts.init(document.getElementById('mapChart'))
-          echarts.registerMap('chongqing', data)
-          this.loadMapData()
-        })
-        .catch(err => {
-          console.error('加载地图数据失败:', err)
-          this.mapLoading = false
-        })
+    fetchMapJson() {
+      return window.fetch('/chongqing.json').then(response => {
+        if (!response.ok) {
+          throw new Error('地图数据加载失败')
+        }
+        return response.json()
+      })
     },
+    normalizeArrayData(response) {
+      if (response && response.code === 200 && Array.isArray(response.data)) {
+        return response.data
+      }
+      return []
+    },
+    initCharts() {
+      if (this.$refs.mapChart && !this.mapChart) {
+        this.mapChart = echarts.init(this.$refs.mapChart)
+      }
+      if (this.$refs.districtChart && !this.districtChart) {
+        this.districtChart = echarts.init(this.$refs.districtChart)
+      }
+      if (this.$refs.hotSpotChart && !this.hotSpotChart) {
+        this.hotSpotChart = echarts.init(this.$refs.hotSpotChart)
+      }
+      if (this.$refs.trendChart && !this.trendChart) {
+        this.trendChart = echarts.init(this.$refs.trendChart)
+      }
+    },
+    renderAllCharts() {
+      this.renderMapChart()
+      this.renderDistrictChart()
+      this.renderHotSpotChart()
+      this.renderTrendChart()
+    },
+    renderMapChart() {
+      if (!this.mapChart || !this.mapGeoJson || !this.hasMapContent) {
+        return
+      }
 
-    // 加载地图数据
-    loadMapData() {
-      if (!this.mapChart || !this.mapData) return
+      echarts.registerMap('chongqing-dashboard', this.mapGeoJson)
 
-      const option = {
+      const districtMapData = this.districtDistribution.map(item => ({
+        name: item.district,
+        value: Number(item.scenicCount || 0) + Number(item.venueCount || 0),
+        scenicCount: Number(item.scenicCount || 0),
+        venueCount: Number(item.venueCount || 0)
+      }))
+      const maxDistrictValue = Math.max.apply(null, districtMapData.map(item => item.value).concat([1]))
+      const scatterData = this.mapPoints.map(item => ({
+        name: item.name,
+        value: [Number(item.longitude), Number(item.latitude), Number(item.viewCount || 0)],
+        type: item.type,
+        level: item.level,
+        category: item.category,
+        viewCount: Number(item.viewCount || 0)
+      }))
+
+      this.mapChart.setOption({
+        backgroundColor: 'transparent',
         tooltip: {
           trigger: 'item',
-          formatter: (params) => {
-            if (params.data) {
-              return `${params.name}<br/>景区: ${params.data.value || 0} 个<br/>场馆: ${params.data.venueValue || 0} 个`
+          backgroundColor: 'rgba(27, 41, 61, 0.92)',
+          borderWidth: 0,
+          textStyle: {
+            color: '#eef4ff'
+          },
+          formatter: params => {
+            if (params.seriesType === 'effectScatter') {
+              const data = params.data || {}
+              const typeLabel = data.type === 'venue' ? '场馆' : '景区'
+              const extra = data.type === 'venue'
+                ? `类型：${data.category || '未分类'}`
+                : `等级：${data.level || '未评级'}`
+              return `${data.name}<br/>${typeLabel}<br/>${extra}<br/>浏览量：${data.viewCount || 0}`
             }
-            return params.name
+            const data = params.data || {}
+            return `${params.name}<br/>景区：${data.scenicCount || 0}<br/>场馆：${data.venueCount || 0}<br/>总量：${data.value || 0}`
           }
         },
         visualMap: {
           min: 0,
-          max: 20,
-          text: ['高', '低'],
-          realtime: false,
-          calculable: true,
+          max: maxDistrictValue,
+          orient: 'horizontal',
+          left: 20,
+          bottom: 10,
+          text: ['资源多', '资源少'],
+          textStyle: {
+            color: '#64748b'
+          },
           inRange: {
-            color: ['#e0f3f8', '#abd9e9', '#74add1', '#4575b4']
+            color: ['#f6efe6', '#efc88f', '#df8c56', '#b45b33']
           },
-          left: 'left',
-          bottom: '20'
+          calculable: true
         },
-        series: [{
-          name: '景区分布',
-          type: 'map',
-          map: 'chongqing',
-          roam: true,
-          zoom: 1.2,
-          // 默认不显示标签，避免文字挤在一起
-          label: {
-            show: false
-          },
-          // 鼠标悬停时显示高亮和标签
-          emphasis: {
+        series: [
+          {
+            name: '区县资源分布',
+            type: 'map',
+            map: 'chongqing-dashboard',
+            roam: true,
+            zoom: 1.08,
+            data: districtMapData,
             itemStyle: {
-              areaColor: '#ffd700'
+              borderColor: 'rgba(74, 91, 120, 0.26)',
+              borderWidth: 1,
+              areaColor: '#f5f6f8'
+            },
+            emphasis: {
+              itemStyle: {
+                areaColor: '#f2c078'
+              },
+              label: {
+                color: '#23304a',
+                fontWeight: 700
+              }
             },
             label: {
-              show: true,
-              formatter: '{b}',
-              fontSize: 12,
-              fontWeight: 'bold',
-              color: '#333'
+              show: false
             }
           },
-          // 放大到较大级别时显示标签
-          zoom: 1.5,
-          data: this.generateMapData()
-        }]
+          {
+            name: '资源点位',
+            type: 'effectScatter',
+            coordinateSystem: 'geo',
+            zlevel: 3,
+            rippleEffect: {
+              scale: 3,
+              brushType: 'stroke'
+            },
+            symbolSize: value => {
+              const base = Number(value[2] || 0)
+              return Math.max(10, Math.min(base / 20 + 10, 18))
+            },
+            itemStyle: {
+              color: '#1f6a8f',
+              shadowBlur: 10,
+              shadowColor: 'rgba(31, 106, 143, 0.35)'
+            },
+            data: scatterData
+          }
+        ],
+        geo: {
+          map: 'chongqing-dashboard',
+          roam: true,
+          silent: true
+        }
+      }, true)
+    },
+    renderDistrictChart() {
+      if (!this.districtChart || !this.hasDistrictData) {
+        return
       }
 
-      this.mapChart.setOption(option)
-      this.mapLoading = false
-    },
-
-    // 生成地图数据（示例数据，实际从后端获取）
-    generateMapData() {
-      // 模拟各区县景区数量
-      const scenicData = [
-        { name: '渝中区', value: 8 },
-        { name: '江北区', value: 5 },
-        { name: '渝北区', value: 12 },
-        { name: '南岸区', value: 6 },
-        { name: '沙坪坝区', value: 7 },
-        { name: '九龙坡区', value: 4 },
-        { name: '大渡口区', value: 2 },
-        { name: '巴南区', value: 5 },
-        { name: '北碚区', value: 4 },
-        { name: '璧山区', value: 3 },
-        { name: '永川区', value: 6 },
-        { name: '合川区', value: 4 },
-        { name: '涪陵区', value: 5 },
-        { name: '万州区', value: 7 },
-        { name: '黔江区', value: 3 },
-        { name: '武隆区', value: 15 },
-        { name: '南川区', value: 4 },
-        { name: '綦江区', value: 3 },
-        { name: '大足区', value: 8 },
-        { name: '铜梁区', value: 3 },
-        { name: '潼南区', value: 2 },
-        { name: '荣昌区', value: 2 },
-        { name: '梁平区', value: 3 },
-        { name: '城口县', value: 2 },
-        { name: '丰都县', value: 4 },
-        { name: '垫江县', value: 2 },
-        { name: '忠县', value: 3 },
-        { name: '开州区', value: 5 },
-        { name: '云阳县', value: 3 },
-        { name: '奉节县', value: 6 },
-        { name: '巫山县', value: 4 },
-        { name: '巫溪县', value: 2 },
-        { name: '石柱县', value: 5 },
-        { name: '秀山县', value: 2 },
-        { name: '酉阳县', value: 3 },
-        { name: '彭水县', value: 4 }
-      ]
-
-      const venueData = [
-        { name: '渝中区', venueValue: 12 },
-        { name: '江北区', venueValue: 8 },
-        { name: '渝北区', venueValue: 15 },
-        { name: '南岸区', venueValue: 7 },
-        { name: '沙坪坝区', venueValue: 10 },
-        { name: '九龙坡区', venueValue: 6 },
-        { name: '大渡口区', venueValue: 3 },
-        { name: '巴南区', venueValue: 5 },
-        { name: '北碚区', venueValue: 6 },
-        { name: '璧山区', venueValue: 4 },
-        { name: '永川区', venueValue: 8 },
-        { name: '合川区', venueValue: 5 },
-        { name: '涪陵区', venueValue: 7 },
-        { name: '万州区', venueValue: 9 },
-        { name: '黔江区', venueValue: 4 },
-        { name: '武隆区', venueValue: 6 },
-        { name: '南川区', venueValue: 3 },
-        { name: '綦江区', venueValue: 4 },
-        { name: '大足区', venueValue: 7 },
-        { name: '铜梁区', venueValue: 3 },
-        { name: '潼南区', venueValue: 2 },
-        { name: '荣昌区', venueValue: 2 },
-        { name: '梁平区', venueValue: 3 },
-        { name: '城口县', venueValue: 1 },
-        { name: '丰都县', venueValue: 2 },
-        { name: '垫江县', venueValue: 2 },
-        { name: '忠县', venueValue: 3 },
-        { name: '开州区', venueValue: 5 },
-        { name: '云阳县', venueValue: 3 },
-        { name: '奉节县', venueValue: 4 },
-        { name: '巫山县', venueValue: 3 },
-        { name: '巫溪县', venueValue: 2 },
-        { name: '石柱县', venueValue: 4 },
-        { name: '秀山县', venueValue: 2 },
-        { name: '酉阳县', venueValue: 2 },
-        { name: '彭水县', venueValue: 3 }
-      ]
-
-      // 合并数据
-      const mergedData = scenicData.map(s => ({
-        ...s,
-        venueValue: venueData.find(v => v.name === s.name)?.venueValue || 0
-      }))
-
-      return mergedData
-    },
-
-    // 加载区县分布数据
-    loadDistrictData() {
-      this.chartLoading = true
-      this.districtChart = echarts.init(document.getElementById('districtChart'))
-
-      const option = {
+      const list = this.districtDistribution.slice(0, 10)
+      this.districtChart.setOption({
+        backgroundColor: 'transparent',
         tooltip: {
           trigger: 'axis',
-          axisPointer: { type: 'shadow' }
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        legend: {
+          top: 0,
+          right: 0,
+          textStyle: {
+            color: '#64748b'
+          }
         },
         grid: {
           left: '3%',
           right: '4%',
-          bottom: '3%',
-          top: '3%',
+          bottom: '4%',
+          top: 44,
           containLabel: true
         },
         xAxis: {
           type: 'category',
-          data: ['渝中', '江北', '渝北', '南岸', '沙坪坝', '九龙坡', '大渡口', '巴南', '北碚', '武隆', '大足', '万州'],
-          axisLabel: { rotate: 45, fontSize: 10 },
-          axisTick: { alignWithLabel: true }
+          data: list.map(item => item.district),
+          axisLine: {
+            lineStyle: {
+              color: '#d8dee9'
+            }
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            color: '#64748b',
+            rotate: 28
+          }
         },
         yAxis: {
           type: 'value',
-          name: '数量',
-          axisTick: { show: false }
+          splitLine: {
+            lineStyle: {
+              color: 'rgba(100, 116, 139, 0.12)'
+            }
+          },
+          axisLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            color: '#64748b'
+          }
         },
         series: [
           {
             name: '景区',
             type: 'bar',
-            barWidth: '35%',
+            barMaxWidth: 22,
+            data: list.map(item => Number(item.scenicCount || 0)),
             itemStyle: {
+              borderRadius: [10, 10, 0, 0],
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#409EFF' },
-                { offset: 1, color: '#66b1ff' }
+                { offset: 0, color: '#4f8df5' },
+                { offset: 1, color: '#6eb5ff' }
               ])
-            },
-            data: [8, 5, 12, 6, 7, 4, 2, 5, 4, 15, 8, 7]
+            }
           },
           {
             name: '场馆',
             type: 'bar',
-            barWidth: '35%',
+            barMaxWidth: 22,
+            data: list.map(item => Number(item.venueCount || 0)),
             itemStyle: {
+              borderRadius: [10, 10, 0, 0],
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: '#67C23A' },
-                { offset: 1, color: '#95d475' }
+                { offset: 0, color: '#36a56c' },
+                { offset: 1, color: '#7fd3a5' }
               ])
-            },
-            data: [12, 8, 15, 7, 10, 6, 3, 5, 6, 6, 7, 9]
+            }
           }
         ]
+      }, true)
+    },
+    renderHotSpotChart() {
+      if (!this.hotSpotChart || !this.hasHotSpotData) {
+        return
       }
 
-      this.districtChart.setOption(option)
-      this.chartLoading = false
-    },
-
-    // 加载热度排行数据
-    loadHotSpotData() {
-      this.hotSpotChart = echarts.init(document.getElementById('hotSpotChart'))
-
-      const option = {
+      const list = this.hotSpotRanking.slice(0, 10)
+      this.hotSpotChart.setOption({
+        backgroundColor: 'transparent',
         tooltip: {
           trigger: 'axis',
-          axisPointer: { type: 'shadow' }
+          axisPointer: {
+            type: 'shadow'
+          }
         },
         grid: {
-          left: '3%',
+          left: '4%',
           right: '4%',
-          bottom: '3%',
-          top: '3%',
+          bottom: '4%',
+          top: 14,
           containLabel: true
         },
         xAxis: {
           type: 'value',
-          axisTick: { show: false }
+          splitLine: {
+            lineStyle: {
+              color: 'rgba(100, 116, 139, 0.12)'
+            }
+          },
+          axisLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            color: '#64748b'
+          }
         },
         yAxis: {
           type: 'category',
-          data: ['洪崖洞', '武隆天生三桥', '大足石刻', '长江三峡', '解放碑', '磁器口', '白公馆', '渣滓洞', '仙女山', '金佛山'],
-          axisLabel: { fontSize: 10 },
-          axisTick: { show: false }
-        },
-        series: [{
-          name: '浏览量',
-          type: 'bar',
-          barWidth: '60%',
-          itemStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-              { offset: 0, color: '#fdb462' },
-              { offset: 1, color: '#ffbf47' }
-            ])
+          inverse: true,
+          data: list.map(item => item.name),
+          axisLine: {
+            show: false
           },
-          data: [12580, 9820, 8560, 7890, 7230, 6890, 5420, 4890, 4560, 3980]
-        }]
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            color: '#475569'
+          }
+        },
+        series: [
+          {
+            name: '浏览量',
+            type: 'bar',
+            data: list.map(item => Number(item.viewCount || 0)),
+            barMaxWidth: 18,
+            itemStyle: {
+              borderRadius: [0, 10, 10, 0],
+              color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                { offset: 0, color: '#f1b24a' },
+                { offset: 1, color: '#df6f39' }
+              ])
+            },
+            label: {
+              show: true,
+              position: 'right',
+              color: '#6b7280'
+            }
+          }
+        ]
+      }, true)
+    },
+    renderTrendChart() {
+      if (!this.trendChart || !this.hasTrendData) {
+        return
       }
 
-      this.hotSpotChart.setOption(option)
-    },
+      const xData = this.activityTrend.map(item => this.formatMonthLabel(item.month))
+      const yData = this.activityTrend.map(item => Number(item.count || 0))
 
-    // 加载趋势数据
-    loadTrendData() {
-      this.trendChart = echarts.init(document.getElementById('trendChart'))
-
-      const option = {
+      this.trendChart.setOption({
+        backgroundColor: 'transparent',
         tooltip: {
           trigger: 'axis'
         },
         grid: {
           left: '3%',
           right: '4%',
-          bottom: '3%',
-          top: '10%',
+          bottom: '4%',
+          top: 18,
           containLabel: true
         },
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-          axisTick: { show: false }
+          data: xData,
+          axisLine: {
+            lineStyle: {
+              color: '#d8dee9'
+            }
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            color: '#64748b'
+          }
         },
         yAxis: {
           type: 'value',
-          name: '活动数',
-          axisTick: { show: false }
+          splitLine: {
+            lineStyle: {
+              color: 'rgba(100, 116, 139, 0.12)'
+            }
+          },
+          axisLine: {
+            show: false
+          },
+          axisTick: {
+            show: false
+          },
+          axisLabel: {
+            color: '#64748b'
+          }
         },
-        series: [{
-          name: '活动数量',
-          type: 'line',
-          smooth: true,
-          symbol: 'circle',
-          symbolSize: 8,
-          itemStyle: {
-            color: '#409EFF'
-          },
-          lineStyle: {
-            width: 3,
-            color: '#409EFF'
-          },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
-              { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
-            ])
-          },
-          data: [12, 18, 25, 32, 45, 52, 48, 55, 42, 38, 28, 15]
-        }]
+        series: [
+          {
+            name: '活动数量',
+            type: 'line',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 8,
+            data: yData,
+            itemStyle: {
+              color: '#2f6fed'
+            },
+            lineStyle: {
+              width: 3,
+              color: '#2f6fed'
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(47, 111, 237, 0.28)' },
+                { offset: 1, color: 'rgba(47, 111, 237, 0.02)' }
+              ])
+            }
+          }
+        ]
+      }, true)
+    },
+    formatMonthLabel(value) {
+      if (!value || typeof value !== 'string') {
+        return value || ''
       }
-
-      this.trendChart.setOption(option)
+      const match = value.match(/^(\d{4})-(\d{2})$/)
+      if (match) {
+        return `${match[1]}.${match[2]}`
+      }
+      return value
     },
-
-    // 响应式处理
     handleResize() {
-      if (this.mapChart) this.mapChart.resize()
-      if (this.districtChart) this.districtChart.resize()
-      if (this.hotSpotChart) this.hotSpotChart.resize()
-      if (this.trendChart) this.trendChart.resize()
+      if (this.mapChart) {
+        this.mapChart.resize()
+      }
+      if (this.districtChart) {
+        this.districtChart.resize()
+      }
+      if (this.hotSpotChart) {
+        this.hotSpotChart.resize()
+      }
+      if (this.trendChart) {
+        this.trendChart.resize()
+      }
     },
-
-    // 销毁图表实例
     disposeCharts() {
       if (this.mapChart) {
         this.mapChart.dispose()
@@ -504,127 +771,341 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.dashboard-container {
-  padding: 20px;
-  background-color: #f5f7fa;
+.tourism-dashboard {
+  --bg: linear-gradient(180deg, #f4efe6 0%, #f7f9fc 42%, #fcfbf7 100%);
+  --panel: rgba(255, 255, 255, 0.92);
+  --line: rgba(34, 48, 74, 0.08);
+  --text: #23304a;
+  --muted: #64748b;
+  --shadow: 0 18px 40px rgba(36, 54, 86, 0.08);
   min-height: calc(100vh - 84px);
+  padding: 24px;
+  background: var(--bg);
+  color: var(--text);
 }
 
-.stat-cards {
-  margin-bottom: 20px;
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(280px, 0.82fr);
+  gap: 20px;
+  padding: 28px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(227, 96, 54, 0.18), transparent 28%),
+    radial-gradient(circle at left bottom, rgba(41, 125, 93, 0.16), transparent 30%),
+    linear-gradient(135deg, #fff8ee 0%, #ffffff 58%, #f4f8f7 100%);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(228, 102, 59, 0.08);
 }
 
-.stat-card {
+.hero__eyebrow,
+.panel__eyebrow,
+.hero__panel-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b45b33;
+}
+
+.hero__title {
+  margin: 10px 0 12px;
+  font-size: 34px;
+  line-height: 1.15;
+  color: #1f2a44;
+}
+
+.hero__desc {
+  max-width: 760px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.hero__meta span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(35, 48, 74, 0.08);
+  color: #486078;
+  font-size: 13px;
+}
+
+.hero__panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 22px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #223e63 0%, #172c47 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #eef4ff;
+}
+
+.hero__panel-number {
+  margin-top: 10px;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hero__panel-title {
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.hero__panel-tip {
+  margin: 10px 0 18px;
+  color: rgba(238, 244, 255, 0.76);
+  line-height: 1.75;
+  font-size: 13px;
+}
+
+.hero__panel-metrics {
+  display: grid;
+  gap: 12px;
+}
+
+.hero__panel-metrics div {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hero__panel-metrics span {
+  display: block;
+  font-size: 12px;
+  color: rgba(238, 244, 255, 0.7);
+}
+
+.hero__panel-metrics strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.metric-card {
+  padding: 20px;
+  border-radius: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.metric-card__head {
   display: flex;
   align-items: center;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 20px;
-  transition: transform 0.3s;
+  justify-content: space-between;
+}
 
-  &:hover {
-    transform: translateY(-5px);
-  }
+.metric-card__label {
+  font-size: 14px;
+  color: var(--muted);
+}
 
-  .stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-    font-size: 24px;
-    color: #fff;
-  }
+.metric-card__icon {
+  font-size: 22px;
+}
 
-  &.scenic .stat-icon {
-    background: linear-gradient(135deg, #409EFF, #66b1ff);
-  }
+.metric-card__value {
+  margin-top: 18px;
+  font-size: 34px;
+  font-weight: 700;
+  color: #1f2a44;
+}
 
-  &.venue .stat-icon {
-    background: linear-gradient(135deg, #67C23A, #95d475);
-  }
+.metric-card__foot {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #748397;
+}
 
-  &.activity .stat-icon {
-    background: linear-gradient(135deg, #E6A23C, #f5c77e);
-  }
+.metric-card--blue .metric-card__icon { color: #2f6fed; }
+.metric-card--green .metric-card__icon { color: #2f9d73; }
+.metric-card--amber .metric-card__icon { color: #d48522; }
+.metric-card--rose .metric-card__icon { color: #d0575d; }
 
-  &.pending .stat-icon {
-    background: linear-gradient(135deg, #F56C6C, #f89f9f);
-  }
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
 
-  .stat-info {
-    flex: 1;
+.panel {
+  padding: 22px;
+  border-radius: 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
 
-    .stat-value {
-      font-size: 28px;
-      font-weight: 600;
-      color: #303133;
-      line-height: 1;
-    }
+.panel--wide {
+  grid-column: span 2;
+}
 
-    .stat-label {
-      font-size: 14px;
-      color: #909399;
-      margin-top: 5px;
-    }
+.panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.panel__title {
+  margin: 6px 0 0;
+  font-size: 22px;
+  color: #1f2a44;
+}
+
+.panel__hint {
+  font-size: 12px;
+  color: #8492a6;
+}
+
+.panel__body--chart {
+  position: relative;
+  min-height: 340px;
+}
+
+.chart-surface {
+  width: 100%;
+  height: 340px;
+}
+
+.panel--wide .chart-surface,
+.panel--wide .panel__body--chart {
+  min-height: 420px;
+  height: 420px;
+}
+
+.chart-surface--hidden {
+  visibility: hidden;
+}
+
+.chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.insight-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(35, 48, 74, 0.1);
+  font-size: 14px;
+  color: #64748b;
+}
+
+.insight-item:last-child {
+  border-bottom: none;
+}
+
+.insight-item strong {
+  color: #1f2a44;
+  font-weight: 700;
+}
+
+.notice-box {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff4e8 0%, #f7fbfa 100%);
+  border: 1px solid rgba(228, 102, 59, 0.12);
+}
+
+.notice-box__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #a74f2d;
+}
+
+.notice-box p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #5e6b80;
+}
+
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.chart-row {
-  margin-bottom: 20px;
-}
-
-.chart-container {
-  background: #fff;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  height: 350px;
-
-  .chart-header {
-    padding-bottom: 15px;
-    border-bottom: 1px solid #ebeef5;
-
-    .chart-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #303133;
-    }
+@media (max-width: 992px) {
+  .hero,
+  .main-grid {
+    grid-template-columns: 1fr;
   }
 
-  .map-chart {
-    height: 280px;
+  .panel--wide {
+    grid-column: span 1;
   }
 
-  .bar-chart,
-  .hot-chart,
-  .trend-chart {
-    height: 280px;
+  .panel--wide .chart-surface,
+  .panel--wide .panel__body--chart {
+    min-height: 360px;
+    height: 360px;
   }
 }
 
 @media (max-width: 768px) {
-  .stat-card {
-    padding: 15px;
-
-    .stat-icon {
-      width: 50px;
-      height: 50px;
-      font-size: 20px;
-    }
-
-    .stat-info .stat-value {
-      font-size: 22px;
-    }
+  .tourism-dashboard {
+    padding: 16px;
   }
 
-  .chart-container {
+  .hero {
+    padding: 20px;
+  }
+
+  .hero__title {
+    font-size: 28px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .chart-surface,
+  .panel__body--chart,
+  .panel--wide .chart-surface,
+  .panel--wide .panel__body--chart {
+    min-height: 300px;
     height: 300px;
-    margin-bottom: 20px;
   }
 }
 </style>

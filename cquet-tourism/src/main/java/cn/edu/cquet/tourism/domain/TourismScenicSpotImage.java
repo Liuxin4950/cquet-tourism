@@ -12,19 +12,23 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "景区图片关联表")
 public class TourismScenicSpotImage {
 
-    @Schema(description = "主键，整型")
+    @Schema(description = "主键")
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     @Schema(description = "景区id")
     @TableField("scenic_spot_id")
-    private Integer scenicSpotId;
+    private Long scenicSpotId;
 
     @Schema(description = "图片id")
     @TableField("image_id")
-    private Integer imageId;
+    private Long imageId;
 
     @Schema(description = "排序")
-    @TableField("sort")
-    private Integer sort;
+    @TableField("sort_order")
+    private Integer sortOrder;
+
+    @Schema(description = "是否封面")
+    @TableField("is_cover")
+    private String isCover;
 }

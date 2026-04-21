@@ -12,17 +12,17 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "场馆设备关联表")
 public class TourismVenueFacilities {
 
-    @Schema(description = "主键，整型")
+    @Schema(description = "主键")
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     @Schema(description = "场馆id")
     @TableField("venue_id")
-    private Integer venueId;
+    private Long venueId;
 
     @Schema(description = "设备id")
     @TableField("facilities_id")
-    private Integer facilitiesId;
+    private Long facilitiesId;
 
     @Schema(description = "排序")
     private Integer sort;

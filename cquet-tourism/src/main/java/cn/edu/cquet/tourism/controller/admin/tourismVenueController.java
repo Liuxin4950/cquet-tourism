@@ -135,7 +135,7 @@ public class tourismVenueController extends BaseController {
      * 入参：路径参数 `ids`
      * 返回：统一 `Result`
      */
-    public Result remove(@PathVariable List<Integer> ids) {
+    public Result remove(@PathVariable List<Long> ids) {
         return toAjax(tourismVenueService.removeVenueByIds(ids));
     }
 
@@ -154,16 +154,20 @@ public class tourismVenueController extends BaseController {
         if (id == null) {
             return warn("场馆id不能为空");
         }
-        List<TourismActivity> list = ((cn.edu.cquet.tourism.service.impl.TourismVenueServiceImpl)tourismVenueService).getActivitiesByVenueId(id.intValue());
+        List<TourismActivity> list = tourismVenueService.getActivitiesByVenueId(id);
+        java.util.Map<Long, TourismActivityApproval> latestMap = approvalService.latestByActivityIds(
+                list.stream().map(TourismActivity::getId).toList()
+        );
         java.util.List<TourismActivityVo> vos = new java.util.ArrayList<>(list.size());
         for (TourismActivity a : list) {
             TourismActivityVo vo = new TourismActivityVo();
             vo.setId(a.getId()); vo.setName(a.getName()); vo.setCategory(a.getCategory()); vo.setStartTime(a.getStartTime()); vo.setEndTime(a.getEndTime());
             vo.setStatus(a.getStatus());
-            java.util.List<TourismActivityApproval> h = approvalService.history(a.getId());
-            TourismActivityApproval latest = (h == null || h.isEmpty()) ? null : h.get(0);
-            if (latest == null) { vo.setAuditStatus("0"); }
-            else { vo.setAuditStatus(latest.getAuditStatus()); vo.setAuditReason(latest.getReason()); vo.setAuditor(latest.getAuditor()); vo.setAuditTime(latest.getAuditTime()); }
+            vo.setCoverImage(a.getCoverImage());
+            vo.setCoverImageId(a.getCoverImageId());
+            TourismActivityApproval latest = latestMap.get(a.getId());
+            vo.setAuditStatus(a.getAuditStatus() != null ? a.getAuditStatus() : "0");
+            if (latest != null) { vo.setAuditStatus(latest.getAuditStatus()); vo.setAuditReason(latest.getReason()); vo.setAuditor(latest.getAuditor()); vo.setAuditTime(latest.getAuditTime()); }
             vos.add(vo);
         }
         return success(vos);
@@ -182,7 +186,7 @@ public class tourismVenueController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:venue:image:edit')")
     @PutMapping("/{id}/images")
     @Operation(summary = "设置当前场馆的关联图片（覆盖式）")
-    public Result setVenueImages(@PathVariable Long id, @RequestBody List<Integer> imageIds) {
+    public Result setVenueImages(@PathVariable Long id, @RequestBody List<Long> imageIds) {
         if (id == null) return warn("场馆id不能为空");
         return toAjax(tourismVenueService.setImagesForVenue(id, imageIds));
     }

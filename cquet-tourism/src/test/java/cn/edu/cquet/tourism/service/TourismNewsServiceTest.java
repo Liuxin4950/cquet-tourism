@@ -38,7 +38,7 @@ class TourismNewsServiceTest {
     @BeforeEach
     void setUp() {
         testNews = new TourismNews();
-        testNews.setId(1);
+        testNews.setId(Long.valueOf(1L));
         testNews.setTitle("重庆旅游新政策发布");
         testNews.setContent("近日，重庆发布了新的旅游政策...");
         testNews.setAuthor("旅游局");

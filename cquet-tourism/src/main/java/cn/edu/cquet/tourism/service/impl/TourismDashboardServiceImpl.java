@@ -11,6 +11,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,20 +35,27 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
         Map<String, Object> statistics = new HashMap<>();
 
         // 统计景区数量
-        long scenicCount = scenicSpotMapper.selectCount(null);
+        LambdaQueryWrapper<TourismScenicSpot> scenicWrapper = new LambdaQueryWrapper<>();
+        scenicWrapper.eq(TourismScenicSpot::getDelFlag, "0");
+        long scenicCount = scenicSpotMapper.selectCount(scenicWrapper);
         statistics.put("scenicCount", scenicCount);
 
         // 统计场馆数量
-        long venueCount = venueMapper.selectCount(null);
+        LambdaQueryWrapper<TourismVenue> venueWrapper = new LambdaQueryWrapper<>();
+        venueWrapper.eq(TourismVenue::getDelFlag, "0");
+        long venueCount = venueMapper.selectCount(venueWrapper);
         statistics.put("venueCount", venueCount);
 
         // 统计活动数量
-        long activityCount = activityMapper.selectCount(null);
+        LambdaQueryWrapper<TourismActivity> activityWrapper = new LambdaQueryWrapper<>();
+        activityWrapper.eq(TourismActivity::getDelFlag, "0");
+        long activityCount = activityMapper.selectCount(activityWrapper);
         statistics.put("activityCount", activityCount);
 
         // 统计待审核活动数量（状态为0表示待审核）
         LambdaQueryWrapper<TourismActivity> pendingWrapper = new LambdaQueryWrapper<>();
-        pendingWrapper.eq(TourismActivity::getStatus, "0");
+        pendingWrapper.eq(TourismActivity::getDelFlag, "0")
+                .eq(TourismActivity::getAuditStatus, "0");
         long pendingCount = activityMapper.selectCount(pendingWrapper);
         statistics.put("pendingCount", pendingCount);
 
@@ -56,16 +67,24 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
         List<Map<String, Object>> result = new ArrayList<>();
 
         // 查询各区县景区数量
-        List<TourismScenicSpot> scenicSpots = scenicSpotMapper.selectList(null);
+        LambdaQueryWrapper<TourismScenicSpot> scenicWrapper = new LambdaQueryWrapper<>();
+        scenicWrapper.eq(TourismScenicSpot::getDelFlag, "0");
+        List<TourismScenicSpot> scenicSpots = scenicSpotMapper.selectList(scenicWrapper);
         Map<String, Long> scenicDistrictCount = scenicSpots.stream()
-                .filter(s -> s.getDistrict() != null && !s.getDistrict().isEmpty())
-                .collect(Collectors.groupingBy(TourismScenicSpot::getDistrict, Collectors.counting()));
+                .map(TourismScenicSpot::getDistrict)
+                .map(this::normalizeDistrict)
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(district -> district, Collectors.counting()));
 
         // 查询各区县场馆数量
-        List<TourismVenue> venues = venueMapper.selectList(null);
+        LambdaQueryWrapper<TourismVenue> venueWrapper = new LambdaQueryWrapper<>();
+        venueWrapper.eq(TourismVenue::getDelFlag, "0");
+        List<TourismVenue> venues = venueMapper.selectList(venueWrapper);
         Map<String, Long> venueDistrictCount = venues.stream()
-                .filter(v -> v.getDistrict() != null && !v.getDistrict().isEmpty())
-                .collect(Collectors.groupingBy(TourismVenue::getDistrict, Collectors.counting()));
+                .map(TourismVenue::getDistrict)
+                .map(this::normalizeDistrict)
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(district -> district, Collectors.counting()));
 
         // 合并数据
         Set<String> allDistricts = new HashSet<>();
@@ -80,10 +99,10 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
             result.add(item);
         }
 
-        // 按景区数量降序排序
+        // 按总量降序排序
         result.sort((a, b) -> Long.compare(
-                (Long) b.getOrDefault("scenicCount", 0L),
-                (Long) a.getOrDefault("scenicCount", 0L)
+                toLong(b.get("scenicCount")) + toLong(b.get("venueCount")),
+                toLong(a.get("scenicCount")) + toLong(a.get("venueCount"))
         ));
 
         return result;
@@ -95,6 +114,7 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
 
         // 查询所有景区并按浏览量排序
         LambdaQueryWrapper<TourismScenicSpot> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TourismScenicSpot::getDelFlag, "0");
         wrapper.orderByDesc(TourismScenicSpot::getViewCount);
         wrapper.last("LIMIT 10");
 
@@ -114,32 +134,31 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
 
     @Override
     public List<Map<String, Object>> getActivityTrend() {
-        List<Map<String, Object>> result = new ArrayList<>();
-
-        // 查询所有活动
-        List<TourismActivity> activities = activityMapper.selectList(null);
-
-        // 按月份统计
-        Map<String, Long> monthlyCount = new HashMap<>();
-        for (int i = 1; i <= 12; i++) {
-            monthlyCount.put(String.valueOf(i), 0L);
+        LocalDate currentDate = LocalDate.now();
+        LinkedHashMap<YearMonth, Long> monthlyCount = new LinkedHashMap<>();
+        for (int i = 11; i >= 0; i--) {
+            YearMonth month = YearMonth.from(currentDate.minusMonths(i));
+            monthlyCount.put(month, 0L);
         }
 
+        LambdaQueryWrapper<TourismActivity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TourismActivity::getDelFlag, "0");
+        List<TourismActivity> activities = activityMapper.selectList(wrapper);
+
         for (TourismActivity activity : activities) {
-            if (activity.getCreateTime() != null) {
-                String month = String.valueOf(activity.getCreateTime().getMonth() + 1);
-                monthlyCount.merge(month, 1L, Long::sum);
+            YearMonth activityMonth = resolveActivityMonth(activity);
+            if (activityMonth != null && monthlyCount.containsKey(activityMonth)) {
+                monthlyCount.merge(activityMonth, 1L, Long::sum);
             }
         }
 
-        // 转换为列表
-        for (int i = 1; i <= 12; i++) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        monthlyCount.forEach((month, count) -> {
             Map<String, Object> item = new HashMap<>();
-            item.put("month", i + "月");
-            item.put("count", monthlyCount.getOrDefault(String.valueOf(i), 0L));
+            item.put("month", month.toString());
+            item.put("count", count);
             result.add(item);
-        }
-
+        });
         return result;
     }
 
@@ -149,7 +168,8 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
 
         // 查询有经纬度的景区
         LambdaQueryWrapper<TourismScenicSpot> scenicWrapper = new LambdaQueryWrapper<>();
-        scenicWrapper.isNotNull(TourismScenicSpot::getLongitude)
+        scenicWrapper.eq(TourismScenicSpot::getDelFlag, "0")
+                    .isNotNull(TourismScenicSpot::getLongitude)
                     .isNotNull(TourismScenicSpot::getLatitude);
         List<TourismScenicSpot> scenicSpots = scenicSpotMapper.selectList(scenicWrapper);
 
@@ -166,7 +186,8 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
 
         // 查询有经纬度的场馆
         LambdaQueryWrapper<TourismVenue> venueWrapper = new LambdaQueryWrapper<>();
-        venueWrapper.isNotNull(TourismVenue::getLongitude)
+        venueWrapper.eq(TourismVenue::getDelFlag, "0")
+                    .isNotNull(TourismVenue::getLongitude)
                     .isNotNull(TourismVenue::getLatitude);
         List<TourismVenue> venues = venueMapper.selectList(venueWrapper);
 
@@ -182,5 +203,28 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
         }
 
         return result;
+    }
+
+    private String normalizeDistrict(String district) {
+        if (district == null) {
+            return null;
+        }
+        String normalized = district.trim();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private long toLong(Object value) {
+        return value instanceof Number ? ((Number) value).longValue() : 0L;
+    }
+
+    private YearMonth resolveActivityMonth(TourismActivity activity) {
+        if (activity.getStartTime() != null) {
+            LocalDateTime startTime = activity.getStartTime();
+            return YearMonth.from(startTime);
+        }
+        if (activity.getCreateTime() != null) {
+            return YearMonth.from(activity.getCreateTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        }
+        return null;
     }
 }

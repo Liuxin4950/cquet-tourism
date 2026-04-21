@@ -55,7 +55,7 @@ public class TourismNewsController extends BaseController {
      * 入参：路径参数 `id`
      * 返回：新闻详情
      */
-    public Result getInfo(@PathVariable Integer id) {
+    public Result getInfo(@PathVariable Long id) {
         TourismNews news = tourismNewsService.getById(id);
         return success(news);
     }
@@ -96,7 +96,7 @@ public class TourismNewsController extends BaseController {
      * 删除
      * 入参：路径参数 `ids`
      */
-    public Result remove(@PathVariable List<Integer> ids) {
+    public Result remove(@PathVariable List<Long> ids) {
         // 将删除的结果转换为Result对象返回
         return toAjax(tourismNewsService.removeBatchByIds(ids));
     }

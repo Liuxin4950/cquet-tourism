@@ -89,7 +89,7 @@ public class TourismScenicSpotController extends BaseController {
     @PreAuthorize("@ss.hasPermi('tourism:scenicSpot:image:edit')")
     @PutMapping("/{id}/images")
     @Operation(summary = "设置当前景区的关联图片（覆盖式）")
-    public Result setSpotImages(@PathVariable Long id, @RequestBody java.util.List<Integer> imageIds) {
+    public Result setSpotImages(@PathVariable Long id, @RequestBody java.util.List<Long> imageIds) {
         if (id == null) return warn("景区id不能为空");
         return toAjax(tourismScenicSpotService.setImagesForScenicSpot(id, imageIds));
     }

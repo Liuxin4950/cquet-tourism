@@ -39,6 +39,10 @@ public class TourismScenicSpot extends AbsEntity {
     @TableField("cover_image")
     private String coverImage;
 
+    @Schema(description = "景点封面图片ID")
+    @TableField("cover_image_id")
+    private Long coverImageId;
+
     @Schema(description = "门票价格") 
     @TableField("ticket_price")
     private BigDecimal ticketPrice;
@@ -82,5 +86,5 @@ public class TourismScenicSpot extends AbsEntity {
 
     // 景点图片ID列表（业务层辅助字段，不存储在数据库）
     @TableField(exist = false)
-    private List<Integer> imageIds;
+    private List<Long> imageIds;
 }

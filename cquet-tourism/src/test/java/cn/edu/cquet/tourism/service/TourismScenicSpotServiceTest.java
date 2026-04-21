@@ -103,7 +103,7 @@ class TourismScenicSpotServiceTest {
         @DisplayName("新增时绑定图片成功")
         void addScenicSpot_BindsImages_WhenImageIdsProvided() {
             // given
-            testSpot.setImageIds(Arrays.asList(1, 2, 3));
+            testSpot.setImageIds(Arrays.asList(Long.valueOf(1L), Long.valueOf(2L), Long.valueOf(3L)));
             when(tourismScenicSpotMapper.selectList(any(LambdaQueryWrapper.class)))
                     .thenReturn(Collections.emptyList());
             when(tourismScenicSpotMapper.insert(any(TourismScenicSpot.class))).thenReturn(1);
@@ -159,7 +159,7 @@ class TourismScenicSpotServiceTest {
         @DisplayName("更新时重建图片关联")
         void updateScenicSpot_RebuildsImageRelations() {
             // given
-            testSpot.setImageIds(Arrays.asList(1, 2));
+            testSpot.setImageIds(Arrays.asList(Long.valueOf(1L), Long.valueOf(2L)));
             when(tourismScenicSpotMapper.selectList(any(LambdaQueryWrapper.class)))
                     .thenReturn(Collections.emptyList());
             when(tourismScenicSpotMapper.updateById(any(TourismScenicSpot.class))).thenReturn(1);
@@ -263,7 +263,7 @@ class TourismScenicSpotServiceTest {
         @DisplayName("设置图片关联时先删后插")
         void setImagesForScenicSpot_DeletesAndInserts() {
             // given
-            List<Integer> imageIds = Arrays.asList(1, 2, 3);
+            List<Long> imageIds = Arrays.asList(Long.valueOf(1L), Long.valueOf(2L), Long.valueOf(3L));
 
             // when
             boolean result = scenicSpotService.setImagesForScenicSpot(1L, imageIds);
@@ -278,7 +278,7 @@ class TourismScenicSpotServiceTest {
         @DisplayName("景区ID或图片ID为null时失败")
         void setImagesForScenicSpot_Fails_WhenParamsNull() {
             // when & then
-            assertFalse(scenicSpotService.setImagesForScenicSpot(null, Arrays.asList(1, 2)));
+            assertFalse(scenicSpotService.setImagesForScenicSpot(null, Arrays.asList(Long.valueOf(1L), Long.valueOf(2L))));
             assertFalse(scenicSpotService.setImagesForScenicSpot(1L, null));
         }
     }

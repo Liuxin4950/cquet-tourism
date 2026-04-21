@@ -19,10 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import cn.edu.cquet.common.utils.bean.BeanUtils;
 import cn.edu.cquet.tourism.domain.TourismActivity;
 import cn.edu.cquet.tourism.mapper.TourismActivityMapper;
+import org.springframework.util.StringUtils;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -54,9 +60,7 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
     private TourismActivityMapper activityMapper; // 活动 Mapper
 
     @Autowired
-    private cn.edu.cquet.tourism.service.TourismActivityApprovalService approvalService; // 审批记录服务
-
-
+    private cn.edu.cquet.tourism.service.TourismImageService imageService; // 图片服务
 
     @Override
     /**
@@ -68,7 +72,9 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
         queryWrapper.like(name != null && !name.isBlank(), TourismVenue::getName, name) // 名称模糊查询
                 .like(address != null && !address.isBlank(), TourismVenue::getAddress, address); // 地址模糊查询
         queryWrapper.eq(TourismVenue::getDelFlag, "0"); // 仅查询未删除的数据
-        return tourismVenueMapper.selectList(queryWrapper); // 执行查询
+        List<TourismVenue> venues = tourismVenueMapper.selectList(queryWrapper); // 执行查询
+        hydrateCoverImages(venues);
+        return venues;
     }
 
     @Override
@@ -78,7 +84,9 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
           .like(address != null && !address.isBlank(), TourismVenue::getAddress, address)
           .like(city != null && !city.isBlank(), TourismVenue::getCity, city)
           .eq(TourismVenue::getDelFlag, "0");
-        return tourismVenueMapper.selectList(qw);
+        List<TourismVenue> venues = tourismVenueMapper.selectList(qw);
+        hydrateCoverImages(venues);
+        return venues;
     }
 
     @Override
@@ -95,20 +103,25 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
             log.error("该场馆已存在");
             return false;
         }
+        resolveCoverImageReference(venue);
         int inserted = tourismVenueMapper.insert(venue); // 插入主表
         if (inserted <= 0) return false; // 插入失败
         // 处理图片关联：若传入 imageIds，则批量插入关联表
         if (venue.getImageIds() != null && !venue.getImageIds().isEmpty()) {
-            for (Integer imageId : venue.getImageIds()) {
+            int sortOrder = 0;
+            for (Long imageId : venue.getImageIds()) {
                 TourismVenueImage rel = new TourismVenueImage(); // 关联对象
                 rel.setVenueId(venue.getId()); // 绑定场馆ID
                 rel.setImageId(imageId); // 绑定图片ID
+                rel.setSortOrder(sortOrder);
+                rel.setIsCover(sortOrder == 0 ? "1" : "0");
                 venueImageMapper.insert(rel); // 插入关联
+                sortOrder++;
             }
         }
         // 处理设施关联：若传入 facilitiesIds，则批量插入关联表
         if (venue.getFacilitiesIds() != null && !venue.getFacilitiesIds().isEmpty()) {
-            for (Integer fid : venue.getFacilitiesIds()) {
+            for (Long fid : venue.getFacilitiesIds()) {
                 TourismVenueFacilities rel = new TourismVenueFacilities(); // 关联对象
                 rel.setVenueId(venue.getId()); // 绑定场馆ID
                 rel.setFacilitiesId(fid); // 绑定设施ID
@@ -132,6 +145,7 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
             log.error("该场馆已存在");
             return false;
         }
+        resolveCoverImageReference(venue);
         int updated = tourismVenueMapper.updateById(venue); // 更新主表
         if (updated <= 0) return false; // 更新失败
         // 更新图片关联：若提供 imageIds，则先删后插重建关联
@@ -139,11 +153,15 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
             LambdaQueryWrapper<TourismVenueImage> del = new LambdaQueryWrapper<>(); // 删除条件
             del.eq(TourismVenueImage::getVenueId, venue.getId()); // 绑定场馆ID
             venueImageMapper.delete(del); // 删除旧关联
-            for (Integer imageId : venue.getImageIds()) { // 重建关联
+            int sortOrder = 0;
+            for (Long imageId : venue.getImageIds()) { // 重建关联
                 TourismVenueImage rel = new TourismVenueImage();
                 rel.setVenueId(venue.getId());
                 rel.setImageId(imageId);
+                rel.setSortOrder(sortOrder);
+                rel.setIsCover(sortOrder == 0 ? "1" : "0");
                 venueImageMapper.insert(rel);
+                sortOrder++;
             }
         }
         // 更新设施关联：若提供 facilitiesIds，则先删后插重建关联
@@ -151,7 +169,7 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
             LambdaQueryWrapper<TourismVenueFacilities> del2 = new LambdaQueryWrapper<>(); // 删除条件
             del2.eq(TourismVenueFacilities::getVenueId, venue.getId()); // 绑定场馆ID
             venueFacilitiesMapper.delete(del2); // 删除旧关联
-            for (Integer fid : venue.getFacilitiesIds()) { // 重建关联
+            for (Long fid : venue.getFacilitiesIds()) { // 重建关联
                 TourismVenueFacilities rel = new TourismVenueFacilities();
                 rel.setVenueId(venue.getId());
                 rel.setFacilitiesId(fid);
@@ -169,22 +187,27 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
     public VenueDetailVo getDetail(Long id) {
         TourismVenue v = tourismVenueMapper.selectById(id); // 主键查询场馆
         if (v == null) return null; // 不存在直接返回
+        hydrateCoverImages(java.util.Collections.singletonList(v));
         VenueDetailVo vo = new VenueDetailVo(); // 创建详情 VO
         BeanUtils.copyProperties(v, vo); // 拷贝主表字段
 
         LambdaQueryWrapper<TourismVenueImage> q1 = new LambdaQueryWrapper<>(); // 查询图片关联
-        q1.eq(TourismVenueImage::getVenueId, v.getId()); // venue_id=当前场馆ID
+        q1.eq(TourismVenueImage::getVenueId, v.getId())
+          .orderByDesc(TourismVenueImage::getIsCover)
+          .orderByAsc(TourismVenueImage::getSortOrder)
+          .orderByAsc(TourismVenueImage::getId); // venue_id=当前场馆ID
         List<TourismVenueImage> vimgs = venueImageMapper.selectList(q1); // 关联记录列表
         if (!vimgs.isEmpty()) {
-            List<Integer> imageIds = vimgs.stream().map(TourismVenueImage::getImageId).collect(java.util.stream.Collectors.toList()); // 提取图片ID
-            List<TourismImage> images = imageMapper.selectBatchIds(imageIds); // 批量查询图片
+            List<Long> imageIds = vimgs.stream().map(TourismVenueImage::getImageId).collect(Collectors.toList()); // 提取图片ID
+            Map<Long, TourismImage> imageMap = imageService.getImageMap(imageIds);
+            List<TourismImage> images = imageIds.stream().map(imageMap::get).filter(Objects::nonNull).collect(Collectors.toList());
             vo.setImages(images); // 设置图片列表
         }
         LambdaQueryWrapper<TourismVenueFacilities> q2 = new LambdaQueryWrapper<>(); // 查询设施关联
         q2.eq(TourismVenueFacilities::getVenueId, v.getId()); // venue_id=当前场馆ID
         List<TourismVenueFacilities> vfs = venueFacilitiesMapper.selectList(q2); // 关联记录列表
         if (!vfs.isEmpty()) {
-            List<Integer> fids = vfs.stream().map(TourismVenueFacilities::getFacilitiesId).collect(java.util.stream.Collectors.toList()); // 提取设施ID
+            List<Long> fids = vfs.stream().map(TourismVenueFacilities::getFacilitiesId).collect(Collectors.toList()); // 提取设施ID
             List<TourismFacilities> facilities = facilitiesMapper.selectBatchIds(fids); // 批量查询设施
             vo.setFacilities(facilities); // 设置设施列表
         }
@@ -195,49 +218,49 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
      * 查询场馆下的活动列表
      * 条件：未删除、审核通过、状态正常；按创建时间倒序
      */
-    public List<TourismActivity> getActivitiesByVenueId(Integer venueId) {
+    public List<TourismActivity> getActivitiesByVenueId(Long venueId) {
         LambdaQueryWrapper<TourismActivity> qw = new LambdaQueryWrapper<>();
         qw.eq(TourismActivity::getVenueId, venueId)
           .eq(TourismActivity::getDelFlag, "0")
+          .eq(TourismActivity::getAuditStatus, "1")
           .eq(TourismActivity::getStatus, "0")
           .orderByDesc(TourismActivity::getCreateTime);
-        java.util.List<TourismActivity> all = activityMapper.selectList(qw);
-        java.util.List<TourismActivity> passed = new java.util.ArrayList<>();
-        for (TourismActivity a : all) {
-            java.util.List<cn.edu.cquet.tourism.domain.TourismActivityApproval> h = approvalService.history(a.getId());
-            cn.edu.cquet.tourism.domain.TourismActivityApproval latest = (h == null || h.isEmpty()) ? null : h.get(0);
-            if (latest != null && "1".equals(latest.getAuditStatus())) {
-                passed.add(a);
-            }
-        }
-        return passed;
+        java.util.List<TourismActivity> activities = activityMapper.selectList(qw);
+        hydrateActivityCoverImages(activities);
+        return activities;
     }
 
 
     @Override
     public java.util.List<TourismImage> getImagesByVenue(Long venueId) {
         LambdaQueryWrapper<TourismVenueImage> qw = new LambdaQueryWrapper<>();
-        qw.eq(TourismVenueImage::getVenueId, venueId.intValue());
+        qw.eq(TourismVenueImage::getVenueId, venueId)
+          .orderByDesc(TourismVenueImage::getIsCover)
+          .orderByAsc(TourismVenueImage::getSortOrder)
+          .orderByAsc(TourismVenueImage::getId);
         java.util.List<TourismVenueImage> rels = venueImageMapper.selectList(qw);
         if (rels.isEmpty()) return java.util.Collections.emptyList();
-        java.util.List<Integer> imageIds = rels.stream().map(TourismVenueImage::getImageId).collect(java.util.stream.Collectors.toList());
-        return imageMapper.selectBatchIds(imageIds);
+        java.util.List<Long> imageIds = rels.stream().map(TourismVenueImage::getImageId).collect(Collectors.toList());
+        Map<Long, TourismImage> imageMap = imageService.getImageMap(imageIds);
+        return imageIds.stream().map(imageMap::get).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-    public boolean setImagesForVenue(Long venueId, java.util.List<Integer> imageIds) {
+    public boolean setImagesForVenue(Long venueId, java.util.List<Long> imageIds) {
         LambdaQueryWrapper<TourismVenueImage> del = new LambdaQueryWrapper<>();
-        del.eq(TourismVenueImage::getVenueId, venueId.intValue());
+        del.eq(TourismVenueImage::getVenueId, venueId);
         venueImageMapper.delete(del);
         if (imageIds != null) {
             int sort = 0;
-            for (Integer imgId : imageIds) {
+            for (Long imgId : imageIds) {
                 TourismVenueImage rel = new TourismVenueImage();
-                rel.setVenueId(venueId.intValue());
+                rel.setVenueId(venueId);
                 rel.setImageId(imgId);
-                rel.setSort(sort++);
+                rel.setSortOrder(sort);
+                rel.setIsCover(sort == 0 ? "1" : "0");
                 venueImageMapper.insert(rel);
+                sort++;
             }
         }
         return true;
@@ -251,7 +274,7 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
      * 步骤：删除图片与设施的关联；将关联活动的 venue_id 置为 NULL；批量逻辑删除主表
      * 注意：不删除关联的活动记录，仅解除关联（与数据库 ON DELETE SET NULL 约束一致）
      */
-    public boolean removeVenueByIds(List<Integer> ids) {
+    public boolean removeVenueByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) return false; // 校验：至少一个 id
         LambdaQueryWrapper<TourismVenueImage> del1 = new LambdaQueryWrapper<>(); // 删除图片关联
         del1.in(TourismVenueImage::getVenueId, ids);
@@ -267,5 +290,65 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
         activityMapper.update(null, clearVenue);
 
         return tourismVenueMapper.deleteBatchIds(ids) > 0; // 删除主表并返回结果
+    }
+
+    private void resolveCoverImageReference(TourismVenue venue) {
+        if (venue == null) {
+            return;
+        }
+        if (StringUtils.hasText(venue.getCoverImage())) {
+            TourismImage image = imageService.ensureByUrl(venue.getCoverImage());
+            venue.setCoverImageId(image != null ? image.getId() : null);
+        } else if (venue.getCoverImageId() == null) {
+            venue.setCoverImageId(null);
+        }
+    }
+
+    private void hydrateCoverImages(Collection<TourismVenue> venues) {
+        if (venues == null || venues.isEmpty()) {
+            return;
+        }
+        List<Long> coverImageIds = venues.stream()
+                .map(TourismVenue::getCoverImageId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        if (coverImageIds.isEmpty()) {
+            return;
+        }
+        Map<Long, TourismImage> imageMap = imageService.getImageMap(coverImageIds);
+        for (TourismVenue venue : venues) {
+            if (venue.getCoverImageId() == null) {
+                continue;
+            }
+            TourismImage image = imageMap.get(venue.getCoverImageId());
+            if (image != null && StringUtils.hasText(image.getUrl())) {
+                venue.setCoverImage(image.getUrl());
+            }
+        }
+    }
+
+    private void hydrateActivityCoverImages(Collection<TourismActivity> activities) {
+        if (activities == null || activities.isEmpty()) {
+            return;
+        }
+        List<Long> coverImageIds = activities.stream()
+                .map(TourismActivity::getCoverImageId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        if (coverImageIds.isEmpty()) {
+            return;
+        }
+        Map<Long, TourismImage> imageMap = imageService.getImageMap(coverImageIds);
+        for (TourismActivity activity : activities) {
+            if (activity.getCoverImageId() == null) {
+                continue;
+            }
+            TourismImage image = imageMap.get(activity.getCoverImageId());
+            if (image != null && StringUtils.hasText(image.getUrl())) {
+                activity.setCoverImage(image.getUrl());
+            }
+        }
     }
 }

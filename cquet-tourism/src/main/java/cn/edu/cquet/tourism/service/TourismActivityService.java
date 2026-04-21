@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TourismActivityService {
     // 列表查询（根据名称、场馆ID、审核状态）
-    List<TourismActivity> list(String name, Integer venueId, String auditStatus);
+    List<TourismActivity> list(String name, Long venueId, String auditStatus);
     // 详情查询（根据ID）
     TourismActivity detail(Long id);
     // 更新状态（根据ID）

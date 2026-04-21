@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,13 +37,16 @@ public class WebTourismActivityController extends BaseController {
     @GetMapping("/list")
     @Operation(summary = "用户端活动列表")
     public TableDataInfo list(@RequestParam(required = false) String name,
-                              @RequestParam(required = false) Integer venueId,
+                              @RequestParam(required = false) Long venueId,
                               @RequestParam(required = false) String auditStatus) {
         startPage();
         List<TourismActivity> list = activityService.list(name, venueId, auditStatus);
+        Map<Long, TourismActivityApproval> latestMap = approvalService.latestByActivityIds(
+                list.stream().map(TourismActivity::getId).toList()
+        );
         List<TourismActivityVo> vos = new ArrayList<>(list.size());
         for (TourismActivity activity : list) {
-            vos.add(toVo(activity));
+            vos.add(toVo(activity, latestMap.get(activity.getId())));
         }
         return getDataTable(vos);
     }
@@ -55,17 +59,14 @@ public class WebTourismActivityController extends BaseController {
         if (activity == null) {
             return warn("活动不存在");
         }
-        return success(toVo(activity));
+        return success(toVo(activity, approvalService.latest(id)));
     }
 
-    private TourismActivityVo toVo(TourismActivity activity) {
+    private TourismActivityVo toVo(TourismActivity activity, TourismActivityApproval latest) {
         TourismActivityVo vo = new TourismActivityVo();
         BeanUtils.copyProperties(activity, vo);
-        List<TourismActivityApproval> history = approvalService.history(activity.getId());
-        TourismActivityApproval latest = (history == null || history.isEmpty()) ? null : history.get(0);
-        if (latest == null) {
-            vo.setAuditStatus("0");
-        } else {
+        vo.setAuditStatus(activity.getAuditStatus() != null ? activity.getAuditStatus() : "0");
+        if (latest != null) {
             vo.setAuditStatus(latest.getAuditStatus());
             vo.setAuditReason(latest.getReason());
             vo.setAuditor(latest.getAuditor());

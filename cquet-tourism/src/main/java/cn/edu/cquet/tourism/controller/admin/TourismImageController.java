@@ -83,7 +83,10 @@ public class TourismImageController extends BaseController {
      */
     public TableDataInfo list() {
         startPage();
-        List<TourismImage> list = imageService.list();
+        List<TourismImage> list = imageService.lambdaQuery()
+                .eq(TourismImage::getDelFlag, "0")
+                .orderByDesc(TourismImage::getCreateTime)
+                .list();
         return getDataTable(list);
     }
 
@@ -100,7 +103,7 @@ public class TourismImageController extends BaseController {
      * 入参：路径参数 `id`
      * 返回：图片记录，不存在则返回警告
      */
-    public Result get(@PathVariable Integer id) {
+    public Result get(@PathVariable Long id) {
         TourismImage img = imageService.getById(id);
         if (img == null) {
             return warn("图片不存在");
@@ -120,7 +123,7 @@ public class TourismImageController extends BaseController {
      * 入参：路径参数 `ids`
      * 返回：统一 `Result`
      */
-    public Result remove(@PathVariable List<Integer> ids) {
+    public Result remove(@PathVariable List<Long> ids) {
         return toAjax(imageService.removeByIds(ids));
     }
 }

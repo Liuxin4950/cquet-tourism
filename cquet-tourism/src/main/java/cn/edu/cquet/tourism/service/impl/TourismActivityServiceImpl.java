@@ -2,17 +2,21 @@ package cn.edu.cquet.tourism.service.impl;
 
 import cn.edu.cquet.common.exception.ServiceException;
 import cn.edu.cquet.tourism.domain.TourismActivity;
+import cn.edu.cquet.tourism.domain.TourismImage;
 import cn.edu.cquet.tourism.mapper.TourismActivityMapper;
 import cn.edu.cquet.tourism.service.TourismActivityService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import cn.edu.cquet.common.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 /**
@@ -28,34 +32,23 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
     @Autowired
     private cn.edu.cquet.tourism.service.TourismActivityApprovalService approvalService; // 审批记录服务
 
+    @Autowired
+    private cn.edu.cquet.tourism.service.TourismImageService imageService; // 图片资源服务
+
     @Override
     /**
      * 列表查询
      * 条件：名称模糊、场馆、审核状态；仅查询未删除；按创建时间降序
      */
-    public List<TourismActivity> list(String name, Integer venueId, String auditStatus) {
+    public List<TourismActivity> list(String name, Long venueId, String auditStatus) {
         LambdaQueryWrapper<TourismActivity> qw = new LambdaQueryWrapper<>(); // 创建查询构造器
         qw.like(StringUtils.hasText(name), TourismActivity::getName, name) // 名称模糊
           .eq(venueId != null, TourismActivity::getVenueId, venueId) // 场馆过滤
+          .eq(StringUtils.hasText(auditStatus), TourismActivity::getAuditStatus, normalizeAuditStatus(auditStatus))
           .eq(TourismActivity::getDelFlag, "0") // 未删除
           .orderByDesc(TourismActivity::getCreateTime); // 创建时间倒序
         List<TourismActivity> list = activityMapper.selectList(qw);
-        // 若携带审核状态筛选，则根据最新审批记录进行过滤
-        if (StringUtils.hasText(auditStatus)) {
-            String as = normalizeAuditStatus(auditStatus);
-            if ("0".equals(as)) {
-                list = list.stream().filter(a -> {
-                    List<cn.edu.cquet.tourism.domain.TourismActivityApproval> h = approvalService.history(a.getId());
-                    return h == null || h.isEmpty();
-                }).toList();
-            } else if ("1".equals(as) || "2".equals(as)) {
-                list = list.stream().filter(a -> {
-                    List<cn.edu.cquet.tourism.domain.TourismActivityApproval> h = approvalService.history(a.getId());
-                    cn.edu.cquet.tourism.domain.TourismActivityApproval latest = (h == null || h.isEmpty()) ? null : h.get(0);
-                    return latest != null && as.equals(latest.getAuditStatus());
-                }).toList();
-            }
-        }
+        hydrateCoverImages(list);
         return list;
     }
 
@@ -65,7 +58,9 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
      */
     public TourismActivity detail(Long id) {
         if (id == null) return null; // 基本校验
-        return activityMapper.selectById(id); // 主键查询
+        TourismActivity activity = activityMapper.selectById(id); // 主键查询
+        hydrateCoverImages(activity == null ? java.util.Collections.emptyList() : java.util.Collections.singletonList(activity));
+        return activity;
     }
 
     @Override
@@ -114,6 +109,8 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
         activity.setApplicantName(cn.edu.cquet.common.utils.SecurityUtils.getUsername());
         if (activity.getApplyReason() == null) activity.setApplyReason(activity.getDescription());
         activity.setApplyTime(new java.util.Date());
+        activity.setAuditStatus("0");
+        resolveCoverImageReference(activity);
         return activityMapper.insert(activity) > 0; // 插入记录
     }
 
@@ -124,6 +121,7 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
      */
     public boolean update(TourismActivity activity) {
         if (activity == null || activity.getId() == null) return false;
+        resolveCoverImageReference(activity);
         return activityMapper.updateById(activity) > 0;
     }
 
@@ -145,5 +143,41 @@ public class TourismActivityServiceImpl extends ServiceImpl<TourismActivityMappe
     public boolean removeByIds(java.util.List<Long> ids) {
         if (ids == null || ids.isEmpty()) return false;
         return activityMapper.deleteBatchIds(ids) > 0;
+    }
+
+    private void resolveCoverImageReference(TourismActivity activity) {
+        if (activity == null) {
+            return;
+        }
+        if (StringUtils.hasText(activity.getCoverImage())) {
+            TourismImage image = imageService.ensureByUrl(activity.getCoverImage());
+            activity.setCoverImageId(image != null ? image.getId() : null);
+        } else if (activity.getCoverImageId() == null) {
+            activity.setCoverImageId(null);
+        }
+    }
+
+    private void hydrateCoverImages(Collection<TourismActivity> activities) {
+        if (activities == null || activities.isEmpty()) {
+            return;
+        }
+        List<Long> coverImageIds = activities.stream()
+                .map(TourismActivity::getCoverImageId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        if (coverImageIds.isEmpty()) {
+            return;
+        }
+        Map<Long, TourismImage> imageMap = imageService.getImageMap(coverImageIds);
+        for (TourismActivity activity : activities) {
+            if (activity.getCoverImageId() == null) {
+                continue;
+            }
+            TourismImage image = imageMap.get(activity.getCoverImageId());
+            if (image != null && StringUtils.hasText(image.getUrl())) {
+                activity.setCoverImage(image.getUrl());
+            }
+        }
     }
 }

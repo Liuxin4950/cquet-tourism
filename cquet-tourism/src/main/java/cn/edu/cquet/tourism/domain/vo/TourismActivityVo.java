@@ -12,10 +12,11 @@ public class TourismActivityVo {
     private Long id;
     private String name;
     private String coverImage;
+    private Long coverImageId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String category;
-    private Integer venueId;
+    private Long venueId;
     private String organizer;
     private String contactPhone;
     private String description;

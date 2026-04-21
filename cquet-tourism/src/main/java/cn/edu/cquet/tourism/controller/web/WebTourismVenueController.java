@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,24 +64,24 @@ public class WebTourismVenueController extends BaseController {
         if (id == null) {
             return warn("场馆id不能为空");
         }
-        List<TourismActivity> list =
-                ((cn.edu.cquet.tourism.service.impl.TourismVenueServiceImpl) tourismVenueService)
-                        .getActivitiesByVenueId(id.intValue());
+        List<TourismActivity> list = tourismVenueService.getActivitiesByVenueId(id);
+        Map<Long, TourismActivityApproval> latestMap = approvalService.latestByActivityIds(
+                list.stream().map(TourismActivity::getId).toList()
+        );
         List<TourismActivityVo> vos = new ArrayList<>(list.size());
         for (TourismActivity activity : list) {
             TourismActivityVo vo = new TourismActivityVo();
             vo.setId(activity.getId());
             vo.setName(activity.getName());
+            vo.setCoverImage(activity.getCoverImage());
+            vo.setCoverImageId(activity.getCoverImageId());
             vo.setCategory(activity.getCategory());
             vo.setStartTime(activity.getStartTime());
             vo.setEndTime(activity.getEndTime());
             vo.setStatus(activity.getStatus());
-            List<TourismActivityApproval> history = approvalService.history(activity.getId());
-            TourismActivityApproval latest =
-                    (history == null || history.isEmpty()) ? null : history.get(0);
-            if (latest == null) {
-                vo.setAuditStatus("0");
-            } else {
+            TourismActivityApproval latest = latestMap.get(activity.getId());
+            vo.setAuditStatus(activity.getAuditStatus() != null ? activity.getAuditStatus() : "0");
+            if (latest != null) {
                 vo.setAuditStatus(latest.getAuditStatus());
                 vo.setAuditReason(latest.getReason());
                 vo.setAuditor(latest.getAuditor());

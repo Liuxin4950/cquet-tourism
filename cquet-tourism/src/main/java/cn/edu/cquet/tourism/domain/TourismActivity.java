@@ -35,6 +35,10 @@ public class TourismActivity extends AbsEntity {
     @Schema(description = "封面图片地址")
     private String coverImage;
 
+    @TableField("cover_image_id")
+    @Schema(description = "封面图片ID")
+    private Long coverImageId;
+
     @TableField("start_time")
     @NotNull(message = "开始时间不能为空")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -54,7 +58,7 @@ public class TourismActivity extends AbsEntity {
     @TableField("venue_id")
     @NotNull(message = "所属场馆不能为空")
     @Schema(description = "所属场馆ID")
-    private Integer venueId;
+    private Long venueId;
 
     @Schema(description = "主办方")
     @Size(max = 100)
@@ -101,4 +105,9 @@ public class TourismActivity extends AbsEntity {
     @Schema(description = "申报时间")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private java.util.Date applyTime;
+
+    @TableField("audit_status")
+    @Schema(description = "审核状态：0-待审核，1-通过，2-拒绝")
+    @Size(max = 1)
+    private String auditStatus;
 }

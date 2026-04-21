@@ -60,5 +60,5 @@ public interface TourismScenicSpotService extends IService<TourismScenicSpot> {
     /**
      * 设置景区关联的图片（覆盖式）
      */
-    boolean setImagesForScenicSpot(Long scenicSpotId, List<Integer> imageIds);
+    boolean setImagesForScenicSpot(Long scenicSpotId, List<Long> imageIds);
 }

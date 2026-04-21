@@ -70,7 +70,7 @@ class TourismVenueServiceTest {
     @BeforeEach
     void setUp() {
         testVenue = new TourismVenue();
-        testVenue.setId(1);
+        testVenue.setId(Long.valueOf(1L));
         testVenue.setName("重庆体育馆");
         testVenue.setCity("重庆");
         testVenue.setAddress("重庆市渝中区体育路1号");
@@ -111,7 +111,7 @@ class TourismVenueServiceTest {
         @Test
         @DisplayName("新增时绑定图片成功")
         void addVenue_BindsImages_WhenImageIdsProvided() {
-            testVenue.setImageIds(Arrays.asList(1, 2, 3));
+            testVenue.setImageIds(Arrays.asList(Long.valueOf(1L), Long.valueOf(2L), Long.valueOf(3L)));
             when(tourismVenueMapper.selectList(any(LambdaQueryWrapper.class)))
                     .thenReturn(Collections.emptyList());
             when(tourismVenueMapper.insert(any(TourismVenue.class))).thenReturn(1);
@@ -125,7 +125,7 @@ class TourismVenueServiceTest {
         @Test
         @DisplayName("新增时绑定设施成功")
         void addVenue_BindsFacilities_WhenFacilitiesIdsProvided() {
-            testVenue.setFacilitiesIds(Arrays.asList(1, 2));
+            testVenue.setFacilitiesIds(Arrays.asList(Long.valueOf(1L), Long.valueOf(2L)));
             when(tourismVenueMapper.selectList(any(LambdaQueryWrapper.class)))
                     .thenReturn(Collections.emptyList());
             when(tourismVenueMapper.insert(any(TourismVenue.class))).thenReturn(1);
@@ -179,7 +179,7 @@ class TourismVenueServiceTest {
         @Test
         @DisplayName("更新时重建图片关联")
         void updateVenue_RebuildsImageRelations() {
-            testVenue.setImageIds(Arrays.asList(1, 2));
+            testVenue.setImageIds(Arrays.asList(Long.valueOf(1L), Long.valueOf(2L)));
             when(tourismVenueMapper.selectList(any(LambdaQueryWrapper.class)))
                     .thenReturn(Collections.emptyList());
             when(tourismVenueMapper.updateById(any(TourismVenue.class))).thenReturn(1);
@@ -216,7 +216,7 @@ class TourismVenueServiceTest {
         @Test
         @DisplayName("批量删除成功")
         void removeVenueByIds_Success() {
-            List<Integer> ids = Arrays.asList(1, 2, 3);
+            List<Long> ids = Arrays.asList(Long.valueOf(1L), Long.valueOf(2L), Long.valueOf(3L));
             when(tourismVenueMapper.deleteBatchIds(ids)).thenReturn(3);
 
             boolean result = venueService.removeVenueByIds(ids);
@@ -288,7 +288,7 @@ class TourismVenueServiceTest {
         @Test
         @DisplayName("设置图片关联时先删后插")
         void setImagesForVenue_DeletesAndInserts() {
-            List<Integer> imageIds = Arrays.asList(1, 2, 3);
+            List<Long> imageIds = Arrays.asList(Long.valueOf(1L), Long.valueOf(2L), Long.valueOf(3L));
 
             boolean result = venueService.setImagesForVenue(1L, imageIds);
 
@@ -301,7 +301,7 @@ class TourismVenueServiceTest {
         @DisplayName("查询场馆关联图片")
         void getImagesByVenue_ReturnsImageList() {
             TourismVenueImage rel = new TourismVenueImage();
-            rel.setImageId(1);
+            rel.setImageId(Long.valueOf(1L));
             when(venueImageMapper.selectList(any(LambdaQueryWrapper.class)))
                     .thenReturn(List.of(rel));
             when(imageMapper.selectBatchIds(any())).thenReturn(List.of(new TourismImage()));

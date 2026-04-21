@@ -14,9 +14,9 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "景区设备设施表")
 public class TourismFacilities {
 
-    @Schema(description = "主键，整型")
+    @Schema(description = "主键")
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     @Schema(description = "设施名称")
     @TableField("facilities")
