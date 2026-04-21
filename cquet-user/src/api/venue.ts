@@ -3,15 +3,25 @@ import request from './request'
 export interface Venue {
   id: number
   name: string
-  type: string
-  province: string
-  city: string
-  address: string
-  description: string
-  capacity: number
-  openHours: string
-  ticketInfo: string
-  images: string[]
+  type?: string
+  category?: string
+  province?: string
+  city?: string
+  district?: string
+  address?: string
+  description?: string
+  capacity?: number
+  openHours?: string
+  openingHours?: string
+  ticketInfo?: string
+  ticketPrice?: number | string
+  coverImage?: string
+  images?: string[]
+  contactPhone?: string
+  website?: string
+  bookingRequired?: string
+  status?: string
+  facilities?: string[] | string | null
 }
 
 export interface VenueQuery {

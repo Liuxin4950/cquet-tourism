@@ -1,16 +1,33 @@
 import request from './request'
 
+export interface ScenicSpotVenue {
+  id: number
+  name?: string
+  address?: string
+  capacity?: number
+  description?: string
+  facilities?: string[] | string
+  images?: string[]
+}
+
 export interface ScenicSpot {
   id: number
   name: string
   level: string
-  province: string
-  city: string
+  province?: string
+  city?: string
+  district?: string
   address: string
-  description: string
-  openHours: string
-  ticketInfo: string
-  images: string[]
+  description?: string
+  openTime?: string
+  openHours?: string
+  openingHours?: string
+  ticketInfo?: string
+  ticketPrice?: number | string
+  coverImage?: string
+  images?: string[]
+  status?: string
+  venues?: ScenicSpotVenue[]
 }
 
 export interface ScenicSpotQuery {

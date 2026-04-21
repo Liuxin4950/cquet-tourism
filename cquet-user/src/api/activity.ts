@@ -3,15 +3,27 @@ import request from './request'
 export interface Activity {
   id: number
   name: string
-  type: string
+  category?: string
+  type?: string
+  coverImage?: string
   venueId: number
-  venueName: string
+  venueName?: string
   startTime: string
   endTime: string
   description: string
-  capacity: number
-  currentParticipants: number
+  organizer?: string
+  contactPhone?: string
+  currentParticipants?: number
+  maxParticipants?: number
   status: string
+  auditStatus?: string
+  auditReason?: string
+  auditor?: string
+  auditTime?: string
+  applicantName?: string
+  applyReason?: string
+  applyTime?: string
+  createTime?: string
 }
 
 export interface ActivityQuery {

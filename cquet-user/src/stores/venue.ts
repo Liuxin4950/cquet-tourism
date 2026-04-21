@@ -3,6 +3,19 @@ import { ref } from 'vue'
 import { listVenue, getVenue, listVenueImages } from '@/api/venue'
 import { imgUrl } from '@/utils/imgUrl'
 
+const normalizeImageList = (source: any): string[] => {
+  if (!source) return []
+  const list = Array.isArray(source) ? source : String(source).split(',')
+  return list
+    .map((item: any) => {
+      if (!item) return ''
+      if (typeof item === 'string') return item.trim()
+      return item.url || item.imageUrl || item.path || ''
+    })
+    .filter(Boolean)
+    .map((item: string) => imgUrl(item))
+}
+
 export const useVenueStore = defineStore('venue', () => {
   const venues = ref<any[]>([])
   const currentVenue = ref<any | null>(null)
@@ -20,8 +33,8 @@ export const useVenueStore = defineStore('venue', () => {
       // 统一 coverImage → images[]；category → type（兼容前端类型）；URL 经过 imgUrl 处理
       venues.value = list.map(v => ({
         ...v,
-        type: v.category,
-        images: v.coverImage ? [imgUrl(v.coverImage)] : [],
+        type: v.type || v.category,
+        images: normalizeImageList(v.images).length > 0 ? normalizeImageList(v.images) : normalizeImageList(v.coverImage),
       }))
       total.value = res.total || res.data?.total || 0
     } catch {
@@ -36,7 +49,15 @@ export const useVenueStore = defineStore('venue', () => {
     error.value = false
     try {
       const res: any = await getVenue(id)
-      currentVenue.value = res.data || res
+      const body = res.data || res
+      const detail = body.data || body
+      const detailImages = normalizeImageList(detail.images)
+      const coverImages = normalizeImageList(detail.coverImage)
+      currentVenue.value = {
+        ...detail,
+        type: detail.type || detail.category,
+        images: detailImages.length > 0 ? detailImages : coverImages,
+      }
     } catch {
       error.value = true
     } finally {
@@ -47,8 +68,9 @@ export const useVenueStore = defineStore('venue', () => {
   const fetchVenueImages = async (id: number) => {
     try {
       const res: any = await listVenueImages(id)
-      const images: any[] = res.data || res || []
-      venueImages.value = images.map((img: any) => imgUrl(img.url || img.imageUrl || img))
+      const body = res.data || res
+      const images: any[] = body.data || body || []
+      venueImages.value = normalizeImageList(images)
     } catch (e) {
       console.warn(`fetchVenueImages(${id}) failed:`, e)
       venueImages.value = []

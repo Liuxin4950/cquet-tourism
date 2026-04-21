@@ -1,114 +1,235 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import NavBar from '@/components/layout/NavBar.vue'
-import HeroBanner from '@/components/ui/HeroBanner.vue'
-import ActivityGridCard from '@/components/ui/ActivityGridCard.vue'
 import BackToTop from '@/components/ui/BackToTop.vue'
-import LoadingState from '@/components/ui/LoadingState.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
-import ErrorState from '@/components/ui/ErrorState.vue'
+import ChannelIntro from '@/components/channel/ChannelIntro.vue'
+import ChannelPageShell from '@/components/channel/ChannelPageShell.vue'
+import PageToolbar from '@/components/channel/PageToolbar.vue'
+import PaginationBar from '@/components/channel/PaginationBar.vue'
+import StateBlock from '@/components/channel/StateBlock.vue'
+import ActivityScheduleCard, { type ScheduleActivity } from '@/components/cards/ActivityScheduleCard.vue'
 import { useActivityStore } from '@/stores/activity'
+
+type SortType = 'timeAsc' | 'timeDesc' | 'nameAsc'
+interface VenueFilterOption {
+  id: number
+  name: string
+}
 
 const store = useActivityStore()
 const page = ref(1)
 const pageSize = ref(12)
+const searchName = ref('')
+const selectedStatus = ref('')
+const selectedVenueId = ref('')
+const sortType = ref<SortType>('timeAsc')
+
+const buildQuery = (targetPage = page.value) => ({
+  pageNum: targetPage,
+  pageSize: pageSize.value,
+  name: searchName.value.trim() || undefined,
+  status: selectedStatus.value || undefined,
+  venueId: selectedVenueId.value ? Number(selectedVenueId.value) : undefined,
+})
 
 onMounted(() => {
-  store.fetchActivities({ pageNum: page.value, pageSize: pageSize.value })
+  store.fetchActivities(buildQuery())
 })
+
+const handleSearch = () => {
+  page.value = 1
+  store.fetchActivities(buildQuery(1))
+}
+
+const handleReset = () => {
+  searchName.value = ''
+  selectedStatus.value = ''
+  selectedVenueId.value = ''
+  sortType.value = 'timeAsc'
+  page.value = 1
+  store.fetchActivities(buildQuery(1))
+}
 
 const handlePageChange = (p: number) => {
   page.value = p
-  store.fetchActivities({ pageNum: p, pageSize: pageSize.value })
+  store.fetchActivities(buildQuery(p))
 }
 
 const handleRetry = () => {
-  store.fetchActivities({ pageNum: page.value, pageSize: pageSize.value })
+  store.fetchActivities(buildQuery())
 }
 
 const totalPages = computed(() => Math.ceil(store.total / pageSize.value))
 
-const rows = computed(() => {
-  const result: any[][] = []
-  for (let i = 0; i < store.activities.length; i += 3) {
-    result.push(store.activities.slice(i, i + 3))
-  }
-  return result
+const activities = computed<ScheduleActivity[]>(() => store.activities as ScheduleActivity[])
+
+const venueOptions = computed<VenueFilterOption[]>(() => {
+  const map = new Map<number, string>()
+  activities.value.forEach(activity => {
+    const rawVenueId = (activity as ScheduleActivity & { venueId?: number }).venueId
+    if (rawVenueId && activity.venueName) {
+      map.set(rawVenueId, activity.venueName)
+    }
+  })
+  return Array.from(map, ([id, name]) => ({ id, name }))
 })
+
+const sortedActivities = computed(() => {
+  return [...activities.value].sort((a, b) => {
+    if (sortType.value === 'nameAsc') {
+      return (a.name || '').localeCompare(b.name || '', 'zh-Hans-CN')
+    }
+
+    const aTime = a.startTime ? new Date(a.startTime.replace(/-/g, '/')).getTime() : 0
+    const bTime = b.startTime ? new Date(b.startTime.replace(/-/g, '/')).getTime() : 0
+    return sortType.value === 'timeDesc' ? bTime - aTime : aTime - bTime
+  })
+})
+
+const recommendedActivities = computed(() => {
+  return sortedActivities.value.slice(0, 3)
+})
+
+const showRecommendations = computed(() => recommendedActivities.value.length > 0 && !store.isLoading && !store.error)
+
+const formatActivityDate = (value?: string) => {
+  if (!value) return '时间待定'
+  return value.slice(0, 16)
+}
 </script>
 
 <template>
-  <div class="relative bg-white">
-    <NavBar />
+  <NavBar />
 
-    <!-- Hero Banner: 100vh + 纯黑渐变 -->
-    <div class="relative" style="z-index: 1;">
-      <HeroBanner
-        title="特色活动"
-        backgroundImage="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1920&h=1080&fit=crop&q=80"
-        theme="black"
+  <ChannelPageShell>
+    <ChannelIntro
+      eyebrow="CHONGQING EVENTS"
+      title="特色活动"
+      subtitle="发现近期值得参与的文化体验、城市活动与特色演出"
+      total-label="活动总数"
+      :total-value="store.total"
+      filtered-label="当前结果"
+      :filtered-value="activities.length"
+      note="按时间、场馆与状态快速浏览"
+    />
+
+    <div class="mt-10">
+      <PageToolbar
+        v-model:search="searchName"
+        v-model:status="selectedStatus"
+        v-model:venue-id="selectedVenueId"
+        v-model:sort="sortType"
+        :result-count="activities.length"
+        :venue-options="venueOptions"
+        @submit="handleSearch"
+        @reset="handleReset"
       />
     </div>
 
-    <!-- 页面内容 -->
-    <div class="bg-white">
-      <!-- 标题栏 -->
-      <div class="border-b border-dark/10">
-        <div class="max-w-[1280px] mx-auto px-6 lg:px-10">
-          <h2 class="font-heading text-lg font-semibold text-brand py-8">特色活动</h2>
-        </div>
-      </div>
+    <div class="mt-6">
+      <StateBlock
+        v-if="store.isLoading"
+        type="loading"
+      />
 
-      <LoadingState v-if="store.isLoading" :isLoading="store.isLoading" />
-      <ErrorState v-else-if="store.error" message="加载失败，请检查网络连接" @retry="handleRetry" />
-      <EmptyState v-else-if="store.activities.length === 0" message="暂无活动数据" />
+      <StateBlock
+        v-else-if="store.error"
+        type="error"
+        title="活动加载失败"
+        description="网络异常或数据暂不可用，请稍后重试。"
+        action-text="重新加载"
+        @action="handleRetry"
+      />
 
-      <div v-else>
-        <div
-          v-for="(row, rowIndex) in rows"
-          :key="rowIndex"
-          class="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-dark/10"
-          :class="rowIndex < rows.length - 1 ? 'border-b border-dark/10' : ''"
-        >
-          <div
-            v-for="(activity, colIndex) in row"
-            :key="activity.id"
-            class="border-r border-dark/10 last:border-r-0"
-          >
-            <ActivityGridCard :activity="activity" />
+      <StateBlock
+        v-else-if="sortedActivities.length === 0"
+        type="empty"
+        title="暂时没有符合条件的活动"
+        description="你可以调整筛选条件，或先浏览全部活动内容。"
+        action-text="查看全部活动"
+        secondary-action-text="清除筛选"
+        @action="handleReset"
+        @secondary="handleReset"
+      />
+
+      <div v-else class="space-y-10">
+        <section v-if="showRecommendations">
+          <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 class="font-heading text-[26px] font-bold text-brand">近期推荐</h2>
+              <p class="mt-2 font-body text-sm text-muted">基于当前活动列表靠前内容展示，便于快速发现值得关注的活动。</p>
+            </div>
+            <span class="font-body text-sm text-muted">精选活动</span>
           </div>
-          <div
-            v-for="n in (3 - row.length)"
-            :key="'empty-' + n"
-            class="border-r border-dark/10 last:border-r-0 hidden lg:block"
-          ></div>
-        </div>
-      </div>
 
-      <!-- 分页器 -->
-      <div v-if="totalPages > 1" class="flex items-center justify-center gap-3 py-10 border-t border-dark/10">
-        <button
-          @click="handlePageChange(page - 1)"
-          :disabled="page === 1"
-          class="w-8 h-8 rounded border border-border flex items-center justify-center text-muted hover:border-brand hover:text-brand transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </button>
-        <span class="font-montserrat text-sm text-muted px-2">{{ page }} / {{ totalPages }}</span>
-        <button
-          @click="handlePageChange(page + 1)"
-          :disabled="page === totalPages"
-          class="w-8 h-8 rounded border border-border flex items-center justify-center text-muted hover:border-brand hover:text-brand transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-          </svg>
-        </button>
+          <div class="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+            <router-link
+              :to="`/activities/${recommendedActivities[0].id}`"
+              class="group rounded-[20px] border border-border bg-light p-6 transition-colors hover:border-accent md:p-7"
+            >
+              <div class="mb-8 flex flex-wrap items-center gap-2">
+                <span v-if="recommendedActivities[0].type || recommendedActivities[0].category" class="font-body text-sm text-muted">
+                  {{ recommendedActivities[0].type || recommendedActivities[0].category }}
+                </span>
+                <span v-if="recommendedActivities[0].status" class="rounded-full border border-border bg-white px-3 py-1 font-body text-xs text-muted">
+                  {{ recommendedActivities[0].status }}
+                </span>
+              </div>
+              <h3 class="font-heading text-[26px] font-semibold leading-tight text-brand">
+                {{ recommendedActivities[0].name || '暂无名称' }}
+              </h3>
+              <p class="mt-4 line-clamp-2 font-body text-base leading-7 text-muted">
+                {{ recommendedActivities[0].description || '暂无活动介绍' }}
+              </p>
+              <div class="mt-7 flex flex-wrap gap-x-5 gap-y-2 font-body text-sm text-muted">
+                <span>{{ formatActivityDate(recommendedActivities[0].startTime) }}</span>
+                <span v-if="recommendedActivities[0].venueName">{{ recommendedActivities[0].venueName }}</span>
+              </div>
+            </router-link>
+
+            <div v-if="recommendedActivities.length > 1" class="grid gap-5">
+              <router-link
+                v-for="item in recommendedActivities.slice(1)"
+                :key="item.id"
+                :to="`/activities/${item.id}`"
+                class="rounded-[20px] border border-border bg-white p-6 transition-colors hover:border-accent"
+              >
+                <div class="mb-3 flex items-center justify-between gap-3">
+                  <span class="font-body text-xs text-muted">{{ formatActivityDate(item.startTime) }}</span>
+                  <span v-if="item.status" class="rounded-full bg-light px-3 py-1 font-body text-xs text-muted">{{ item.status }}</span>
+                </div>
+                <h3 class="font-heading text-[18px] font-semibold text-brand">{{ item.name || '暂无名称' }}</h3>
+                <p class="mt-3 line-clamp-2 font-body text-sm leading-6 text-muted">
+                  {{ item.description || item.venueName || '暂无活动介绍' }}
+                </p>
+              </router-link>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="mb-5">
+            <h2 class="font-heading text-[24px] font-bold text-brand">全部活动</h2>
+            <p class="mt-2 font-body text-sm text-muted">按时间、状态和场馆浏览更多活动。</p>
+          </div>
+
+          <div class="space-y-4">
+            <ActivityScheduleCard
+              v-for="activity in sortedActivities"
+              :key="activity.id"
+              :activity="activity"
+            />
+          </div>
+        </section>
+
+        <PaginationBar
+          :page="page"
+          :total-pages="totalPages"
+          @change="handlePageChange"
+        />
       </div>
     </div>
+  </ChannelPageShell>
 
-    <BackToTop />
-  </div>
+  <BackToTop />
 </template>

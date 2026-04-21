@@ -3,6 +3,19 @@ import { ref } from 'vue'
 import { listScenicSpot, getScenicSpot, listScenicSpotImages } from '@/api/scenicSpot'
 import { imgUrl } from '@/utils/imgUrl'
 
+const normalizeImageList = (source: any): string[] => {
+  if (!source) return []
+  const list = Array.isArray(source) ? source : String(source).split(',')
+  return list
+    .map((item: any) => {
+      if (!item) return ''
+      if (typeof item === 'string') return item.trim()
+      return item.url || item.imageUrl || item.path || ''
+    })
+    .filter(Boolean)
+    .map((item: string) => imgUrl(item))
+}
+
 export const useScenicSpotStore = defineStore('scenicSpot', () => {
   const spots = ref<any[]>([])
   const currentSpot = ref<any | null>(null)
@@ -35,7 +48,14 @@ export const useScenicSpotStore = defineStore('scenicSpot', () => {
     error.value = false
     try {
       const res: any = await getScenicSpot(id)
-      currentSpot.value = res.data || res
+      const body = res.data || res
+      const detail = body.data || body
+      const detailImages = normalizeImageList(detail.images)
+      const coverImages = normalizeImageList(detail.coverImage)
+      currentSpot.value = {
+        ...detail,
+        images: detailImages.length > 0 ? detailImages : coverImages,
+      }
     } catch {
       error.value = true
     } finally {
@@ -46,8 +66,9 @@ export const useScenicSpotStore = defineStore('scenicSpot', () => {
   const fetchSpotImages = async (id: number) => {
     try {
       const res: any = await listScenicSpotImages(id)
-      const images: any[] = res.data || res || []
-      spotImages.value = images.map((img: any) => imgUrl(img.url || img.imageUrl || img))
+      const body = res.data || res
+      const images: any[] = body.data || body || []
+      spotImages.value = normalizeImageList(images)
     } catch (e) {
       console.warn(`fetchSpotImages(${id}) failed:`, e)
       spotImages.value = []
