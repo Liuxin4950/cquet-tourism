@@ -55,9 +55,12 @@ public class tourismVenueController extends BaseController {
      */
     public TableDataInfo getList(@RequestParam(required = false) String name,
                                  @RequestParam(required = false) String address,
-                                 @RequestParam(required = false) String city) {
+                                 @RequestParam(required = false) String city,
+                                 @RequestParam(required = false) String district,
+                                 @RequestParam(required = false) String category,
+                                 @RequestParam(required = false) String status) {
         startPage();
-        List<TourismVenue> list = tourismVenueService.getVenueList(name, address, city);
+        List<TourismVenue> list = tourismVenueService.getVenueList(name, address, city, district, category, status);
         // 将数据转换为TableDataInfo对象返回
         return getDataTable(list);
     }

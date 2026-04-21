@@ -1,6 +1,9 @@
 <template>
-  <div class="app-container">
+  <div class="app-container tourism-page">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
+      <el-form-item label="文件名" prop="fileName">
+        <el-input v-model="queryParams.fileName" placeholder="请输入文件名" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
+      </el-form-item>
       <el-form-item label="图片URL" prop="url">
         <el-input v-model="queryParams.url" placeholder="请输入图片URL" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
       </el-form-item>
@@ -22,13 +25,14 @@
 
     <el-table
       v-loading="loading"
+      class="tourism-data-table"
       :data="imageList"
       @selection-change="handleSelectionChange"
       border
       stripe
+      fit
       size="small"
       highlight-current-row
-      :header-cell-style="{ background: '#fafafa', color: '#606266' }"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" />
@@ -44,6 +48,26 @@
           <span v-else>无图片</span>
         </template>
       </el-table-column>
+      <el-table-column label="文件名" min-width="220" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          <span>{{ scope.row.originalName || scope.row.fileName || '暂无...' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="类型" prop="fileExt" width="90" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.fileExt || '暂无...' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="大小" prop="fileSize" width="100" align="center">
+        <template slot-scope="scope">
+          <span>{{ formatFileSize(scope.row.fileSize) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="存储" prop="storageType" width="100" align="center">
+        <template slot-scope="scope">
+          <el-tag size="mini" type="info">{{ scope.row.storageType || 'local' }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="图片URL" prop="url" min-width="300" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <a :href="imageUrl(scope.row.url)" target="_blank" style="color: #409eff">{{ scope.row.url }}</a>
@@ -54,7 +78,7 @@
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="160">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="160">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:image:remove']">删除</el-button>
         </template>
@@ -64,7 +88,7 @@
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
     <!-- 新增图片对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body custom-class="tourism-form-dialog">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="图片URL" prop="url">
           <el-input v-model="form.url" placeholder="请输入图片URL" />
@@ -86,7 +110,7 @@
 </template>
 
 <script>
-import { listImages, getImage, addImage, delImage } from '@/api/tourism/images'
+import { listImages, addImage, delImage } from '@/api/tourism/images'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -99,7 +123,7 @@ export default {
       single: true,
       multiple: true,
       ids: [],
-      queryParams: { pageNum: 1, pageSize: 10, url: undefined },
+      queryParams: { pageNum: 1, pageSize: 10, fileName: undefined, url: undefined },
       showSearch: true,
       loading: false,
       title: '',
@@ -124,7 +148,7 @@ export default {
       })
     },
     resetQuery() {
-      this.queryParams = { pageNum: 1, pageSize: 10, url: undefined }
+      this.queryParams = { pageNum: 1, pageSize: 10, fileName: undefined, url: undefined }
       this.getList()
     },
     handleSelectionChange(selection) {
@@ -169,6 +193,13 @@ export default {
       const base = process.env.VUE_APP_BASE_API || ''
       if (!url) return ''
       return url.indexOf('http') === 0 ? url : base + url
+    },
+    formatFileSize(size) {
+      const value = Number(size)
+      if (!value) return '暂无...'
+      if (value < 1024) return value + 'B'
+      if (value < 1024 * 1024) return (value / 1024).toFixed(1) + 'KB'
+      return (value / 1024 / 1024).toFixed(1) + 'MB'
     }
   }
 }

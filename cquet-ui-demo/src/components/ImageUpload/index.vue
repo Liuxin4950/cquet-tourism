@@ -93,10 +93,10 @@ export default {
           // 然后将数组转为对象数组
           this.fileList = list.map(item => {
             if (typeof item === "string") {
-              if (item.indexOf(this.baseUrl) === -1) {
-                  item = { name: this.baseUrl + item, url: this.baseUrl + item };
+              if (this.isExternalUrl(item) || item.indexOf(this.baseUrl) === 0) {
+                item = { name: item, url: item };
               } else {
-                  item = { name: item, url: item };
+                item = { name: this.baseUrl + item, url: this.baseUrl + item };
               }
             }
             return item;
@@ -190,9 +190,11 @@ export default {
     },
     // 预览
     handlePictureCardPreview(file) {
-      this.dialogImageUrl += file.url;
-      console.log(this.dialogImageUrl);
+      this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+    isExternalUrl(url) {
+      return /^https?:\/\//i.test(url || "");
     },
     // 对象转成指定字符串分隔
     listToString(list, separator) {
@@ -200,7 +202,8 @@ export default {
       separator = separator || ",";
       for (let i in list) {
         if (list[i].url) {
-          strs += list[i].url.replace(this.baseUrl, "") + separator;
+          const url = list[i].url;
+          strs += (this.isExternalUrl(url) ? url : url.replace(this.baseUrl, "")) + separator;
         }
       }
       return strs != '' ? strs.substr(0, strs.length - 1) : '';

@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container tourism-page">
     <el-form
       :model="queryParams"
       ref="queryForm"
@@ -85,6 +85,11 @@
 
     <el-table
       v-loading="loading"
+      class="tourism-data-table"
+      border
+      stripe
+      fit
+      highlight-current-row
       :data="newsList"
       @selection-change="handleSelectionChange"
     >
@@ -94,19 +99,19 @@
         label="标题"
         prop="title"
         :show-overflow-tooltip="true"
-        min-width="200"
+        min-width="260"
       />
       <el-table-column
-        label="创建人"
-        prop="createBy"
+        label="作者"
+        prop="author"
         :show-overflow-tooltip="true"
-        width="200"
+        min-width="120"
       />
       <el-table-column
         label="创建时间"
         align="center"
         prop="createTime"
-        width="250"
+        width="180"
       >
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
@@ -116,7 +121,6 @@
         label="操作"
         align="center"
         class-name="small-padding fixed-width"
-        fixed="right"
         width="220"
       >
         <template slot-scope="scope">
@@ -158,7 +162,7 @@
     />
 
     <!-- 添加或修改角色配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body custom-class="tourism-form-dialog">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="新闻标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入新闻标题" />
@@ -179,7 +183,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="新闻详情" :visible.sync="detailOpen" width="1000px" append-to-body>
+    <el-dialog title="新闻详情" :visible.sync="detailOpen" width="1000px" append-to-body custom-class="tourism-detail-dialog">
       <el-descriptions :border="true" :column="4" size="small">
         <el-descriptions-item label="标题">{{ detail.title }}</el-descriptions-item>
         <el-descriptions-item label="作者">{{ detail.author }}</el-descriptions-item>

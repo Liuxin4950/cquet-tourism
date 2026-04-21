@@ -1,20 +1,22 @@
 <template>
-  <div class="app-container">
+  <div class="app-container tourism-page">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="场馆名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入场馆名称" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
       </el-form-item>
-      <!-- <el-form-item label="详细地址" prop="address">
-        <el-input v-model="queryParams.address" placeholder="请输入详细地址" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
+      <el-form-item label="场馆类别" prop="category">
+        <el-select v-model="queryParams.category" placeholder="请选择场馆类别" clearable filterable style="width: 240px">
+          <el-option v-for="opt in categoryOptions" :key="opt" :label="opt" :value="opt" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="所在区县" prop="district">
+        <el-input v-model="queryParams.district" placeholder="请输入所在区县" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="场馆状态" clearable style="width: 240px">
           <el-option label="正常" value="0" />
           <el-option label="停用" value="1" />
         </el-select>
-      </el-form-item> -->
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -37,6 +39,11 @@
 
     <el-table
       v-loading="loading"
+      class="tourism-data-table"
+      border
+      stripe
+      fit
+      highlight-current-row
       :data="venueList"
       @selection-change="handleSelectionChange"
       @sort-change="handleSortChange"
@@ -54,27 +61,37 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="场馆名称" prop="name" min-width="100" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="类别" prop="category" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="所在城市" prop="city" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="所在区县" prop="district" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="门票价格" prop="ticketPrice" width="110" align="center">
+      <el-table-column label="场馆名称" prop="name" min-width="160" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="类别" prop="category" min-width="110" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="所在区县" prop="district" min-width="100" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="容量" prop="capacity" min-width="95" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.capacity != null ? scope.row.capacity + '人' : '暂无...' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="需预约" prop="bookingRequired" min-width="90" align="center">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.bookingRequired === '1' || scope.row.bookingRequired === 1 ? 'warning' : 'success'">
+            {{ scope.row.bookingRequired === '1' || scope.row.bookingRequired === 1 ? '需要' : '无需' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="门票价格" prop="ticketPrice" min-width="100" align="center">
         <template slot-scope="scope">
           <span>{{ Number(scope.row.ticketPrice) === 0 ? '免费' : (scope.row.ticketPrice != null ? ('¥' + scope.row.ticketPrice) : '暂无...') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="状态" prop="status" width="100" align="center">
+      <el-table-column label="状态" prop="status" min-width="90" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status === '0' ? 'success' : 'info'">{{ scope.row.status === '0' ? '正常' : '停用' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="170">
+      <el-table-column label="浏览/收藏" min-width="110" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.createTime ? parseTime(scope.row.createTime) : '暂无...' }}</span>
+          <span>{{ Number(scope.row.viewCount || 0) }} / {{ Number(scope.row.collectionCount || 0) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="250">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-document" @click="viewVenueDetail(scope.row)" v-hasPermi="['tourism:venue:query']">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-video-play" @click="toggleStatus(scope.row)" v-hasPermi="['tourism:venue:edit']">{{ scope.row.status === '0' ? '停用' : '启用' }}</el-button>
@@ -87,7 +104,7 @@
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body custom-class="tourism-form-dialog">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="12">
@@ -238,9 +255,9 @@
     </el-dialog>
 
     <el-dialog title="场馆特色活动" :visible.sync="activityOpen" width="800px" append-to-body>
-      <el-table :data="activityList">
-        <el-table-column label="活动名称" prop="name" width="180" :show-overflow-tooltip="true" />
-        <el-table-column label="类别" prop="category" width="120" />
+      <el-table class="tourism-data-table" border stripe fit :data="activityList">
+        <el-table-column label="活动名称" prop="name" min-width="160" :show-overflow-tooltip="true" />
+        <el-table-column label="类别" prop="category" min-width="100" />
         <el-table-column label="开始时间" prop="startTime" width="180">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.startTime) }}</span>
@@ -267,7 +284,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="场馆详情" :visible.sync="venueDetailOpen" width="1000px" append-to-body>
+    <el-dialog title="场馆详情" :visible.sync="venueDetailOpen" width="1000px" append-to-body custom-class="tourism-detail-dialog">
       <div class="detail-module">
         <div class="main-img-wrapper">
           <el-image
@@ -335,6 +352,8 @@ export default {
         endTime: undefined,
         name: undefined,
         address: undefined,
+        category: undefined,
+        district: undefined,
         status: undefined,
         orderByColumn: 'id',
         isAsc: 'asc'
@@ -377,8 +396,6 @@ export default {
     },
     getList() {
       this.loading = true
-      this.queryParams.startTime = this.dateRange[0]
-      this.queryParams.endTime = this.dateRange[1]
       listScenicVenue(this.queryParams)
         .then(res => {
           const payload = res && res.data && typeof res.data === 'object' ? res.data : res
@@ -406,6 +423,8 @@ export default {
         pageSize: 10,
         name: undefined,
         address: undefined,
+        category: undefined,
+        district: undefined,
         status: undefined,
         orderByColumn: 'id',
         isAsc: 'asc'

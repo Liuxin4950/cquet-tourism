@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container tourism-page">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="活动名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入活动名称" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
@@ -24,33 +24,42 @@
 
     <el-table
       v-loading="loading"
+      class="tourism-data-table"
+      border
+      stripe
+      fit
+      highlight-current-row
       :data="activityList"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" />
-      <el-table-column label="活动名称" prop="name" width="150" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="所属场馆" width="150">
+      <el-table-column label="活动名称" prop="name" min-width="160" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="所属场馆" min-width="150" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ venueName(scope.row.venueId) }}</template>
       </el-table-column>
-      <el-table-column label="申报人" prop="applicantName" width="150" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="申报理由" prop="applyReason" width="250" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="审核状态" prop="auditStatus" width="150" align="center">
+      <el-table-column label="申报人" prop="applicantName" min-width="100" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="申报时间" prop="applyTime" width="180" align="center">
+        <template slot-scope="scope"><span>{{ scope.row.applyTime ? parseTime(scope.row.applyTime) : '暂无...' }}</span></template>
+      </el-table-column>
+      <el-table-column label="申报理由" prop="applyReason" min-width="180" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="审核状态" prop="auditStatus" min-width="110" align="center">
         <template slot-scope="scope">
           <el-tag :type="auditTagType(scope.row.auditStatus)">{{ auditText(scope.row.auditStatus) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="审核人" prop="auditor" width="150" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="审核意见" prop="auditReason" width="250" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="审核时间" prop="auditTime" align="center" width="190">
+      <el-table-column label="审核人" prop="auditor" min-width="100" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="审核意见" prop="auditReason" min-width="180" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="审核时间" prop="auditTime" align="center" min-width="180">
         <template slot-scope="scope"><span>{{ scope.row.auditTime ? parseTime(scope.row.auditTime) : '暂无...' }}</span></template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="190">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="190">
         <template slot-scope="scope">
           <template v-if="scope.row.auditStatus === '0'">
             <el-button size="mini" type="text" icon="el-icon-circle-check" @click="approve(scope.row)" v-hasPermi="['tourism:activityApplication:approve']">通过</el-button>
             <el-button size="mini" type="text" icon="el-icon-circle-close" @click="reject(scope.row)" v-hasPermi="['tourism:activityApplication:reject']">拒绝</el-button>
-        </template>
+          </template>
+          <span v-else class="text-muted">已处理</span>
         </template>
       </el-table-column>
     </el-table>
@@ -60,7 +69,7 @@
 </template>
 
 <script>
-import { listScenicActivityApplication, passScenicActivityApplication, rejectScenicActivityApplication, delScenicActivity } from '@/api/tourism/scenicActivity'
+import { listScenicActivityApplication, passScenicActivityApplication, rejectScenicActivityApplication } from '@/api/tourism/scenicActivity'
 import { listScenicVenue } from '@/api/tourism/scenicVenue'
 import Pagination from '@/components/Pagination'
 
@@ -120,4 +129,5 @@ export default {
 
 <style lang="scss" scoped>
 .app-container { padding: 20px; }
+.text-muted { color: #909399; font-size: 12px; }
 </style>

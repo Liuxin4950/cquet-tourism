@@ -60,6 +60,8 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
         queryWrapper.like(queryVo.getName() != null && !queryVo.getName().isBlank(), TourismScenicSpot::getName, queryVo.getName())
                 // 城市模糊匹配（仅当 city 非空），支持输入“成都”匹配“四川省成都市”
                 .like(queryVo.getCity() != null && !queryVo.getCity().isBlank(), TourismScenicSpot::getCity, queryVo.getCity())
+                // 区县模糊匹配（仅当 district 非空），便于管理端按重庆区县快速筛选
+                .like(queryVo.getDistrict() != null && !queryVo.getDistrict().isBlank(), TourismScenicSpot::getDistrict, queryVo.getDistrict())
                 // 景区等级精确匹配（仅当 level 非空）
                 .eq(queryVo.getLevel() != null && !queryVo.getLevel().isBlank(), TourismScenicSpot::getLevel, queryVo.getLevel())
                 // 票价下限（仅当 minTicketPrice 非空）
@@ -255,7 +257,26 @@ public class TourismScenicSpotServiceImpl extends ServiceImpl<TourismScenicSpotM
                 sort++;
             }
         }
+        syncCoverFromImageIds(scenicSpotId, imageIds);
         return true;
+    }
+
+    private void syncCoverFromImageIds(Long scenicSpotId, java.util.List<Long> imageIds) {
+        if (imageIds == null || imageIds.isEmpty()) {
+            lambdaUpdate()
+                    .eq(TourismScenicSpot::getId, scenicSpotId)
+                    .set(TourismScenicSpot::getCoverImageId, null)
+                    .set(TourismScenicSpot::getCoverImage, "")
+                    .update();
+            return;
+        }
+        Long coverImageId = imageIds.get(0);
+        TourismImage coverImage = imageMapper.selectById(coverImageId);
+        lambdaUpdate()
+                .eq(TourismScenicSpot::getId, scenicSpotId)
+                .set(TourismScenicSpot::getCoverImageId, coverImageId)
+                .set(TourismScenicSpot::getCoverImage, coverImage != null ? coverImage.getUrl() : "")
+                .update();
     }
 
     private void resolveCoverImageReference(TourismScenicSpot scenicSpot) {

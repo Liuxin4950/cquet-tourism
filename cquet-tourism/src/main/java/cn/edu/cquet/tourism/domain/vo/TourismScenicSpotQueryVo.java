@@ -18,6 +18,9 @@ public class TourismScenicSpotQueryVo {
     @Schema(description = "所属城市")
     private String city;
 
+    @Schema(description = "所属区县")
+    private String district;
+
     @Schema(description = "景区级别(如：AAAAA, AAAA, AAA)")
     private String level;
 

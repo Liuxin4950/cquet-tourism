@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container tourism-page">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="通知标题" prop="title">
         <el-input v-model="queryParams.title" placeholder="请输入通知标题" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
@@ -28,17 +28,22 @@
 
     <el-table
       v-loading="loading"
+      class="tourism-data-table"
+      border
+      stripe
+      fit
+      highlight-current-row
       :data="noticeList"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="编号" prop="id" width="150" align="center" />
-      <el-table-column label="标题" prop="title" min-width="280" :show-overflow-tooltip="true" />
-      <el-table-column label="创建人" prop="createBy" width="280" :show-overflow-tooltip="true" />
-      <el-table-column label="创建时间" prop="createTime" width="280" align="center">
+      <el-table-column label="编号" prop="id" width="100" align="center" />
+      <el-table-column label="标题" prop="title" min-width="260" :show-overflow-tooltip="true" />
+      <el-table-column label="创建人" prop="createBy" min-width="120" :show-overflow-tooltip="true" />
+      <el-table-column label="创建时间" prop="createTime" width="180" align="center">
         <template slot-scope="scope"><span>{{ parseTime(scope.row.createTime) }}</span></template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="220">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="220">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-document" @click="viewDetail(scope.row)" v-hasPermi="['tourism:notice:query']">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['tourism:notice:edit']">修改</el-button>
@@ -49,7 +54,7 @@
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
-    <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body custom-class="tourism-form-dialog">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="公告标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入公告标题" />
@@ -67,7 +72,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="公告详情" :visible.sync="detailOpen" width="900px" append-to-body>
+    <el-dialog title="公告详情" :visible.sync="detailOpen" width="900px" append-to-body custom-class="tourism-detail-dialog">
       <el-descriptions :border="true" :column="3" size="small">
         <el-descriptions-item label="标题">{{ detail.title }}</el-descriptions-item>
         <el-descriptions-item label="创建人">{{ detail.createBy }}</el-descriptions-item>

@@ -1,8 +1,8 @@
 <template>
-  <div class="app-container">
+  <div class="app-container tourism-page">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
-      <el-form-item label="设备名称" prop="facilitiesName">
-        <el-input v-model="queryParams.facilitiesName" placeholder="请输入设备名称" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
+      <el-form-item label="设施名称" prop="facilitiesName">
+        <el-input v-model="queryParams.facilitiesName" placeholder="请输入设施名称" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -25,18 +25,19 @@
 
     <el-table
       v-loading="loading"
+      class="tourism-data-table"
       :data="facilitiesList"
       @selection-change="handleSelectionChange"
       border
       stripe
+      fit
       size="small"
       highlight-current-row
-      :header-cell-style="{ background: '#fafafa', color: '#606266' }"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" />
-      <el-table-column label="设备名称" prop="facilitiesName" min-width="240" :show-overflow-tooltip="true" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="160">
+      <el-table-column label="设施名称" prop="facilitiesName" min-width="220" :show-overflow-tooltip="true" />
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="160">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['tourism:facilities:edit']">修改</el-button>
           <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['tourism:facilities:remove']">删除</el-button>
@@ -46,10 +47,10 @@
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body custom-class="tourism-form-dialog">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <el-form-item label="设备名称" prop="facilitiesName">
-          <el-input v-model="form.facilitiesName" placeholder="请输入设备名称" />
+        <el-form-item label="设施名称" prop="facilitiesName">
+          <el-input v-model="form.facilitiesName" placeholder="请输入设施名称" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -80,7 +81,7 @@ export default {
       title: '',
       open: false,
       form: {},
-      rules: { facilitiesName: [{ required: true, message: '设备名称不能为空', trigger: 'blur' }] }
+      rules: { facilitiesName: [{ required: true, message: '设施名称不能为空', trigger: 'blur' }] }
     }
   },
   created() { this.getList() },
@@ -89,10 +90,10 @@ export default {
     getList() { this.loading = true; listFacilities(this.queryParams).then(response => { this.loading = false; this.facilitiesList = response.rows; this.total = response.total }) },
     resetQuery() { this.queryParams = { pageNum: 1, pageSize: 10, facilitiesName: undefined }; this.getList() },
     handleSelectionChange(selection) { this.ids = selection.map(item => item.id); this.single = selection.length != 1; this.multiple = !selection.length },
-    handleUpdate(row) { this.reset(); const id = row.id || this.ids[0]; getFacilities(id).then(response => { this.form = response.data; this.open = true; this.title = '修改设备' }) },
+    handleUpdate(row) { this.reset(); const id = row.id || this.ids[0]; getFacilities(id).then(response => { this.form = response.data; this.open = true; this.title = '修改设施' }) },
     reset() { this.form = { id: undefined, facilitiesName: undefined }; this.resetForm && this.resetForm('form') },
-    handleAdd() { this.open = true; this.title = '新增设备'; this.reset() },
-    handleDelete(row) { const ids = row.id || this.ids; this.$modal.confirm('是否确认删除设备编号为"' + ids + '"的数据项？').then(function() { return delFacilities(ids) }).then(() => { this.getList(); this.$modal.msgSuccess('删除成功') }).catch(() => { this.$modal.msgError('删除失败') }) },
+    handleAdd() { this.open = true; this.title = '新增设施'; this.reset() },
+    handleDelete(row) { const ids = row.id || this.ids; this.$modal.confirm('是否确认删除设施编号为"' + ids + '"的数据项？').then(function() { return delFacilities(ids) }).then(() => { this.getList(); this.$modal.msgSuccess('删除成功') }).catch(() => { this.$modal.msgError('删除失败') }) },
     submitForm() { this.$refs['form'].validate(valid => { if (valid) { if (this.form.id != undefined) { updateFacilities(this.form).then(() => { this.$modal.msgSuccess('修改成功'); this.open = false; this.getList() }) } else { addFacilities(this.form).then(() => { this.$modal.msgSuccess('新增成功'); this.open = false; this.getList() }) } } }) },
     cancel() { this.open = false; this.resetForm && this.resetForm('form') }
   }

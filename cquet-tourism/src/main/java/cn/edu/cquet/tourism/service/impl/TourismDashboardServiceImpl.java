@@ -1,12 +1,14 @@
 package cn.edu.cquet.tourism.service.impl;
 
 import cn.edu.cquet.tourism.domain.TourismActivity;
+import cn.edu.cquet.tourism.domain.TourismImage;
 import cn.edu.cquet.tourism.domain.TourismScenicSpot;
 import cn.edu.cquet.tourism.domain.TourismVenue;
 import cn.edu.cquet.tourism.mapper.TourismActivityMapper;
 import cn.edu.cquet.tourism.mapper.TourismScenicSpotMapper;
 import cn.edu.cquet.tourism.mapper.TourismVenueMapper;
 import cn.edu.cquet.tourism.service.TourismDashboardService;
+import cn.edu.cquet.tourism.service.TourismImageService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,9 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
 
     @Autowired
     private TourismActivityMapper activityMapper;
+
+    @Autowired
+    private TourismImageService imageService;
 
     @Override
     public Map<String, Object> getStatistics() {
@@ -173,36 +178,80 @@ public class TourismDashboardServiceImpl implements TourismDashboardService {
                     .isNotNull(TourismScenicSpot::getLatitude);
         List<TourismScenicSpot> scenicSpots = scenicSpotMapper.selectList(scenicWrapper);
 
+        List<TourismVenue> venues = loadVenuesWithCoordinate();
+        Map<Long, TourismImage> coverImageMap = loadCoverImageMap(scenicSpots, venues);
+
         for (TourismScenicSpot spot : scenicSpots) {
             Map<String, Object> item = new HashMap<>();
+            item.put("id", spot.getId());
             item.put("name", spot.getName());
             item.put("longitude", spot.getLongitude());
             item.put("latitude", spot.getLatitude());
             item.put("type", "scenic");
             item.put("level", spot.getLevel());
+            item.put("district", spot.getDistrict());
+            item.put("address", spot.getAddress());
+            item.put("description", spot.getDescription());
+            item.put("coverImage", resolveCoverImage(spot.getCoverImage(), spot.getCoverImageId(), coverImageMap));
             item.put("viewCount", spot.getViewCount() != null ? spot.getViewCount() : 0);
             result.add(item);
         }
 
-        // 查询有经纬度的场馆
-        LambdaQueryWrapper<TourismVenue> venueWrapper = new LambdaQueryWrapper<>();
-        venueWrapper.eq(TourismVenue::getDelFlag, "0")
-                    .isNotNull(TourismVenue::getLongitude)
-                    .isNotNull(TourismVenue::getLatitude);
-        List<TourismVenue> venues = venueMapper.selectList(venueWrapper);
-
         for (TourismVenue venue : venues) {
             Map<String, Object> item = new HashMap<>();
+            item.put("id", venue.getId());
             item.put("name", venue.getName());
             item.put("longitude", venue.getLongitude());
             item.put("latitude", venue.getLatitude());
             item.put("type", "venue");
             item.put("category", venue.getCategory());
+            item.put("district", venue.getDistrict());
+            item.put("address", venue.getAddress());
+            item.put("description", venue.getDescription());
+            item.put("coverImage", resolveCoverImage(venue.getCoverImage(), venue.getCoverImageId(), coverImageMap));
             item.put("viewCount", venue.getViewCount() != null ? venue.getViewCount() : 0);
             result.add(item);
         }
 
         return result;
+    }
+
+    private List<TourismVenue> loadVenuesWithCoordinate() {
+        LambdaQueryWrapper<TourismVenue> venueWrapper = new LambdaQueryWrapper<>();
+        venueWrapper.eq(TourismVenue::getDelFlag, "0")
+                .isNotNull(TourismVenue::getLongitude)
+                .isNotNull(TourismVenue::getLatitude);
+        return venueMapper.selectList(venueWrapper);
+    }
+
+    private Map<Long, TourismImage> loadCoverImageMap(List<TourismScenicSpot> scenicSpots, List<TourismVenue> venues) {
+        List<Long> coverImageIds = new ArrayList<>();
+        scenicSpots.stream()
+                .map(TourismScenicSpot::getCoverImageId)
+                .filter(Objects::nonNull)
+                .forEach(coverImageIds::add);
+        venues.stream()
+                .map(TourismVenue::getCoverImageId)
+                .filter(Objects::nonNull)
+                .forEach(coverImageIds::add);
+        if (coverImageIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return imageService.getImageMap(coverImageIds);
+    }
+
+    private String resolveCoverImage(String legacyCoverImage, Long coverImageId, Map<Long, TourismImage> coverImageMap) {
+        if (coverImageId != null) {
+            TourismImage image = coverImageMap.get(coverImageId);
+            if (image != null && hasText(image.getUrl())) {
+                return image.getUrl();
+            }
+        }
+        return hasText(legacyCoverImage) ? legacyCoverImage : "";
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     private String normalizeDistrict(String district) {

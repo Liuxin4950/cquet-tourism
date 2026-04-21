@@ -20,7 +20,7 @@ public interface TourismVenueService extends IService<TourismVenue> {
     /**
      * 根据名称、地址、城市模糊查询
      */
-    List<TourismVenue> getVenueList(String name, String address, String city);
+    List<TourismVenue> getVenueList(String name, String address, String city, String district, String category, String status);
 
     /**
      * 添加场馆

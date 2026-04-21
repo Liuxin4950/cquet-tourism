@@ -40,9 +40,12 @@ public class WebTourismVenueController extends BaseController {
     @Operation(summary = "用户端获取场馆列表")
     public TableDataInfo getList(@RequestParam(required = false) String name,
                                  @RequestParam(required = false) String address,
-                                 @RequestParam(required = false) String city) {
+                                 @RequestParam(required = false) String city,
+                                 @RequestParam(required = false) String district,
+                                 @RequestParam(required = false) String category,
+                                 @RequestParam(required = false) String status) {
         startPage();
-        List<TourismVenue> list = tourismVenueService.getVenueList(name, address, city);
+        List<TourismVenue> list = tourismVenueService.getVenueList(name, address, city, district, category, status);
         return getDataTable(list);
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container tourism-page">
     <el-form
       :model="queryParams"
       ref="queryForm"
@@ -30,10 +30,10 @@
           <el-option label="AAAAA级" value="AAAAA" />
         </el-select>
       </el-form-item>
-      <el-form-item label="所在城市" prop="city">
+      <el-form-item label="所在区县" prop="district">
         <el-input
-          v-model="queryParams.city"
-          placeholder="请输入所在城市"
+          v-model="queryParams.district"
+          placeholder="请输入所在区县"
           clearable
           style="width: 240px"
           @keyup.enter.native="handleQuery"
@@ -108,6 +108,11 @@
 
     <el-table
       v-loading="loading"
+      class="tourism-data-table"
+      border
+      stripe
+      fit
+      highlight-current-row
       :data="scenicSpotList"
       @selection-change="handleSelectionChange"
       @sort-change="handleSortChange"
@@ -118,7 +123,7 @@
         label="景区名称"
         prop="name"
         :show-overflow-tooltip="true"
-        min-width="180"
+        min-width="160"
         :formatter="formatText"
       />
       <el-table-column
@@ -129,16 +134,16 @@
         :formatter="formatText"
       />
       <el-table-column
-        label="所在城市"
-        prop="city"
-        width="120"
+        label="所在区县"
+        prop="district"
+        min-width="100"
         :show-overflow-tooltip="true"
         :formatter="formatText"
       />
       <el-table-column
         label="门票价格"
         prop="ticketPrice"
-        width="110"
+        min-width="100"
         align="center"
       >
         <template slot-scope="scope">
@@ -146,12 +151,17 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="联系电话"
-        prop="contactPhone"
-        width="140"
+        label="开放时间"
+        prop="openingHours"
+        min-width="150"
         :show-overflow-tooltip="true"
         :formatter="formatText"
       />
+      <el-table-column label="浏览/收藏" min-width="110" align="center">
+        <template slot-scope="scope">
+          <span>{{ Number(scope.row.viewCount || 0) }} / {{ Number(scope.row.collectionCount || 0) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column
         label="封面"
         width="90"
@@ -172,7 +182,7 @@
         label="创建时间"
         align="center"
         prop="createTime"
-        width="170"
+        min-width="160"
       >
         <template slot-scope="scope">
           <span>{{ scope.row.createTime ? parseTime(scope.row.createTime) : '暂无' }}</span>
@@ -182,7 +192,6 @@
         label="操作"
         align="center"
         class-name="small-padding fixed-width"
-        fixed="right"
         width="220"
       >
         <template slot-scope="scope">
@@ -224,7 +233,7 @@
     />
 
     <!-- 添加或修改景区配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body custom-class="tourism-form-dialog">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <!-- 基本信息区块 -->
         <div class="form-section">
@@ -393,7 +402,7 @@
     </el-dialog>
 
 
-    <el-dialog title="景区详情" :visible.sync="scenicDetailOpen" width="1000px" append-to-body>
+    <el-dialog title="景区详情" :visible.sync="scenicDetailOpen" width="1000px" append-to-body custom-class="tourism-detail-dialog">
       <div class="detail-module">
         <div class="main-img-wrapper">
           <el-image
@@ -486,6 +495,7 @@ import {
   updateScenicSpot,
   delScenicSpot,
 } from "@/api/tourism/scenicSpot";
+import { batchUploadImageUrls } from "@/api/tourism/uploadPictures";
 import ImageUpload from "@/components/ImageUpload";
 
 // 引入分页组件
@@ -523,6 +533,7 @@ export default {
         name: undefined,
         level: undefined,
         city: undefined,
+        district: undefined,
         status: undefined,
         orderByColumn: "id",
         isAsc: "asc",
@@ -704,7 +715,7 @@ export default {
         pageSize: 10,
         name: undefined,
         level: undefined,
-        city: undefined,
+        district: undefined,
         status: undefined,
         orderByColumn: "id",
         isAsc: "asc",
@@ -818,49 +829,21 @@ export default {
         if (valid) {
           const formData = { ...this.form };
           if (formData.feeType === 'free') { formData.ticketPrice = 0 } else { if (!(Number(formData.ticketPrice) > 0)) { this.$modal.msgError('请填写有效票价'); return } }
-          if (formData.id != undefined) {
-            updateScenicSpot(formData).then((response) => {
-              // 同步图片关联
-              import('@/api/tourism/uploadPictures').then((u) => {
-                const urls = Array.isArray(this.form.imageUrls)
-                  ? this.form.imageUrls
-                  : (typeof this.form.imageUrls === 'string' && this.form.imageUrls
-                      ? this.form.imageUrls.split(',').filter(Boolean)
-                      : []);
-                u.batchUploadImageUrls(urls).then((res) => {
-                  const imageIds = (res.data || res.rows || []).map((it) => it.id);
-                  import('@/api/tourism/scenicSpot').then((m) => {
-                    m.setScenicSpotImages(this.form.id, imageIds).then(() => {
-                      this.$modal.msgSuccess('修改成功');
-                      this.open = false;
-                      this.getList();
-                    });
-                  });
-                });
+          this.buildImagePayload(formData).then((payload) => {
+            if (payload.id != undefined) {
+              updateScenicSpot(payload).then(() => {
+                this.$modal.msgSuccess('修改成功');
+                this.open = false;
+                this.getList();
               });
-            });
-          } else {
-            addScenicSpot(formData).then((response) => {
-              const sid = (response && response.data && response.data.id) ? response.data.id : formData.id;
-              import('@/api/tourism/uploadPictures').then((u) => {
-                const urls = Array.isArray(this.form.imageUrls)
-                  ? this.form.imageUrls
-                  : (typeof this.form.imageUrls === 'string' && this.form.imageUrls
-                      ? this.form.imageUrls.split(',').filter(Boolean)
-                      : []);
-                u.batchUploadImageUrls(urls).then((res) => {
-                  const imageIds = (res.data || res.rows || []).map((it) => it.id);
-                  import('@/api/tourism/scenicSpot').then((m) => {
-                    m.setScenicSpotImages(sid, imageIds).then(() => {
-                      this.$modal.msgSuccess('新增成功');
-                      this.open = false;
-                      this.getList();
-                    });
-                  });
-                });
+            } else {
+              addScenicSpot(payload).then(() => {
+                this.$modal.msgSuccess('新增成功');
+                this.open = false;
+                this.getList();
               });
-            });
-          }
+            }
+          });
         }
       });
     },
@@ -929,6 +912,49 @@ export default {
       const base = process.env.VUE_APP_BASE_API || '';
       if (!u) return '';
       return u.indexOf('http') === 0 ? u : base + u;
+    },
+    buildImagePayload(formData) {
+      const coverUrl = this.firstUrl(formData.coverImage);
+      const contentUrls = this.normalizeUrlList(formData.imageUrls);
+      const allUrls = this.uniqueUrls([coverUrl].concat(contentUrls));
+      formData.coverImage = coverUrl;
+      formData.imageIds = [];
+      formData.coverImageId = undefined;
+      if (!allUrls.length) {
+        return Promise.resolve(formData);
+      }
+      return batchUploadImageUrls(allUrls).then((res) => {
+        const images = (res && res.data) || (res && res.rows) || [];
+        const idByUrl = {};
+        images.forEach((image) => {
+          const url = image && (image.url || image.imageUrl);
+          if (url && image.id != null) idByUrl[url] = image.id;
+        });
+        const coverImageId = coverUrl ? idByUrl[coverUrl] : undefined;
+        const contentImageIds = contentUrls.map(url => idByUrl[url]).filter(id => id != null);
+        formData.coverImageId = coverImageId;
+        formData.imageIds = this.uniqueIds((coverImageId != null ? [coverImageId] : []).concat(contentImageIds));
+        return formData;
+      });
+    },
+    normalizeUrlList(value) {
+      if (!value) return [];
+      const list = Array.isArray(value) ? value : String(value).split(',');
+      return list.map(item => {
+        if (!item) return '';
+        if (typeof item === 'string') return item.trim();
+        return (item.url || item.imageUrl || '').trim();
+      }).filter(Boolean);
+    },
+    firstUrl(value) {
+      const list = this.normalizeUrlList(value);
+      return list.length ? list[0] : '';
+    },
+    uniqueUrls(urls) {
+      return urls.filter(Boolean).filter((url, index, arr) => arr.indexOf(url) === index);
+    },
+    uniqueIds(ids) {
+      return ids.filter(id => id != null).filter((id, index, arr) => arr.indexOf(id) === index);
     },
     initAreaOptions() {
       try {

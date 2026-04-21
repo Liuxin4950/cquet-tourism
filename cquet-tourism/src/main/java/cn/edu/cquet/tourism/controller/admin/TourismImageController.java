@@ -81,10 +81,12 @@ public class TourismImageController extends BaseController {
      * 权限：`tourism:image:list`
      * 返回：分页表格数据 `TableDataInfo`
      */
-    public TableDataInfo list() {
+    public TableDataInfo list(TourismImage image) {
         startPage();
         List<TourismImage> list = imageService.lambdaQuery()
                 .eq(TourismImage::getDelFlag, "0")
+                .like(image != null && image.getUrl() != null && !image.getUrl().isBlank(), TourismImage::getUrl, image.getUrl())
+                .like(image != null && image.getFileName() != null && !image.getFileName().isBlank(), TourismImage::getFileName, image.getFileName())
                 .orderByDesc(TourismImage::getCreateTime)
                 .list();
         return getDataTable(list);

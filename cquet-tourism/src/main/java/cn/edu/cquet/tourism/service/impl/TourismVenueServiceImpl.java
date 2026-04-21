@@ -78,11 +78,14 @@ public class TourismVenueServiceImpl extends ServiceImpl<TourismVenueMapper, Tou
     }
 
     @Override
-    public List<TourismVenue> getVenueList(String name, String address, String city) {
+    public List<TourismVenue> getVenueList(String name, String address, String city, String district, String category, String status) {
         LambdaQueryWrapper<TourismVenue> qw = new LambdaQueryWrapper<>();
         qw.like(name != null && !name.isBlank(), TourismVenue::getName, name)
           .like(address != null && !address.isBlank(), TourismVenue::getAddress, address)
           .like(city != null && !city.isBlank(), TourismVenue::getCity, city)
+          .like(district != null && !district.isBlank(), TourismVenue::getDistrict, district)
+          .eq(category != null && !category.isBlank(), TourismVenue::getCategory, category)
+          .eq(status != null && !status.isBlank(), TourismVenue::getStatus, status)
           .eq(TourismVenue::getDelFlag, "0");
         List<TourismVenue> venues = tourismVenueMapper.selectList(qw);
         hydrateCoverImages(venues);

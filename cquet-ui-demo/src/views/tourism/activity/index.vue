@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container tourism-page">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
       <el-form-item label="活动名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入活动名称" clearable style="width: 240px" @keyup.enter.native="handleQuery" />
@@ -15,9 +15,6 @@
           <el-option label="通过" value="1" />
           <el-option label="拒绝" value="2" />
         </el-select>
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -39,51 +36,46 @@
 
     <el-table
       v-loading="loading"
+      class="tourism-data-table"
+      border
+      stripe
+      fit
+      highlight-current-row
       :data="activityList"
       @selection-change="handleSelectionChange"
       @sort-change="handleSortChange"
     >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" prop="id" width="90" align="center" sortable="custom" />
-      <el-table-column label="活动名称" prop="name" min-width="180" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="所属场馆" min-width="160">
+      <el-table-column label="活动名称" prop="name" min-width="160" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="所属场馆" min-width="150" :show-overflow-tooltip="true">
         <template slot-scope="scope">{{ venueName(scope.row.venueId) }}</template>
       </el-table-column>
-      <el-table-column label="类别" prop="category" width="120" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="主办方" prop="organizer" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="联系电话" prop="contactPhone" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="申报人" prop="applicantName" width="140" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="开始时间" prop="startTime" width="170" align="center">
-        <template slot-scope="scope"><span>{{ scope.row.startTime ? parseTime(scope.row.startTime) : '暂无...' }}</span></template>
+      <el-table-column label="类别" prop="category" min-width="110" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="活动时间" min-width="210" align="center">
+        <template slot-scope="scope">
+          <span>{{ formatActivityTime(scope.row) }}</span>
+        </template>
       </el-table-column>
-      <el-table-column label="结束时间" prop="endTime" width="170" align="center">
-        <template slot-scope="scope"><span>{{ scope.row.endTime ? parseTime(scope.row.endTime) : '暂无...' }}</span></template>
-      </el-table-column>
-      <el-table-column label="申报时间" prop="applyTime" width="170" align="center">
-        <template slot-scope="scope"><span>{{ scope.row.applyTime ? parseTime(scope.row.applyTime) : '暂无...' }}</span></template>
-      </el-table-column>
-      <el-table-column label="人数" prop="currentParticipants" width="120" align="center">
+      <el-table-column label="人数" prop="currentParticipants" min-width="110" align="center">
         <template slot-scope="scope">
           <span>{{ (scope.row.currentParticipants != null && scope.row.maxParticipants != null) ? (scope.row.currentParticipants + ' / ' + scope.row.maxParticipants) : '暂无...' }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="申报理由" prop="applyReason" width="200" :show-overflow-tooltip="true" :formatter="formatText" />
-      <el-table-column label="审核状态" prop="auditStatus" width="110" align="center">
+      <el-table-column label="申报人" prop="applicantName" min-width="100" :show-overflow-tooltip="true" :formatter="formatText" />
+      <el-table-column label="审核状态" prop="auditStatus" min-width="110" align="center">
         <template slot-scope="scope">
           <span v-if="scope.row.auditStatus === undefined || scope.row.auditStatus === null || scope.row.auditStatus === ''">暂无...</span>
           <el-tag v-else :type="auditTagType(scope.row.auditStatus)">{{ auditText(scope.row.auditStatus) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="运行状态" prop="status" width="100" align="center">
+      <el-table-column label="运行状态" prop="status" min-width="100" align="center">
         <template slot-scope="scope">
           <span v-if="scope.row.status === undefined || scope.row.status === null || scope.row.status === ''">暂无...</span>
           <el-tag v-else :type="scope.row.status === '0' ? 'success' : 'info'">{{ scope.row.status === '0' ? '正常' : '停用' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime" width="170" align="center">
-        <template slot-scope="scope"><span>{{ scope.row.createTime ? parseTime(scope.row.createTime) : '暂无...' }}</span></template>
-      </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="240">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="230">
         <template slot-scope="scope">
           <el-button size="mini" type="text" icon="el-icon-document" @click="viewDetail(scope.row)" v-hasPermi="['tourism:activity:query']">详情</el-button>
           <el-button size="mini" type="text" icon="el-icon-video-play" @click="toggleStatus(scope.row)" :disabled="scope.row.auditStatus !== '1'" v-hasPermi="['tourism:activity:edit']">{{ scope.row.status === '0' ? '停用' : '启用' }}</el-button>
@@ -95,7 +87,7 @@
 
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
 
-      <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+      <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body custom-class="tourism-form-dialog">
         <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="12"><el-form-item label="活动名称" prop="name"><el-input v-model="form.name" placeholder="请输入活动名称" /></el-form-item></el-col>
@@ -136,7 +128,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="活动详情" :visible.sync="detailOpen" width="900px" append-to-body>
+    <el-dialog title="活动详情" :visible.sync="detailOpen" width="900px" append-to-body custom-class="tourism-detail-dialog">
       <div class="detail-module">
         <div class="main-img-wrapper">
           <el-image
@@ -233,8 +225,6 @@ export default {
       handleQuery() { this.getList() },
     getList() {
       this.loading = true
-      this.queryParams.startTime = this.dateRange[0]
-      this.queryParams.endTime = this.dateRange[1]
       listScenicActivity(this.queryParams).then(response => {
         this.loading = false
         this.activityList = response.rows
@@ -328,6 +318,12 @@ export default {
       const base = process.env.VUE_APP_BASE_API || ''
       if (!u) return ''
       return u.indexOf('http') === 0 ? u : base + u
+    },
+    formatActivityTime(row) {
+      const start = row.startTime ? this.parseTime(row.startTime) : ''
+      const end = row.endTime ? this.parseTime(row.endTime) : ''
+      if (start && end) return start + ' 至 ' + end
+      return start || end || '暂无...'
     },
     venueName(id) { const name = this.venueMap[id]; return name ? name : '暂无...' },
     formatText(row, column, cellValue) { return cellValue || '暂无...' },

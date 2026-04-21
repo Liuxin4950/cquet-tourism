@@ -1,0 +1,383 @@
+.tourism-page,
+.tourism-dashboard {
+  --tourism-bg: linear-gradient(180deg, #f3efe7 0%, #f7f5ef 45%, #fbfcf9 100%);
+  --tourism-surface: rgba(255, 253, 248, 0.96);
+  --tourism-surface-solid: #fffdf8;
+  --tourism-surface-soft: #f8f3e9;
+  --tourism-line: rgba(42, 58, 86, 0.1);
+  --tourism-line-strong: rgba(42, 58, 86, 0.16);
+  --tourism-text: #22304a;
+  --tourism-muted: #66758c;
+  --tourism-accent: #1f6a8f;
+  --tourism-accent-soft: #e8f3f6;
+  --tourism-warm: #b86b35;
+  --tourism-warm-soft: #fff0dc;
+  --tourism-green: #2f8f6b;
+  --tourism-danger: #c25757;
+  --tourism-shadow: 0 16px 36px rgba(36, 54, 86, 0.08);
+  --tourism-shadow-soft: 0 10px 24px rgba(36, 54, 86, 0.05);
+  --tourism-radius-lg: 14px;
+  --tourism-radius-md: 10px;
+  --tourism-font: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: var(--tourism-font);
+}
+
+.app-container.tourism-page,
+.app-container.tourism-dashboard {
+  min-height: calc(100vh - 84px);
+  padding: 24px;
+  background: var(--tourism-bg);
+  color: var(--tourism-text);
+}
+
+.tourism-page > .el-form {
+  padding: 18px 20px 8px;
+  margin-bottom: 16px;
+  border: 1px solid var(--tourism-line);
+  border-radius: var(--tourism-radius-lg);
+  background: var(--tourism-surface);
+  box-shadow: var(--tourism-shadow-soft);
+  backdrop-filter: blur(8px);
+}
+
+.tourism-page > .el-form .el-form-item {
+  margin-right: 18px;
+  margin-bottom: 12px;
+}
+
+.tourism-page > .el-form .el-form-item__label {
+  color: var(--tourism-muted);
+  font-weight: 600;
+}
+
+.tourism-page > .mb8 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tourism-page .right-toolbar {
+  margin-left: auto;
+}
+
+.tourism-page .el-input,
+.tourism-page .el-select,
+.tourism-page .el-date-editor {
+  max-width: 100%;
+}
+
+.tourism-page .el-input__inner,
+.tourism-page .el-textarea__inner {
+  border-color: var(--tourism-line-strong);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--tourism-text);
+}
+
+.tourism-page .el-input__inner:focus,
+.tourism-page .el-textarea__inner:focus {
+  border-color: var(--tourism-accent);
+  box-shadow: 0 0 0 3px rgba(31, 106, 143, 0.12);
+}
+
+.tourism-page .el-button--mini {
+  border-radius: 8px;
+}
+
+.tourism-page .el-button--primary,
+.el-dialog.tourism-form-dialog .el-button--primary,
+.el-dialog.tourism-detail-dialog .el-button--primary {
+  border-color: var(--tourism-accent);
+  background: var(--tourism-accent);
+}
+
+.tourism-page .el-button--primary:hover,
+.el-dialog.tourism-form-dialog .el-button--primary:hover,
+.el-dialog.tourism-detail-dialog .el-button--primary:hover {
+  border-color: #185b7a;
+  background: #185b7a;
+}
+
+.tourism-page .el-button--text {
+  color: var(--tourism-accent);
+}
+
+.tourism-page .el-button--text:hover {
+  color: var(--tourism-warm);
+}
+
+.tourism-page > .mb8 .el-button.is-plain {
+  border-width: 0;
+  box-shadow: 0 8px 18px rgba(36, 54, 86, 0.08);
+}
+
+.tourism-page > .mb8 .el-button--primary.is-plain {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--tourism-accent) 0%, #2f8f86 100%);
+}
+
+.tourism-page > .mb8 .el-button--primary.is-plain:hover,
+.tourism-page > .mb8 .el-button--primary.is-plain:focus {
+  color: #ffffff;
+  background: linear-gradient(135deg, #185b7a 0%, #28786f 100%);
+}
+
+.tourism-page > .mb8 .el-button--success.is-plain {
+  color: var(--tourism-green);
+  background: #eaf6ef;
+}
+
+.tourism-page > .mb8 .el-button--success.is-plain:hover,
+.tourism-page > .mb8 .el-button--success.is-plain:focus {
+  color: #ffffff;
+  background: var(--tourism-green);
+}
+
+.tourism-page > .mb8 .el-button--danger.is-plain {
+  color: var(--tourism-danger);
+  background: #faeeee;
+}
+
+.tourism-page > .mb8 .el-button--danger.is-plain:hover,
+.tourism-page > .mb8 .el-button--danger.is-plain:focus {
+  color: #ffffff;
+  background: var(--tourism-danger);
+}
+
+.tourism-page .el-table {
+  border: 1px solid var(--tourism-line);
+  border-radius: var(--tourism-radius-lg);
+  overflow: hidden;
+  background: var(--tourism-surface-solid);
+  box-shadow: var(--tourism-shadow-soft);
+}
+
+.tourism-page .el-table th.el-table__cell {
+  background: linear-gradient(180deg, #f8f3e9 0%, #f5f8f7 100%);
+  color: #30415e;
+  font-weight: 700;
+  border-bottom-color: var(--tourism-line-strong);
+}
+
+.tourism-page .el-table td.el-table__cell {
+  padding: 10px 0;
+  border-bottom-color: rgba(42, 58, 86, 0.07);
+}
+
+.tourism-page .el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: #fbfaf6;
+}
+
+.tourism-page .el-table__body tr:hover > td.el-table__cell {
+  background: var(--tourism-accent-soft) !important;
+}
+
+.tourism-page .el-table__fixed-right::before,
+.tourism-page .el-table__fixed::before {
+  background-color: transparent;
+}
+
+.tourism-page .el-table .cell {
+  line-height: 1.55;
+}
+
+.tourism-page .tourism-data-table .cell {
+  padding-left: 8px;
+  padding-right: 8px;
+  white-space: nowrap;
+}
+
+.tourism-page .tourism-data-table .small-padding .cell {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.tourism-page .el-table .el-image {
+  box-shadow: 0 8px 18px rgba(36, 54, 86, 0.12);
+}
+
+.tourism-page a,
+.tourism-page a[style] {
+  color: var(--tourism-accent) !important;
+}
+
+.tourism-page .el-tag {
+  border-radius: 7px;
+  border-width: 0;
+  font-weight: 600;
+}
+
+.tourism-page .pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  height: auto !important;
+  margin-top: 16px !important;
+  margin-bottom: 0 !important;
+  padding: 10px 14px !important;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--tourism-line);
+  border-radius: var(--tourism-radius-md);
+  background: rgba(255, 253, 248, 0.78);
+  box-shadow: var(--tourism-shadow-soft);
+}
+
+.tourism-page .pagination-container .el-pagination {
+  position: static !important;
+  right: auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.tourism-page .pagination-container .el-pagination__total,
+.tourism-page .pagination-container .el-pagination__sizes,
+.tourism-page .pagination-container .btn-prev,
+.tourism-page .pagination-container .btn-next,
+.tourism-page .pagination-container .el-pager,
+.tourism-page .pagination-container .el-pagination__jump {
+  flex: 0 0 auto;
+}
+
+.tourism-page .pagination-container .el-pagination__jump {
+  margin-left: 12px;
+}
+
+.tourism-page .pagination-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tourism-page .pagination-container::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.24);
+}
+
+.el-dialog.tourism-form-dialog,
+.el-dialog.tourism-detail-dialog {
+  border-radius: var(--tourism-radius-lg, 22px);
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(25, 40, 64, 0.18);
+}
+
+.el-dialog.tourism-form-dialog .el-dialog__header,
+.el-dialog.tourism-detail-dialog .el-dialog__header {
+  padding: 20px 24px 16px;
+  background: linear-gradient(135deg, #fff0dc 0%, #f3faf7 100%);
+  border-bottom: 1px solid rgba(42, 58, 86, 0.1);
+}
+
+.el-dialog.tourism-form-dialog .el-dialog__title,
+.el-dialog.tourism-detail-dialog .el-dialog__title {
+  color: #1f2a44;
+  font-weight: 700;
+}
+
+.el-dialog.tourism-form-dialog .el-dialog__body,
+.el-dialog.tourism-detail-dialog .el-dialog__body {
+  background: #fbfaf6;
+}
+
+.el-dialog.tourism-form-dialog .form-section {
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid rgba(42, 58, 86, 0.09);
+  border-radius: 18px;
+  background: #fffdf8;
+  box-shadow: 0 10px 24px rgba(36, 54, 86, 0.04);
+}
+
+.el-dialog.tourism-form-dialog .section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(42, 58, 86, 0.08);
+  color: var(--tourism-text, #22304a);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.el-dialog.tourism-form-dialog .section-title i {
+  color: var(--tourism-warm, #b86b35);
+}
+
+.el-dialog.tourism-detail-dialog .detail-card {
+  border: 1px solid rgba(42, 58, 86, 0.09);
+  border-radius: 12px;
+  background: #fffdf8;
+  box-shadow: 0 10px 24px rgba(36, 54, 86, 0.05);
+}
+
+.el-dialog.tourism-detail-dialog .detail-card:hover {
+  box-shadow: 0 12px 28px rgba(36, 54, 86, 0.08);
+}
+
+.el-dialog.tourism-detail-dialog .main-img-wrapper {
+  border-radius: 20px;
+  box-shadow: 0 14px 30px rgba(36, 54, 86, 0.1);
+}
+
+.el-dialog.tourism-detail-dialog .detail-item .label {
+  color: #7a879a;
+  font-weight: 600;
+}
+
+.el-dialog.tourism-detail-dialog .detail-item .value {
+  color: #23304a;
+  line-height: 1.7;
+}
+
+.el-dialog.tourism-detail-dialog .content-img-group {
+  flex-wrap: wrap;
+}
+
+.el-dialog.tourism-detail-dialog .content-img-item {
+  min-width: 180px;
+}
+
+.el-dialog.tourism-detail-dialog .detail-close-btn:hover {
+  border-color: var(--tourism-accent, #1f6a8f);
+  color: var(--tourism-accent, #1f6a8f);
+}
+
+.el-dialog.tourism-form-dialog .el-upload--picture-card,
+.el-dialog.tourism-form-dialog .el-upload-list--picture-card .el-upload-list__item {
+  border-radius: 10px;
+  border-color: rgba(42, 58, 86, 0.14);
+  background: #fbfaf6;
+}
+
+.el-dialog.tourism-form-dialog .el-upload--picture-card:hover {
+  border-color: var(--tourism-accent, #1f6a8f);
+  color: var(--tourism-accent, #1f6a8f);
+}
+
+.el-dialog.tourism-form-dialog .coord-display,
+.el-dialog.tourism-form-dialog .map-loading,
+.el-dialog.tourism-detail-dialog .empty-tip {
+  color: var(--tourism-muted, #66758c);
+}
+
+@media (max-width: 768px) {
+  .app-container.tourism-page,
+  .app-container.tourism-dashboard {
+    padding: 16px;
+  }
+
+  .tourism-page > .el-form {
+    border-radius: 16px;
+  }
+
+  .tourism-page .pagination-container {
+    justify-content: flex-start;
+    padding: 10px 8px !important;
+  }
+}
