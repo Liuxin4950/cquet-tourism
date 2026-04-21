@@ -43,6 +43,7 @@ public class tourismVenueController extends BaseController {
     private cn.edu.cquet.tourism.service.TourismActivityApprovalService approvalService;
 
     @GetMapping("/list")
+    @PreAuthorize("@ss.hasPermi('tourism:venue:list')")
     @Operation(summary = "获取场馆列表")
     /**
      * 列表查询
@@ -62,6 +63,7 @@ public class tourismVenueController extends BaseController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ss.hasPermi('tourism:venue:query')")
     @Operation(summary = "获取场馆信息")
     /**
      * 详情查询
@@ -138,6 +140,7 @@ public class tourismVenueController extends BaseController {
     }
 
     @GetMapping("/{id}/activities")
+    @PreAuthorize("@ss.hasPermi('tourism:venueActivity:list')")
     @Operation(summary = "查看当前场馆的特色活动列表")
     /**
      * 查询场馆下的特色活动列表
@@ -168,6 +171,7 @@ public class tourismVenueController extends BaseController {
 
 
     @GetMapping("/{id}/images")
+    @PreAuthorize("@ss.hasPermi('tourism:venue:image:list')")
     @Operation(summary = "查看当前场馆的关联图片列表")
     public Result venueImages(@PathVariable Long id) {
         if (id == null) return warn("场馆id不能为空");

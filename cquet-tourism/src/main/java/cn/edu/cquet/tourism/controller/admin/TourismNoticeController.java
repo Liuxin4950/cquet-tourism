@@ -29,6 +29,7 @@ public class TourismNoticeController extends BaseController {
     private TourismNoticeService noticeService;
 
     @GetMapping("/list")
+    @PreAuthorize("@ss.hasPermi('tourism:notice:list')")
     @Operation(summary = "获取通知公告列表（按标题与时间区间）")
     /**
      * 列表查询
@@ -42,6 +43,7 @@ public class TourismNoticeController extends BaseController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ss.hasPermi('tourism:notice:query')")
     @Operation(summary = "获取通知公告详情")
     /**
      * 详情查询

@@ -39,12 +39,13 @@ public class TourismScenicSpotController extends BaseController {
     private TourismScenicSpotService tourismScenicSpotService;
 
     @GetMapping("/list")
+    @PreAuthorize("@ss.hasPermi('tourism:scenicSpot:list')")
     @Operation(summary = "获取景区列表")
     /**
      * 列表查询
      *
      * 路径：`GET /tourism/scenic-spot/list`
-     * 权限：公开访问（用户端无需登录）
+     * 权限：`tourism:scenicSpot:list`
      * 入参：`TourismScenicSpotQueryVo`（名称、城市、等级、票价范围、状态等条件）
      * 返回：`TableDataInfo` 表格数据（包含分页总数与当前页数据）
      */
@@ -57,12 +58,13 @@ public class TourismScenicSpotController extends BaseController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ss.hasPermi('tourism:scenicSpot:query')")
     @Operation(summary = "获取景区信息")
     /**
      * 详情查询
      *
      * 路径：`GET /tourism/scenic-spot/{id}`
-     * 权限：公开访问（用户端无需登录）
+     * 权限：`tourism:scenicSpot:query`
      * 入参：路径参数 `id`
      * 返回：`Result` 包装的 `ScenicSpotDetailVo`，为空则返回警告"景区不存在"
      */
@@ -76,6 +78,7 @@ public class TourismScenicSpotController extends BaseController {
 
 
     @GetMapping("/{id}/images")
+    @PreAuthorize("@ss.hasPermi('tourism:scenicSpot:image:list')")
     @Operation(summary = "查看当前景区的关联图片列表")
     public Result spotImages(@PathVariable Long id) {
         if (id == null) return warn("景区id不能为空");

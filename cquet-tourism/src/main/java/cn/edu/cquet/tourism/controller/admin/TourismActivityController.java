@@ -34,6 +34,7 @@ public class TourismActivityController extends BaseController {
     private TourismActivityApprovalService approvalService;
 
     @GetMapping("/list")
+    @PreAuthorize("@ss.hasPermi('tourism:activity:list')")
     @Operation(summary = "活动列表（含审核状态筛选）")
     /**
      * 列表查询
@@ -53,6 +54,7 @@ public class TourismActivityController extends BaseController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ss.hasPermi('tourism:activity:query')")
     @Operation(summary = "活动详情")
     /**
      * 详情查询

@@ -32,6 +32,7 @@ public class TourismNewsController extends BaseController {
     private TourismNewsService tourismNewsService;
 
     @GetMapping("/list")
+    @PreAuthorize("@ss.hasPermi('tourism:news:list')")
     @Operation(summary = "获取新闻列表")
     /**
      * 列表查询
@@ -47,6 +48,7 @@ public class TourismNewsController extends BaseController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@ss.hasPermi('tourism:news:query')")
     @Operation(summary = "获取新闻信息")
     /**
      * 详情查询
