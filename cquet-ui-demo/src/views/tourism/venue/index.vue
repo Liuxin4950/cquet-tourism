@@ -237,7 +237,7 @@
     </el-dialog>
 
     <!-- 地图位置选择对话框 -->
-    <el-dialog title="在地图上选择位置" :visible.sync="mapPickerVisible" width="1000px" top="5vh" append-to-body :close-on-click-modal="false">
+    <el-dialog title="在地图上选择位置" :visible.sync="mapPickerVisible" width="1000px" top="5vh" append-to-body custom-class="tourism-form-dialog tourism-map-dialog" :close-on-click-modal="false">
       <map-location-picker
         v-if="mapPickerVisible"
         :longitude="form.longitude"

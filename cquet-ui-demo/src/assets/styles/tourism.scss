@@ -266,6 +266,12 @@
   box-shadow: 0 24px 70px rgba(25, 40, 64, 0.18);
 }
 
+.el-dialog.tourism-form-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+}
+
 .el-dialog.tourism-form-dialog .el-dialog__header,
 .el-dialog.tourism-detail-dialog .el-dialog__header {
   padding: 20px 24px 16px;
@@ -282,6 +288,25 @@
 .el-dialog.tourism-form-dialog .el-dialog__body,
 .el-dialog.tourism-detail-dialog .el-dialog__body {
   background: #fbfaf6;
+}
+
+.el-dialog.tourism-form-dialog .el-dialog__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.el-dialog.tourism-form-dialog .el-dialog__footer {
+  flex: 0 0 auto;
+  padding: 16px 24px 20px;
+  background: #fffdf8;
+  border-top: 1px solid rgba(42, 58, 86, 0.08);
+  box-shadow: 0 -8px 24px rgba(36, 54, 86, 0.06);
+}
+
+.el-dialog.tourism-form-dialog .dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .el-dialog.tourism-form-dialog .form-section {
@@ -307,6 +332,40 @@
 
 .el-dialog.tourism-form-dialog .section-title i {
   color: var(--tourism-warm, #b86b35);
+}
+
+.el-dialog.tourism-form-dialog .location-picker-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.el-dialog.tourism-form-dialog .location-picker-row .el-tag {
+  margin-right: 0 !important;
+}
+
+.el-dialog.tourism-form-dialog .location-picker-row .el-button--primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 18px;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--tourism-accent, #1f6a8f) 0%, #2f8f86 100%);
+  border-color: transparent;
+  box-shadow: 0 10px 22px rgba(31, 106, 143, 0.22);
+  opacity: 1;
+}
+
+.el-dialog.tourism-form-dialog .location-picker-row .el-button--primary:hover,
+.el-dialog.tourism-form-dialog .location-picker-row .el-button--primary:focus {
+  background: linear-gradient(135deg, #185b7a 0%, #28786f 100%);
+  box-shadow: 0 12px 24px rgba(24, 91, 122, 0.26);
+}
+
+.el-dialog.tourism-form-dialog .location-picker-row .el-button--primary i {
+  margin-right: 6px;
 }
 
 .el-dialog.tourism-detail-dialog .detail-card {
@@ -379,5 +438,17 @@
   .tourism-page .pagination-container {
     justify-content: flex-start;
     padding: 10px 8px !important;
+  }
+
+  .el-dialog.tourism-form-dialog {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px);
+  }
+
+  .el-dialog.tourism-form-dialog .el-dialog__header,
+  .el-dialog.tourism-form-dialog .el-dialog__body,
+  .el-dialog.tourism-form-dialog .el-dialog__footer {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }

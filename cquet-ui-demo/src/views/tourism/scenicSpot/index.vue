@@ -383,6 +383,7 @@
       width="1000px"
       top="5vh"
       append-to-body
+      custom-class="tourism-form-dialog tourism-map-dialog"
       :close-on-click-modal="false"
     >
       <map-location-picker
