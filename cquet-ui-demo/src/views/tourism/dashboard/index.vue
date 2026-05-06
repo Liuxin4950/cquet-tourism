@@ -564,35 +564,51 @@ export default {
         series: [
           {
             name: '景区',
-            type: 'effectScatter',
+            type: 'scatter',
             coordinateSystem: 'geo',
             zlevel: 3,
-            rippleEffect: {
-              scale: 2.2,
-              brushType: 'stroke'
-            },
             symbolSize: value => this.pointSymbolSize(value),
             itemStyle: {
-              color: '#b86b35',
-              shadowBlur: 8,
-              shadowColor: 'rgba(184, 107, 53, 0.28)'
+              color: 'rgba(196, 112, 58, 0.72)',
+              borderColor: 'rgba(255, 255, 255, 0.88)',
+              borderWidth: 1.2,
+              shadowBlur: 3,
+              shadowColor: 'rgba(105, 79, 58, 0.16)'
+            },
+            emphasis: {
+              scale: 1.5,
+              itemStyle: {
+                color: '#c4703a',
+                borderColor: '#ffffff',
+                borderWidth: 1.5,
+                shadowBlur: 8,
+                shadowColor: 'rgba(105, 79, 58, 0.24)'
+              }
             },
             data: scenicData
           },
           {
             name: '场馆',
-            type: 'effectScatter',
+            type: 'scatter',
             coordinateSystem: 'geo',
             zlevel: 3,
-            rippleEffect: {
-              scale: 2.2,
-              brushType: 'stroke'
-            },
             symbolSize: value => this.pointSymbolSize(value),
             itemStyle: {
-              color: '#1f6a8f',
-              shadowBlur: 8,
-              shadowColor: 'rgba(31, 106, 143, 0.28)'
+              color: 'rgba(74, 131, 157, 0.72)',
+              borderColor: 'rgba(255, 255, 255, 0.88)',
+              borderWidth: 1.2,
+              shadowBlur: 3,
+              shadowColor: 'rgba(56, 87, 112, 0.16)'
+            },
+            emphasis: {
+              scale: 1.5,
+              itemStyle: {
+                color: '#4a839d',
+                borderColor: '#ffffff',
+                borderWidth: 1.5,
+                shadowBlur: 8,
+                shadowColor: 'rgba(56, 87, 112, 0.24)'
+              }
             },
             data: venueData
           }
@@ -600,7 +616,7 @@ export default {
       }, true)
       this.pointMapChart.off('click')
       this.pointMapChart.on('click', params => {
-        if (params.seriesType === 'effectScatter' && params.data) {
+        if (params.seriesType === 'scatter' && params.data) {
           this.selectedMapPoint = params.data
         }
       })
@@ -624,7 +640,7 @@ export default {
     },
     pointSymbolSize(value) {
       const base = Number(value[2] || 0)
-      return Math.max(8, Math.min(base / 28 + 9, 15))
+      return Math.max(5, Math.min(base / 900 + 5, 9))
     },
     pointTypeLabel(point) {
       return point && point.type === 'venue' ? '场馆' : '景区'
