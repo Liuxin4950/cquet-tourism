@@ -309,6 +309,28 @@
   gap: 12px;
 }
 
+.el-dialog.tourism-map-dialog .dialog-footer .el-button {
+  min-width: 92px;
+  height: 36px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.el-dialog.tourism-map-dialog .dialog-footer .el-button--primary {
+  color: #ffffff !important;
+  border-color: var(--tourism-accent, #1f6a8f) !important;
+  background: var(--tourism-accent, #1f6a8f) !important;
+  box-shadow: 0 8px 18px rgba(31, 106, 143, 0.2);
+}
+
+.el-dialog.tourism-map-dialog .dialog-footer .el-button--primary:hover,
+.el-dialog.tourism-map-dialog .dialog-footer .el-button--primary:focus {
+  color: #ffffff !important;
+  border-color: #185b7a !important;
+  background: #185b7a !important;
+}
+
 .el-dialog.tourism-form-dialog .form-section {
   margin-bottom: 18px;
   padding: 18px;

@@ -1,7 +1,7 @@
 {
   "name": "cquet",
   "version": "1.0.0",
-  "description": "管理系统",
+  "description": "文旅管理系统",
   "author": "cquet",
   "license": "MIT",
   "scripts": {
